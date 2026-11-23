@@ -27,7 +27,7 @@ App personal para puntuar y reseñar los restaurantes visitados.
 | Datos y fotos | Firebase: Auth con cuentas de Google, Firestore y Storage. |
 | Alojamiento | GitHub Pages desde este repo, que es público. |
 | UI | La de la demo (`demo/index.html`), aprobada por el propietario. |
-| Compartir | De momento editan dos personas: el propietario y una más. El resto de invitados solo mira. |
+| Compartir | Sustituido el 23 de noviembre de 2026 por el cuaderno común: todos los invitados puntúan y solo los editores dan de alta (ver sección 3 y `docs/propuesta-cuaderno-comun.md`). |
 | Ámbito | También restaurantes de fuera de Mallorca. La localidad es texto libre y el campo sugiere las ya usadas, para evitar variantes del mismo sitio. |
 | Técnica | HTML, CSS y JavaScript sin framework ni paso de compilación. |
 | Orden de construcción | El de la sección 6. |
@@ -51,28 +51,11 @@ Los cuatro puntos que quedaban abiertos el 23 de noviembre (compartir, orden de 
 
 ### Cuaderno común con puntuaciones de varias personas
 
-Planteado por el propietario el 23 de noviembre de 2026. Cambia la idea de partida: en lugar de un cuaderno propio que otros miran, todos los invitados puntúan y todos ven las puntuaciones de los demás. Hay que aprobarlo antes del paso 2. Mientras tanto, las secciones 4 y 5 describen el diseño anterior.
+**Aprobado el 23 de noviembre de 2026.** Todos los invitados puntúan, todos ven las puntuaciones de los demás y cada uno elige de quién es la media que ve. El detalle (papeles, pantallas, modelo de datos, reglas y decisiones D1 a D5) está en `docs/propuesta-cuaderno-comun.md`. Donde ese documento choque con las secciones 1, 4 y 5 de esta especificación, manda ese documento.
 
-Idea:
+Pendiente:
 
-- Cada restaurante tiene una parte común (nombre, localidad, posición, tipos de cocina, precio) y una puntuación por persona (seis notas, plato estrella, reseña, fecha de visita y fotos).
-- Un selector común a mapa, lista y filtros decide quién cuenta en la media: todos, solo yo o personas elegidas. El pin, el color, el orden y el filtro de nota usan esa media.
-- La ficha muestra la media y, debajo, la puntuación de cada persona con su nombre.
-- Cada persona solo puede escribir su propia puntuación. Las medias se calculan en el dispositivo.
-
-Ya decidido:
-
-| Tema | Decisión |
-|---|---|
-| Quién entra | Solo invitados. Grupo privado. |
-| Altas y datos comunes | Solo una lista de editores. El resto del grupo solo añade su puntuación. |
-| Roseta | Dos líneas: la media de las personas seleccionadas y la del propio usuario. |
-
-Falta:
-
-- Redactar el modelo de datos, los permisos y los cambios de pantallas.
-- Diseñar las piezas nuevas de UI (selector de personas, puntuaciones por persona en la ficha, roseta con dos líneas) y enseñarlas al propietario antes de portarlas.
-- Solicitudes de acceso: propuesta de Claude, sin aprobar. Un invitado pide permiso para ver o para editar y el propietario lo aprueba o rechaza en la pantalla de accesos, con aviso dentro de la app (sin correo).
+- Antes del paso 3, Claude actualiza la demo con las piezas nuevas y el propietario la revisa.
 - Tamaño de las fotos: sigue la propuesta de la sección 5, sin acordar.
 
 ### Copias de seguridad
@@ -190,7 +173,7 @@ Confirmado por el propietario.
 1. **Preparación.** La hace el propietario con guía, unos 20 minutos: proyecto de Google con tarjeta y alerta de presupuesto, Firebase en región europea y clave del mapa restringida al dominio de GitHub Pages. El repo ya está creado.
 2. **Prueba técnica.** Login con Google en el iPhone con la app instalada, guardar y leer una ficha, subir una foto y cargar el mapa. Es el punto con más riesgo y va antes de portar nada.
 3. **Portar la demo.** Misma UI, con datos reales y mapa de Google.
-4. **Compartir.** Modo de solo lectura para invitados y una pantalla para gestionar los correos con acceso.
+4. **Compartir.** Papeles de propietario, editor y miembro, pantalla de accesos y solicitudes de acceso (ver `docs/propuesta-cuaderno-comun.md`).
 5. **Remate.** Icono e instalación en el iPhone, consulta sin cobertura de lo ya cargado y exportar una copia de seguridad.
 6. **Más adelante.** Buscador de Places.
 
