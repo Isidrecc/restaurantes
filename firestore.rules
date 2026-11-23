@@ -1,8 +1,8 @@
 rules_version = '2';
 
-// Reglas de Firestore de Puntuam a taula.
-// Papeles en members/{correo}: owner (propietario), editor y member (miembro).
-// Ver docs/propuesta-cuaderno-comun.md y docs/especificacion.md, sección 9.
+// Reglas de Firestore de Puntuam a taula (docs/diseno.md).
+// Papeles en members/{correo}: owner (propietario), editor y viewer (invitado que solo mira).
+// Puntúa quien es propietario o editor y tiene color (azul o rosa).
 
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -18,12 +18,16 @@ service cloud.firestore {
     function memberPath() {
       return /databases/$(database)/documents/members/$(myEmail());
     }
+    function member() {
+      return get(memberPath()).data;
+    }
     function hasRole(roles) {
-      return signedIn() && exists(memberPath()) && get(memberPath()).data.role in roles;
+      return signedIn() && exists(memberPath()) && member().role in roles;
     }
     function isOwner() { return hasRole(['owner']); }
     function isEditor() { return hasRole(['owner', 'editor']); }
-    function isMember() { return hasRole(['owner', 'editor', 'member']); }
+    function isMember() { return hasRole(['owner', 'editor', 'viewer']); }
+    function isRater() { return isEditor() && member().get('color', null) in ['azul', 'rosa']; }
 
     // ---------- Validación ----------
 
@@ -45,115 +49,88 @@ service cloud.firestore {
         && validScore(s.get('ambiente', null));
     }
     function validRestaurant(d) {
-      return d.keys().hasOnly(['name', 'locality', 'location', 'cuisines', 'price', 'placeId',
-                               'source', 'raters', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt'])
-        && d.keys().hasAll(['name', 'locality', 'location', 'cuisines', 'price', 'source',
-                            'raters', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt'])
+      return d.keys().hasOnly(['name', 'locality', 'location', 'cuisines', 'price', 'visitDate', 'blog',
+                               'photos', 'placeId', 'source', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt'])
+        && d.keys().hasAll(['name', 'locality', 'location', 'cuisines', 'price', 'visitDate', 'blog',
+                            'photos', 'source', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt'])
         && d.name is string && d.name.size() > 0 && d.name.size() <= 80
-        && d.locality is string && d.locality.size() <= 60
+        && d.locality is string && d.locality.size() > 0 && d.locality.size() <= 60
         && d.location is map && d.location.keys().hasOnly(['lat', 'lng'])
         && d.location.lat is number && d.location.lat >= -90 && d.location.lat <= 90
         && d.location.lng is number && d.location.lng >= -180 && d.location.lng <= 180
-        && d.cuisines is list && d.cuisines.size() >= 1 && d.cuisines.size() <= 10
+        && d.cuisines is list && d.cuisines.size() <= 10
         && d.price is int && d.price >= 1 && d.price <= 4
-        && d.source in ['manual', 'places']
+        && d.visitDate is string && d.visitDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && d.blog is string && d.blog.size() <= 20000
+        && d.photos is list && d.photos.size() <= 30
         && optString(d.get('placeId', null), 300)
-        && d.raters is list && d.raters.size() <= 200
-        && d.raters.toSet().size() == d.raters.size()
+        && d.source in ['manual', 'places']
         && d.updatedBy == request.auth.uid
         && d.updatedAt == request.time;
     }
     function validRating(d) {
-      return d.keys().hasOnly(['scores', 'global', 'dish', 'review', 'visitDate', 'photos',
-                               'createdAt', 'updatedAt'])
-        && d.keys().hasAll(['scores', 'visitDate', 'photos', 'createdAt', 'updatedAt'])
+      return d.keys().hasOnly(['scores', 'global', 'dish', 'updatedAt'])
+        && d.keys().hasAll(['scores', 'updatedAt'])
         && validScores(d.scores)
         && (d.get('global', null) == null || (d.global is number && d.global >= 1 && d.global <= 10))
         && optString(d.get('dish', null), 80)
-        && optString(d.get('review', null), 2000)
-        && d.visitDate is string && d.visitDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
-        && d.photos is list && d.photos.size() <= 12
         && d.updatedAt == request.time;
     }
 
     // ---------- Colecciones ----------
 
-    // Papel de cada persona. El documento se llama como su correo en minúsculas.
+    // Papel y color de cada persona. El documento se llama como su correo en minúsculas.
     match /members/{email} {
       allow read: if signedIn() && (email == myEmail() || isOwner());
       allow write: if isOwner();
     }
 
-    // Nombre visible de cada persona. Sin correo, para que los miembros no lo vean.
+    // Nombre visible y color (copia del de members, para que los invitados vean quién es quién).
     match /users/{uid} {
       allow read: if isMember();
       allow create, update: if isMember() && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['displayName', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['displayName', 'color', 'updatedAt'])
         && request.resource.data.displayName is string
         && request.resource.data.displayName.size() >= 1
         && request.resource.data.displayName.size() <= 30
+        && request.resource.data.get('color', null) == member().get('color', null)
         && request.resource.data.updatedAt == request.time;
       allow delete: if isOwner();
     }
 
     match /restaurants/{rid} {
-      // Un miembro solo puede añadir o quitar su propio uid de la lista de quienes han puntuado.
-      function onlyMyRaterChange() {
-        let changed = request.resource.data.diff(resource.data).affectedKeys();
-        let after = request.resource.data.raters;
-        let me = [request.auth.uid].toSet();
-        return changed.hasOnly(['raters'])
-          && after is list
-          && after.toSet().size() == after.size()
-          && (after.toSet() == resource.data.raters.toSet().union(me)
-              || after.toSet() == resource.data.raters.toSet().difference(me));
-      }
-      function keepsAuthorship() {
-        return request.resource.data.createdBy == resource.data.createdBy
-          && request.resource.data.createdAt == resource.data.createdAt;
-      }
-
       allow read: if isMember();
       allow create: if isEditor()
         && validRestaurant(request.resource.data)
         && request.resource.data.createdBy == request.auth.uid
-        && request.resource.data.createdAt == request.time
-        && request.resource.data.raters.toSet().difference([request.auth.uid].toSet()).size() == 0;
-      allow update: if (isOwner() && validRestaurant(request.resource.data) && keepsAuthorship())
-        || (isEditor() && validRestaurant(request.resource.data) && keepsAuthorship()
-            && request.resource.data.raters == resource.data.raters)
-        || (isMember() && onlyMyRaterChange());
-      // D2: el propietario siempre; un editor solo si nadie más ha puntuado.
-      allow delete: if isOwner()
-        || (isEditor() && resource.data.raters.toSet().difference([request.auth.uid].toSet()).size() == 0);
+        && request.resource.data.createdAt == request.time;
+      allow update: if isEditor()
+        && validRestaurant(request.resource.data)
+        && request.resource.data.createdBy == resource.data.createdBy
+        && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if isOwner();
 
+      // Nota de cada persona que puntúa: solo la escribe ella.
       match /ratings/{uid} {
-        function inRaters() {
-          return request.auth.uid in
-            getAfter(/databases/$(database)/documents/restaurants/$(rid)).data.raters;
-        }
         allow read: if isMember();
-        allow create: if isMember() && request.auth.uid == uid
-          && validRating(request.resource.data)
-          && request.resource.data.createdAt == request.time
-          && inRaters();
-        allow update: if isMember() && request.auth.uid == uid
-          && validRating(request.resource.data)
-          && request.resource.data.createdAt == resource.data.createdAt
-          && inRaters();
-        allow delete: if (isMember() && request.auth.uid == uid) || isOwner();
+        allow create, update: if isRater() && request.auth.uid == uid && validRating(request.resource.data);
+        allow delete: if (isRater() && request.auth.uid == uid) || isOwner();
       }
     }
 
-    // Solicitudes de acceso o de ser editor. Las resuelve el propietario.
+    // Lectura de todas las notas de una vez (consulta de grupo de colecciones).
+    match /{path=**}/ratings/{uid} {
+      allow read: if isMember();
+    }
+
+    // Solicitudes de acceso. Las resuelven los propietarios.
     match /accessRequests/{uid} {
       allow read: if signedIn() && (request.auth.uid == uid || isOwner());
       allow create: if signedIn() && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['email', 'displayName', 'type', 'status', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['email', 'displayName', 'status', 'createdAt'])
         && request.resource.data.email == myEmail()
         && request.resource.data.displayName is string
         && request.resource.data.displayName.size() <= 60
-        && request.resource.data.type in ['access', 'editor']
         && request.resource.data.status == 'pending'
         && request.resource.data.createdAt == request.time;
       allow update, delete: if isOwner();
