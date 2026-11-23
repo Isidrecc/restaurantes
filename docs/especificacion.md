@@ -27,7 +27,7 @@ App personal para puntuar y reseñar los restaurantes visitados.
 | Datos y fotos | Firebase: Auth con cuentas de Google, Firestore y Storage. |
 | Alojamiento | GitHub Pages desde este repo, que es público. |
 | UI | La de la demo (`demo/index.html`), aprobada por el propietario. |
-| Compartir | Sustituido el 23 de noviembre de 2026 por el cuaderno común: todos los invitados puntúan y solo los editores dan de alta (ver sección 3 y `docs/propuesta-cuaderno-comun.md`). |
+| Compartir | Puntúan dos personas (azul y rosa); el resto de invitados solo mira. Ver `docs/diseno.md`. |
 | Ámbito | También restaurantes de fuera de Mallorca. La localidad es texto libre y el campo sugiere las ya usadas, para evitar variantes del mismo sitio. |
 | Técnica | HTML, CSS y JavaScript sin framework ni paso de compilación. |
 | Orden de construcción | El de la sección 6. |
@@ -49,14 +49,9 @@ App personal para puntuar y reseñar los restaurantes visitados.
 
 Los cuatro puntos que quedaban abiertos el 23 de noviembre (compartir, orden de construcción, técnica y restaurantes de fuera de Mallorca) los confirmó el propietario y están en la sección 2.
 
-### Cuaderno común con puntuaciones de varias personas
+### Diseño de puntuaciones
 
-**Aprobado el 23 de noviembre de 2026.** Todos los invitados puntúan, todos ven las puntuaciones de los demás y cada uno elige de quién es la media que ve. El detalle (papeles, pantallas, modelo de datos, reglas y decisiones D1 a D5) está en `docs/propuesta-cuaderno-comun.md`. Donde ese documento choque con las secciones 1, 4 y 5 de esta especificación, manda ese documento.
-
-Pendiente:
-
-- Antes del paso 3, Claude actualiza la demo con las piezas nuevas y el propietario la revisa.
-- Tamaño de las fotos: cerrado con la prueba técnica (sección 8).
+El 23 de noviembre de 2026 se aprobó primero un «cuaderno común» en el que puntuaba todo el grupo y, al revisar la demo, se sustituyó por el diseño vigente: `docs/diseno.md`. Puntúan dos personas, cada una en su color; los demás invitados miran. Donde `docs/diseno.md` choque con esta especificación, manda `docs/diseno.md`.
 
 ### Copias de seguridad
 
@@ -173,7 +168,7 @@ Confirmado por el propietario.
 1. **Preparación.** La hace el propietario con guía, unos 20 minutos: proyecto de Google con tarjeta y alerta de presupuesto, Firebase en región europea y clave del mapa restringida al dominio de GitHub Pages. El repo ya está creado.
 2. **Prueba técnica.** Login con Google en el iPhone con la app instalada, guardar y leer una ficha, subir una foto y cargar el mapa. Es el punto con más riesgo y va antes de portar nada.
 3. **Portar la demo.** Misma UI, con datos reales y mapa de Google.
-4. **Compartir.** Papeles de propietario, editor y miembro, pantalla de accesos y solicitudes de acceso (ver `docs/propuesta-cuaderno-comun.md`).
+4. **Compartir.** Pantalla de accesos (propietarios, editores e invitados que solo miran, con el color de quien puntúa) y solicitudes de acceso (ver `docs/diseno.md`).
 5. **Remate.** Icono e instalación en el iPhone, consulta sin cobertura de lo ya cargado y exportar una copia de seguridad.
 6. **Más adelante.** Buscador de Places.
 

@@ -7,14 +7,15 @@ App web personal para puntuar y reseñar restaurantes: mapa, lista con filtros y
 - La fase de diseño se cerró en una conversación previa (21 a 23 de noviembre de 2026). La app real todavía no existe: este repo contiene solo la especificación y la demo de UI.
 - Nombre de la app: «Puntuam a taula».
 - Pasos 1 y 2 terminados el 23 de noviembre de 2026. Resultados de la prueba técnica en `docs/especificacion.md`, sección 8.
-- Aprobado el cuaderno común con puntuaciones de varias personas: `docs/propuesta-cuaderno-comun.md`. Antes del paso 3 hay que actualizar la demo con sus piezas nuevas y que el propietario la apruebe.
+- Diseño vigente en `docs/diseno.md` (23 de noviembre de 2026): solo puntúan dos personas (azul y rosa), los demás invitados miran; texto largo y fotos con pie por restaurante. Sustituye al «cuaderno común». La demo no se actualiza: los cambios van directos a la app real, y el propietario quiere ajustar detalles al verla terminada.
+- Siguiente: paso 3, portar la demo a la app real.
 - La seguridad está en la sección 9 de la especificación.
 
 ## Qué leer antes de tocar nada
 
 1. `docs/especificacion.md`: decisiones tomadas, pendientes de confirmar, pantallas, modelo de datos, orden de construcción y condiciones de Google.
-2. `docs/propuesta-cuaderno-comun.md`: cambio aprobado que manda sobre partes de la especificación.
-3. `demo/index.html`: prototipo aprobado. Es la referencia exacta de pantallas, textos y comportamiento. Se abre directamente en un navegador.
+2. `docs/diseno.md`: diseño vigente, que manda sobre partes de la especificación y de la demo.
+3. `demo/index.html`: prototipo aprobado. Es la referencia de estilo, textos y comportamiento, salvo lo que cambia `docs/diseno.md`. Se abre directamente en un navegador.
 
 ## Cómo trabajar con el propietario
 
