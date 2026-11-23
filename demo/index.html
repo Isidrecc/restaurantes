@@ -1,0 +1,2040 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo cuaderno de restaurantes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=Instrument+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-tile-container,
+.leaflet-pane > svg,
+.leaflet-pane > canvas,
+.leaflet-zoom-box,
+.leaflet-image-layer,
+.leaflet-layer {
+	position: absolute;
+	left: 0;
+	top: 0;
+	}
+.leaflet-container {
+	overflow: hidden;
+	}
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	        user-select: none;
+	  -webkit-user-drag: none;
+	}
+
+.leaflet-tile::selection {
+	background: transparent;
+}
+
+.leaflet-safari .leaflet-tile {
+	image-rendering: -webkit-optimize-contrast;
+	}
+
+.leaflet-safari .leaflet-tile-container {
+	width: 1600px;
+	height: 1600px;
+	-webkit-transform-origin: 0 0;
+	}
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	display: block;
+	}
+
+
+.leaflet-container .leaflet-overlay-pane svg {
+	max-width: none !important;
+	max-height: none !important;
+	}
+.leaflet-container .leaflet-marker-pane img,
+.leaflet-container .leaflet-shadow-pane img,
+.leaflet-container .leaflet-tile-pane img,
+.leaflet-container img.leaflet-image-layer,
+.leaflet-container .leaflet-tile {
+	max-width: none !important;
+	max-height: none !important;
+	width: auto;
+	padding: 0;
+	}
+
+.leaflet-container img.leaflet-tile {
+	
+	mix-blend-mode: plus-lighter;
+}
+
+.leaflet-container.leaflet-touch-zoom {
+	-ms-touch-action: pan-x pan-y;
+	touch-action: pan-x pan-y;
+	}
+.leaflet-container.leaflet-touch-drag {
+	-ms-touch-action: pinch-zoom;
+	
+	touch-action: none;
+	touch-action: pinch-zoom;
+}
+.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.leaflet-container {
+	-webkit-tap-highlight-color: transparent;
+}
+.leaflet-container a {
+	-webkit-tap-highlight-color: rgba(51, 181, 229, 0.4);
+}
+.leaflet-tile {
+	filter: inherit;
+	visibility: hidden;
+	}
+.leaflet-tile-loaded {
+	visibility: inherit;
+	}
+.leaflet-zoom-box {
+	width: 0;
+	height: 0;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	z-index: 800;
+	}
+
+.leaflet-overlay-pane svg {
+	-moz-user-select: none;
+	}
+
+.leaflet-pane         { z-index: 400; }
+
+.leaflet-tile-pane    { z-index: 200; }
+.leaflet-overlay-pane { z-index: 400; }
+.leaflet-shadow-pane  { z-index: 500; }
+.leaflet-marker-pane  { z-index: 600; }
+.leaflet-tooltip-pane   { z-index: 650; }
+.leaflet-popup-pane   { z-index: 700; }
+
+.leaflet-map-pane canvas { z-index: 100; }
+.leaflet-map-pane svg    { z-index: 200; }
+
+.leaflet-vml-shape {
+	width: 1px;
+	height: 1px;
+	}
+
+
+
+
+.leaflet-control {
+	position: relative;
+	z-index: 800;
+	pointer-events: visiblePainted; 
+	pointer-events: auto;
+	}
+.leaflet-top,
+.leaflet-bottom {
+	position: absolute;
+	z-index: 1000;
+	pointer-events: none;
+	}
+.leaflet-top {
+	top: 0;
+	}
+.leaflet-right {
+	right: 0;
+	}
+.leaflet-bottom {
+	bottom: 0;
+	}
+.leaflet-left {
+	left: 0;
+	}
+.leaflet-control {
+	float: left;
+	clear: both;
+	}
+.leaflet-right .leaflet-control {
+	float: right;
+	}
+.leaflet-top .leaflet-control {
+	margin-top: 10px;
+	}
+.leaflet-bottom .leaflet-control {
+	margin-bottom: 10px;
+	}
+.leaflet-left .leaflet-control {
+	margin-left: 10px;
+	}
+.leaflet-right .leaflet-control {
+	margin-right: 10px;
+	}
+
+
+
+
+.leaflet-fade-anim .leaflet-popup {
+	opacity: 0;
+	-webkit-transition: opacity 0.2s linear;
+	   -moz-transition: opacity 0.2s linear;
+	        transition: opacity 0.2s linear;
+	}
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup {
+	opacity: 1;
+	}
+.leaflet-zoom-animated {
+	-webkit-transform-origin: 0 0;
+	    -ms-transform-origin: 0 0;
+	        transform-origin: 0 0;
+	}
+svg.leaflet-zoom-animated {
+	will-change: transform;
+}
+
+.leaflet-zoom-anim .leaflet-zoom-animated {
+	-webkit-transition: -webkit-transform 0.25s cubic-bezier(0,0,0.25,1);
+	   -moz-transition:    -moz-transform 0.25s cubic-bezier(0,0,0.25,1);
+	        transition:         transform 0.25s cubic-bezier(0,0,0.25,1);
+	}
+.leaflet-zoom-anim .leaflet-tile,
+.leaflet-pan-anim .leaflet-tile {
+	-webkit-transition: none;
+	   -moz-transition: none;
+	        transition: none;
+	}
+
+.leaflet-zoom-anim .leaflet-zoom-hide {
+	visibility: hidden;
+	}
+
+
+
+
+.leaflet-interactive {
+	cursor: pointer;
+	}
+.leaflet-grab {
+	cursor: -webkit-grab;
+	cursor:    -moz-grab;
+	cursor:         grab;
+	}
+.leaflet-crosshair,
+.leaflet-crosshair .leaflet-interactive {
+	cursor: crosshair;
+	}
+.leaflet-popup-pane,
+.leaflet-control {
+	cursor: auto;
+	}
+.leaflet-dragging .leaflet-grab,
+.leaflet-dragging .leaflet-grab .leaflet-interactive,
+.leaflet-dragging .leaflet-marker-draggable {
+	cursor: move;
+	cursor: -webkit-grabbing;
+	cursor:    -moz-grabbing;
+	cursor:         grabbing;
+	}
+
+
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-image-layer,
+.leaflet-pane > svg path,
+.leaflet-tile-container {
+	pointer-events: none;
+	}
+
+.leaflet-marker-icon.leaflet-interactive,
+.leaflet-image-layer.leaflet-interactive,
+.leaflet-pane > svg path.leaflet-interactive,
+svg.leaflet-image-layer.leaflet-interactive path {
+	pointer-events: visiblePainted; 
+	pointer-events: auto;
+	}
+
+
+
+.leaflet-container {
+	background: #ddd;
+	outline-offset: 1px;
+	}
+.leaflet-container a {
+	color: #0078A8;
+	}
+.leaflet-zoom-box {
+	border: 2px dotted #38f;
+	background: rgba(255,255,255,0.5);
+	}
+
+
+
+.leaflet-container {
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	}
+
+
+
+
+.leaflet-bar {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+	border-radius: 4px;
+	}
+.leaflet-bar a {
+	background-color: #fff;
+	border-bottom: 1px solid #ccc;
+	width: 26px;
+	height: 26px;
+	line-height: 26px;
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	color: black;
+	}
+.leaflet-bar a,
+.leaflet-control-layers-toggle {
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	display: block;
+	}
+.leaflet-bar a:hover,
+.leaflet-bar a:focus {
+	background-color: #f4f4f4;
+	}
+.leaflet-bar a:first-child {
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	}
+.leaflet-bar a:last-child {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	border-bottom: none;
+	}
+.leaflet-bar a.leaflet-disabled {
+	cursor: default;
+	background-color: #f4f4f4;
+	color: #bbb;
+	}
+
+.leaflet-touch .leaflet-bar a {
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	}
+.leaflet-touch .leaflet-bar a:first-child {
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+	}
+.leaflet-touch .leaflet-bar a:last-child {
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
+	}
+
+
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+	font: bold 18px 'Lucida Console', Monaco, monospace;
+	text-indent: 1px;
+	}
+
+.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out  {
+	font-size: 22px;
+	}
+
+
+
+
+.leaflet-control-layers {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+	background: #fff;
+	border-radius: 5px;
+	}
+.leaflet-touch .leaflet-control-layers-toggle {
+	width: 44px;
+	height: 44px;
+	}
+.leaflet-control-layers .leaflet-control-layers-list,
+.leaflet-control-layers-expanded .leaflet-control-layers-toggle {
+	display: none;
+	}
+.leaflet-control-layers-expanded .leaflet-control-layers-list {
+	display: block;
+	position: relative;
+	}
+.leaflet-control-layers-expanded {
+	padding: 6px 10px 6px 6px;
+	color: #333;
+	background: #fff;
+	}
+.leaflet-control-layers-scrollbar {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding-right: 5px;
+	}
+.leaflet-control-layers-selector {
+	margin-top: 2px;
+	position: relative;
+	top: 1px;
+	}
+.leaflet-control-layers label {
+	display: block;
+	font-size: 13px;
+	font-size: 1.08333em;
+	}
+.leaflet-control-layers-separator {
+	height: 0;
+	border-top: 1px solid #ddd;
+	margin: 5px -10px 5px -6px;
+	}
+
+
+
+
+.leaflet-container .leaflet-control-attribution {
+	background: #fff;
+	background: rgba(255, 255, 255, 0.8);
+	margin: 0;
+	}
+.leaflet-control-attribution,
+.leaflet-control-scale-line {
+	padding: 0 5px;
+	color: #333;
+	line-height: 1.4;
+	}
+.leaflet-control-attribution a {
+	text-decoration: none;
+	}
+.leaflet-control-attribution a:hover,
+.leaflet-control-attribution a:focus {
+	text-decoration: underline;
+	}
+.leaflet-attribution-flag {
+	display: inline !important;
+	vertical-align: baseline !important;
+	width: 1em;
+	height: 0.6669em;
+	}
+.leaflet-left .leaflet-control-scale {
+	margin-left: 5px;
+	}
+.leaflet-bottom .leaflet-control-scale {
+	margin-bottom: 5px;
+	}
+.leaflet-control-scale-line {
+	border: 2px solid #777;
+	border-top: none;
+	line-height: 1.1;
+	padding: 2px 5px 1px;
+	white-space: nowrap;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	background: rgba(255, 255, 255, 0.8);
+	text-shadow: 1px 1px #fff;
+	}
+.leaflet-control-scale-line:not(:first-child) {
+	border-top: 2px solid #777;
+	border-bottom: none;
+	margin-top: -2px;
+	}
+.leaflet-control-scale-line:not(:first-child):not(:last-child) {
+	border-bottom: 2px solid #777;
+	}
+
+.leaflet-touch .leaflet-control-attribution,
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	box-shadow: none;
+	}
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	border: 2px solid rgba(0,0,0,0.2);
+	background-clip: padding-box;
+	}
+
+
+
+
+.leaflet-popup {
+	position: absolute;
+	text-align: center;
+	margin-bottom: 20px;
+	}
+.leaflet-popup-content-wrapper {
+	padding: 1px;
+	text-align: left;
+	border-radius: 12px;
+	}
+.leaflet-popup-content {
+	margin: 13px 24px 13px 20px;
+	line-height: 1.3;
+	font-size: 13px;
+	font-size: 1.08333em;
+	min-height: 1px;
+	}
+.leaflet-popup-content p {
+	margin: 17px 0;
+	margin: 1.3em 0;
+	}
+.leaflet-popup-tip-container {
+	width: 40px;
+	height: 20px;
+	position: absolute;
+	left: 50%;
+	margin-top: -1px;
+	margin-left: -20px;
+	overflow: hidden;
+	pointer-events: none;
+	}
+.leaflet-popup-tip {
+	width: 17px;
+	height: 17px;
+	padding: 1px;
+
+	margin: -10px auto 0;
+	pointer-events: auto;
+
+	-webkit-transform: rotate(45deg);
+	   -moz-transform: rotate(45deg);
+	    -ms-transform: rotate(45deg);
+	        transform: rotate(45deg);
+	}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+	background: white;
+	color: #333;
+	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+	}
+.leaflet-container a.leaflet-popup-close-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: none;
+	text-align: center;
+	width: 24px;
+	height: 24px;
+	font: 16px/24px Tahoma, Verdana, sans-serif;
+	color: #757575;
+	text-decoration: none;
+	background: transparent;
+	}
+.leaflet-container a.leaflet-popup-close-button:hover,
+.leaflet-container a.leaflet-popup-close-button:focus {
+	color: #585858;
+	}
+.leaflet-popup-scrolled {
+	overflow: auto;
+	}
+
+.leaflet-oldie .leaflet-popup-content-wrapper {
+	-ms-zoom: 1;
+	}
+.leaflet-oldie .leaflet-popup-tip {
+	width: 24px;
+	margin: 0 auto;
+
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)";
+	filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678);
+	}
+
+.leaflet-oldie .leaflet-control-zoom,
+.leaflet-oldie .leaflet-control-layers,
+.leaflet-oldie .leaflet-popup-content-wrapper,
+.leaflet-oldie .leaflet-popup-tip {
+	border: 1px solid #999;
+	}
+
+
+
+
+.leaflet-div-icon {
+	background: #fff;
+	border: 1px solid #666;
+	}
+
+
+
+
+.leaflet-tooltip {
+	position: absolute;
+	padding: 6px;
+	background-color: #fff;
+	border: 1px solid #fff;
+	border-radius: 3px;
+	color: #222;
+	white-space: nowrap;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+	}
+.leaflet-tooltip.leaflet-interactive {
+	cursor: pointer;
+	pointer-events: auto;
+	}
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	position: absolute;
+	pointer-events: none;
+	border: 6px solid transparent;
+	background: transparent;
+	content: "";
+	}
+
+
+
+.leaflet-tooltip-bottom {
+	margin-top: 6px;
+}
+.leaflet-tooltip-top {
+	margin-top: -6px;
+}
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-top:before {
+	left: 50%;
+	margin-left: -6px;
+	}
+.leaflet-tooltip-top:before {
+	bottom: 0;
+	margin-bottom: -12px;
+	border-top-color: #fff;
+	}
+.leaflet-tooltip-bottom:before {
+	top: 0;
+	margin-top: -12px;
+	margin-left: -6px;
+	border-bottom-color: #fff;
+	}
+.leaflet-tooltip-left {
+	margin-left: -6px;
+}
+.leaflet-tooltip-right {
+	margin-left: 6px;
+}
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	top: 50%;
+	margin-top: -6px;
+	}
+.leaflet-tooltip-left:before {
+	right: 0;
+	margin-right: -12px;
+	border-left-color: #fff;
+	}
+.leaflet-tooltip-right:before {
+	left: 0;
+	margin-left: -12px;
+	border-right-color: #fff;
+	}
+
+
+
+@media print {
+	
+	.leaflet-control {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+		}
+	}
+.leaflet-cluster-anim .leaflet-marker-icon, .leaflet-cluster-anim .leaflet-marker-shadow {
+	-webkit-transition: -webkit-transform 0.3s ease-out, opacity 0.3s ease-in;
+	-moz-transition: -moz-transform 0.3s ease-out, opacity 0.3s ease-in;
+	-o-transition: -o-transform 0.3s ease-out, opacity 0.3s ease-in;
+	transition: transform 0.3s ease-out, opacity 0.3s ease-in;
+}
+
+.leaflet-cluster-spider-leg {
+	
+	-webkit-transition: -webkit-stroke-dashoffset 0.3s ease-out, -webkit-stroke-opacity 0.3s ease-in;
+	-moz-transition: -moz-stroke-dashoffset 0.3s ease-out, -moz-stroke-opacity 0.3s ease-in;
+	-o-transition: -o-stroke-dashoffset 0.3s ease-out, -o-stroke-opacity 0.3s ease-in;
+	transition: stroke-dashoffset 0.3s ease-out, stroke-opacity 0.3s ease-in;
+}
+</style>
+<style>
+/* Layout idea: one-screen phone app. Compact bar, shared filter row, full-bleed view, bottom tabs.
+   Palette borrows from a nautical chart: ink navy, sea grey-blue, sand land. Colour is reserved for scores. */
+:root {
+  --bg: #eef1f3;
+  --surface: #ffffff;
+  --surface-2: #f3f6f8;
+  --ink: #14212b;
+  --muted: #5a6a77;
+  --line: #d3dbe2;
+  --accent: #17456b;
+  --accent-ink: #ffffff;
+  --sea: #cfdde6;
+  --land: #f6f3ea;
+  --land-line: #c7c0ae;
+  --road: #dcc59c;
+  --s5: #17775a;
+  --s4: #4f8420;
+  --s3: #8f6c00;
+  --s2: #c2601a;
+  --s1: #b3303a;
+  --s0: #7b8894;
+  --score-ink: #ffffff;
+  --shadow: 0 6px 24px rgba(20, 33, 43, .16);
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e161c;
+    --surface: #17212a;
+    --surface-2: #1e2a34;
+    --ink: #e7edf1;
+    --muted: #94a4b1;
+    --line: #2b3945;
+    --accent: #86bce6;
+    --accent-ink: #0b1a26;
+    --sea: #0f2130;
+    --land: #27333b;
+    --land-line: #41505b;
+    --road: #5a6168;
+    --s5: #37b383;
+    --s4: #86bb42;
+    --s3: #d6ab2a;
+    --s2: #ea9045;
+    --s1: #ea6570;
+    --s0: #7f8d99;
+    --score-ink: #0b1418;
+    --shadow: 0 6px 24px rgba(0, 0, 0, .5);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e161c;
+  --surface: #17212a;
+  --surface-2: #1e2a34;
+  --ink: #e7edf1;
+  --muted: #94a4b1;
+  --line: #2b3945;
+  --accent: #86bce6;
+  --accent-ink: #0b1a26;
+  --sea: #0f2130;
+  --land: #27333b;
+  --land-line: #41505b;
+  --road: #5a6168;
+  --s5: #37b383;
+  --s4: #86bb42;
+  --s3: #d6ab2a;
+  --s2: #ea9045;
+  --s1: #ea6570;
+  --s0: #7f8d99;
+  --score-ink: #0b1418;
+  --shadow: 0 6px 24px rgba(0, 0, 0, .5);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 15px/1.45 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; }
+.num { font-family: var(--font-display); font-variant-numeric: tabular-nums; }
+
+#app {
+  position: relative;
+  height: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+/* Top bar */
+.bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 16px 8px;
+  background: var(--surface);
+}
+.brand { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.brand-name { font: 700 18px/1.2 var(--font-display); letter-spacing: -.01em; }
+.tag {
+  display: inline-block; padding: 1px 7px; border-radius: 999px;
+  font: 600 11px/1.5 var(--font-body); letter-spacing: .04em; text-transform: uppercase;
+  color: var(--muted); border: 1px solid var(--line); white-space: nowrap;
+}
+
+/* Shared tools */
+.tools {
+  display: flex; gap: 8px; align-items: center;
+  padding: 0 16px 10px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.search {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
+  height: 40px; padding: 0 12px; border-radius: 10px;
+  background: var(--surface-2); border: 1px solid var(--line);
+}
+.search svg { flex: none; color: var(--muted); }
+.search input { -webkit-appearance: none; appearance: none; flex: 1; min-width: 0; border: 0; background: transparent; outline: 0; font-size: 16px; }
+.search:focus-within { border-color: var(--accent); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 40px; padding: 0 14px; border-radius: 10px;
+  background: var(--surface); border: 1px solid var(--line);
+  font-weight: 600; font-size: 14px; white-space: nowrap;
+}
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn-danger { color: var(--s1); }
+.btn-block { width: 100%; }
+.badge {
+  min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
+  background: var(--accent); color: var(--accent-ink);
+  font: 700 11px/18px var(--font-body); text-align: center;
+}
+.active-chips {
+  display: flex; gap: 6px; padding: 8px 16px; overflow-x: auto;
+  background: var(--surface); border-bottom: 1px solid var(--line);
+  scrollbar-width: none;
+}
+.active-chips::-webkit-scrollbar { display: none; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; flex: none;
+  min-height: 32px; padding: 0 12px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--line);
+  font-size: 13px; font-weight: 500; white-space: nowrap;
+}
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.chip-x { background: var(--surface-2); }
+.chip-x svg { color: var(--muted); }
+.chip-clear { border-style: dashed; color: var(--muted); }
+
+/* Views */
+#views { position: relative; flex: 1; min-height: 0; }
+.view { position: absolute; inset: 0; display: none; }
+.view.is-active { display: block; }
+
+/* Map */
+#map, #pick-map { background: var(--sea); font-family: var(--font-body); }
+#map { position: absolute; inset: 0; }
+.leaflet-container { background: var(--sea); outline-offset: -2px; z-index: 0; }
+.muni { fill: var(--land); fill-opacity: 1; stroke: var(--land-line); stroke-width: 1; }
+.road { fill: none; stroke: var(--road); stroke-linecap: round; stroke-linejoin: round; }
+.road.r1 { stroke-width: 2.4; }
+.road.r2 { stroke-width: 1.5; }
+.muni-label { pointer-events: none; }
+.muni-label span {
+  position: absolute; transform: translate(-50%, -50%); white-space: nowrap;
+  font: 500 11px/1 var(--font-body); color: var(--muted); letter-spacing: .01em;
+  text-shadow: 0 0 3px var(--land), 0 0 3px var(--land), 0 0 3px var(--land);
+}
+.muni-label.t2 { display: none; }
+.z-all .muni-label.t2 { display: block; }
+.leaflet-bar a, .leaflet-bar a:hover {
+  background: var(--surface); color: var(--ink); border-bottom-color: var(--line);
+  width: 36px; height: 36px; line-height: 36px;
+}
+.leaflet-bar { border: 1px solid var(--line) !important; box-shadow: none !important; }
+.leaflet-control-attribution {
+  background: color-mix(in srgb, var(--surface) 80%, transparent) !important;
+  color: var(--muted) !important; font-size: 10px;
+}
+.pin-wrap { background: none; border: 0; }
+.pin {
+  width: 38px; height: 38px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+  background: var(--c, var(--s0)); border: 2px solid var(--surface);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .35);
+  display: grid; place-items: center;
+}
+.pin span { transform: rotate(45deg); font: 700 13px/1 var(--font-display); color: var(--score-ink); font-variant-numeric: tabular-nums; }
+.pin.is-selected { box-shadow: 0 0 0 3px var(--ink), 0 2px 8px rgba(0, 0, 0, .4); }
+.pin.pin-new { --c: var(--accent); }
+.cluster {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--accent); color: var(--accent-ink); border: 2px solid var(--surface);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 28%, transparent), 0 2px 6px rgba(0, 0, 0, .35);
+  display: grid; place-items: center;
+  font: 700 15px/1 var(--font-display); font-variant-numeric: tabular-nums;
+}
+.map-error { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--muted); }
+.s5 { --c: var(--s5); } .s4 { --c: var(--s4); } .s3 { --c: var(--s3); } .s2 { --c: var(--s2); } .s1 { --c: var(--s1); } .s0 { --c: var(--s0); }
+
+.map-chip {
+  position: absolute; z-index: 500; left: 12px; top: 12px;
+  padding: 6px 10px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--line);
+  font-size: 13px; font-weight: 600;
+}
+.legend {
+  position: absolute; z-index: 500; left: 12px; bottom: 26px;
+  display: flex; gap: 10px; align-items: center;
+  padding: 6px 10px; border-radius: 10px;
+  background: var(--surface); border: 1px solid var(--line);
+  font-size: 11px; color: var(--muted);
+}
+.legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--c); margin-right: 4px; }
+.preview {
+  position: absolute; z-index: 600; left: 12px; right: 12px; bottom: 12px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: var(--shadow); padding: 12px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.preview-actions { display: flex; gap: 8px; }
+.preview-actions .btn { flex: 1; }
+
+/* Score tile */
+.score {
+  flex: none; width: 52px; height: 52px; border-radius: 12px;
+  background: var(--c, var(--s0)); color: var(--score-ink);
+  display: grid; place-items: center;
+  font: 700 20px/1 var(--font-display); font-variant-numeric: tabular-nums;
+}
+.score.is-big { width: 84px; height: 84px; border-radius: 18px; font-size: 34px; }
+.score.is-empty { font-size: 11px; font-family: var(--font-body); font-weight: 600; text-align: center; padding: 4px; }
+
+/* Cards (list + preview share the row) */
+.row { display: flex; gap: 12px; align-items: flex-start; text-align: left; width: 100%; }
+.row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.row-title { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.row-name { font: 700 17px/1.2 var(--font-display); overflow-wrap: anywhere; }
+.price { flex: none; font-size: 13px; color: var(--muted); letter-spacing: .04em; }
+.meta { font-size: 13px; color: var(--muted); }
+.dish { display: flex; align-items: center; gap: 5px; font-size: 13px; }
+.dish svg { flex: none; color: var(--s3); }
+.dish b { font-weight: 600; }
+
+#view-list { display: none; flex-direction: column; }
+#view-list.is-active { display: flex; }
+.list-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 16px;
+}
+.list-head .meta { font-weight: 600; color: var(--ink); }
+.seg { display: inline-flex; padding: 3px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--line); }
+.seg button, .seg label {
+  min-height: 30px; padding: 0 11px; border: 0; border-radius: 8px; background: transparent;
+  font-size: 13px; font-weight: 600; color: var(--muted);
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.seg button[aria-pressed="true"], .seg input:checked + label { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0, 0, 0, .12); }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+.list { flex: 1; min-height: 0; overflow-y: auto; padding: 0 16px 16px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px;
+}
+button.card { display: block; width: 100%; }
+.empty { padding: 32px 16px; text-align: center; color: var(--muted); display: flex; flex-direction: column; gap: 12px; align-items: center; }
+
+/* Bottom tabs */
+.tabs {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  background: var(--surface); border-top: 1px solid var(--line);
+  padding: 4px 8px 6px;
+}
+.tabs button {
+  border: 0; background: transparent; border-radius: 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 6px 0 4px; color: var(--muted); font-size: 11px; font-weight: 600;
+}
+.tabs button[aria-current="page"] { color: var(--accent); }
+.tabs button[aria-current="page"] svg { stroke-width: 2.4; }
+
+/* Form */
+#view-form { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.form { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.form-title { font-size: 22px; font-weight: 700; }
+.group {
+  margin: 0; padding: 14px; min-width: 0;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.group-title { font: 700 12px/1.3 var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+#rates { display: flex; flex-direction: column; gap: 18px; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field > label, .field-label { font-size: 13px; font-weight: 600; }
+.input, .field select, .field textarea {
+  width: 100%; min-height: 44px; padding: 10px 12px; border-radius: 10px;
+  background: var(--surface-2); border: 1px solid var(--line); font-size: 16px;
+}
+.field textarea { min-height: 110px; resize: vertical; line-height: 1.45; }
+.input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); outline: 0; }
+.seg-wide { display: grid; grid-template-columns: repeat(4, 1fr); }
+.seg-wide label { min-height: 38px; font-size: 14px; }
+.hint { font-size: 12px; color: var(--muted); }
+.error { font-size: 13px; color: var(--s1); font-weight: 600; }
+#pick-map { height: 260px; border-radius: 10px; border: 1px solid var(--line); overflow: hidden; }
+
+.rate { display: flex; flex-direction: column; gap: 6px; }
+.rate-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.rate-head label { font-size: 14px; font-weight: 600; }
+.rate-val { font: 700 17px/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.rate-val.is-empty { font: 500 13px/1 var(--font-body); color: var(--muted); }
+.rate-ctl { display: flex; align-items: center; gap: 8px; }
+.rate-ctl input[type="range"] { flex: 1; min-width: 0; height: 36px; accent-color: var(--accent); }
+.step {
+  flex: none; width: 40px; height: 40px; border-radius: 10px;
+  background: var(--surface-2); border: 1px solid var(--line);
+  font-size: 20px; line-height: 1; font-weight: 600;
+}
+.global-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding-top: 12px; border-top: 1px solid var(--line);
+}
+.global-row span { font-weight: 600; }
+.thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.thumb { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: var(--surface-2); border: 1px solid var(--line); padding: 0; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-x {
+  position: absolute; top: 4px; right: 4px; width: 28px; height: 28px; border-radius: 50%;
+  border: 0; background: rgba(0, 0, 0, .6); color: #fff; display: grid; place-items: center;
+}
+.file-btn { position: relative; overflow: hidden; }
+.file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 0; }
+.form-actions { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; }
+.form-actions .btn { height: 48px; font-size: 15px; }
+
+/* Detail panel */
+.panel {
+  position: absolute; inset: 0; z-index: 1000; background: var(--bg);
+  display: flex; flex-direction: column;
+}
+.panel-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 8px 8px 8px 4px; background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.link-btn {
+  display: inline-flex; align-items: center; gap: 4px; height: 40px; padding: 0 10px;
+  border: 0; background: transparent; border-radius: 10px; font-weight: 600; font-size: 14px; color: var(--accent);
+}
+.link-btn.is-danger { color: var(--s1); }
+.panel-actions { display: flex; gap: 2px; }
+.panel-body { flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; -webkit-overflow-scrolling: touch; }
+.d-head { display: flex; flex-direction: column; gap: 6px; }
+.d-head h2 { font-size: 26px; font-weight: 700; line-height: 1.15; letter-spacing: -.01em; overflow-wrap: anywhere; }
+.d-score { display: flex; align-items: center; gap: 14px; }
+.d-score-text { display: flex; flex-direction: column; gap: 2px; }
+.d-score-text strong { font: 700 18px/1.2 var(--font-display); }
+.crit { display: flex; flex-direction: column; gap: 12px; }
+.crit-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: baseline; }
+.crit-row .crit-name { font-size: 14px; font-weight: 600; }
+.crit-row .crit-sub { font-size: 13px; color: var(--muted); font-weight: 400; }
+.crit-row .crit-val { font: 700 16px/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.crit-bar { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
+.crit-bar i { display: block; height: 100%; border-radius: 3px; background: var(--c); }
+.review { white-space: pre-wrap; max-width: 65ch; }
+/* scrolling columns: children keep their own height */
+.panel-body > *, .list > *, .sheet-body > *, .form > * { flex-shrink: 0; }
+.rose { display: block; width: 100%; max-width: 420px; height: auto; margin: 6px auto 0; }
+.hex-outer { fill: var(--surface-2); stroke: var(--line); stroke-width: 2.5; stroke-linejoin: round; }
+.hex-inner, .rose-spoke { fill: none; stroke: var(--line); stroke-width: 1.5; stroke-linejoin: round; }
+.radar-line { fill: none; stroke: var(--c, var(--s0)); stroke-width: 2.5; stroke-linejoin: round; }
+.rose-name { font: 700 13.5px var(--font-display); fill: var(--ink); }
+.section-title { font: 700 12px/1.3 var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+
+/* Sheets */
+.sheet { position: absolute; inset: 0; z-index: 2000; display: flex; flex-direction: column; justify-content: flex-end; }
+.sheet-backdrop { position: absolute; inset: 0; background: rgba(8, 14, 20, .5); border: 0; }
+.sheet-panel {
+  position: relative; max-height: 88%; display: flex; flex-direction: column;
+  background: var(--surface); border-radius: 18px 18px 0 0; box-shadow: var(--shadow);
+}
+.sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 6px; }
+.sheet-head h2 { font-size: 20px; font-weight: 700; }
+.icon-btn { width: 40px; height: 40px; border-radius: 10px; border: 0; background: transparent; display: grid; place-items: center; color: var(--muted); }
+.sheet-body { overflow-y: auto; padding: 8px 16px 16px; display: flex; flex-direction: column; gap: 18px; -webkit-overflow-scrolling: touch; }
+.sheet-foot { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; padding: 12px 16px 16px; border-top: 1px solid var(--line); }
+.sheet-foot .btn { height: 46px; }
+.chipset { display: flex; flex-wrap: wrap; gap: 8px; }
+.range-row { display: flex; align-items: center; gap: 12px; }
+.range-row input { flex: 1; min-width: 0; height: 36px; accent-color: var(--accent); }
+.range-row output { min-width: 84px; text-align: right; font: 700 16px/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.inline { display: flex; align-items: center; gap: 10px; }
+.inline select { flex: 1; min-width: 0; }
+
+.lightbox { position: absolute; inset: 0; z-index: 3000; background: rgba(0, 0, 0, .92); display: grid; place-items: center; padding: 16px; }
+.lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+.lightbox .icon-btn { position: absolute; top: 10px; right: 10px; color: #fff; background: rgba(255, 255, 255, .14); }
+
+.toast {
+  position: absolute; z-index: 4000; left: 50%; bottom: 76px; transform: translateX(-50%);
+  padding: 10px 16px; border-radius: 999px; background: var(--ink); color: var(--bg);
+  font-size: 14px; font-weight: 600; white-space: nowrap; box-shadow: var(--shadow);
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.toast.is-on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="bar">
+    <div class="brand">
+      <h1 class="brand-name">Cuaderno de restaurantes</h1>
+      <span class="tag">Demo</span>
+    </div>
+  </header>
+
+  <div class="tools" id="tools">
+    <label class="search" for="q">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+      <input id="q" type="search" placeholder="Buscar por nombre" autocomplete="off" enterkeyhint="search">
+    </label>
+    <button class="btn" id="btn-filters" type="button">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>
+      Filtros
+      <span class="badge" id="filter-count" hidden></span>
+    </button>
+  </div>
+  <div class="active-chips" id="active-chips" hidden></div>
+
+  <main id="views">
+    <section class="view is-active" id="view-map" aria-label="Mapa">
+      <div id="map"></div>
+      <div class="map-chip" id="map-count"></div>
+      <div class="legend" id="legend" aria-label="Color de los pines según la nota global">
+        <span class="s5"><i></i>9 o más</span>
+        <span class="s4"><i></i>8</span>
+        <span class="s3"><i></i>7</span>
+        <span class="s2"><i></i>5 y 6</span>
+        <span class="s1"><i></i>menos de 5</span>
+      </div>
+      <div class="preview" id="preview" hidden></div>
+    </section>
+
+    <section class="view" id="view-list" aria-label="Lista">
+      <div class="list-head">
+        <span class="meta" id="list-count"></span>
+        <div class="seg" role="group" aria-label="Ordenar por">
+          <button type="button" data-sort="nota" aria-pressed="true">Nota</button>
+          <button type="button" data-sort="fecha" aria-pressed="false">Fecha</button>
+          <button type="button" data-sort="nombre" aria-pressed="false">Nombre</button>
+        </div>
+      </div>
+      <div class="list" id="list"></div>
+    </section>
+
+    <section class="view" id="view-form" aria-label="Añadir restaurante">
+      <form class="form" id="form" novalidate>
+        <h2 class="form-title" id="form-title">Añadir restaurante</h2>
+
+        <section class="group" aria-label="Datos">
+          <h3 class="group-title">Datos</h3>
+          <div class="field">
+            <label for="f-name">Nombre</label>
+            <input class="input" id="f-name" type="text" autocomplete="off" maxlength="80">
+            <p class="error" id="err-name" hidden>Escribe el nombre del restaurante.</p>
+          </div>
+          <div class="field">
+            <span class="field-label" id="lbl-cuisines">Tipos de cocina</span>
+            <div class="chipset" id="f-cuisines" role="group" aria-labelledby="lbl-cuisines"></div>
+            <p class="hint">Puedes marcar varios.</p>
+          </div>
+          <div class="field">
+            <label for="f-date">Fecha de visita</label>
+            <input class="input" id="f-date" type="date">
+          </div>
+          <div class="field">
+            <span class="field-label" id="lbl-price">Precio</span>
+            <div class="seg seg-wide" role="radiogroup" aria-labelledby="lbl-price" id="f-price"></div>
+          </div>
+        </section>
+
+        <section class="group" aria-label="Ubicación">
+          <h3 class="group-title">Ubicación</h3>
+          <div class="field">
+            <label for="f-muni">Municipio</label>
+            <select id="f-muni"></select>
+            <p class="error" id="err-muni" hidden>Elige el municipio.</p>
+          </div>
+          <div class="field">
+            <div id="pick-map" aria-label="Mapa para situar el restaurante"></div>
+            <p class="hint" id="pick-status">Toca el mapa para situar el restaurante. Al elegir municipio el mapa se acerca a él.</p>
+            <p class="error" id="err-loc" hidden>Toca el mapa para marcar dónde está.</p>
+          </div>
+        </section>
+
+        <section class="group" aria-label="Valoración">
+          <h3 class="group-title">Valoración</h3>
+          <div id="rates"></div>
+          <div class="global-row">
+            <span>Nota global (media)</span>
+            <div class="score" id="f-global">Sin nota</div>
+          </div>
+        </section>
+
+        <section class="group" aria-label="Reseña y fotos">
+          <h3 class="group-title">Reseña y fotos</h3>
+          <div class="field">
+            <label for="f-review">Reseña</label>
+            <textarea id="f-review" placeholder="Qué pedimos, qué repetiría, qué no."></textarea>
+          </div>
+          <div class="field">
+            <span class="field-label">Fotos</span>
+            <div class="thumbs" id="f-thumbs" hidden></div>
+            <span class="btn file-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="3"></rect><circle cx="12" cy="13" r="3.5"></circle><path d="M8 6l1.5-2h5L16 6"></path></svg>
+              Añadir fotos
+              <input id="f-photos" type="file" accept="image/*" multiple aria-label="Añadir fotos">
+            </span>
+          </div>
+        </section>
+
+        <div class="form-actions">
+          <button class="btn" type="button" id="f-cancel">Cancelar</button>
+          <button class="btn btn-primary" type="submit" id="f-save">Guardar restaurante</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <nav class="tabs" aria-label="Secciones">
+    <button type="button" data-view="map" aria-current="page">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"></path><path d="M9 4v14M15 6v14"></path></svg>
+      Mapa
+    </button>
+    <button type="button" data-view="list">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"></path><circle cx="4" cy="6" r="1"></circle><circle cx="4" cy="12" r="1"></circle><circle cx="4" cy="18" r="1"></circle></svg>
+      Lista
+    </button>
+    <button type="button" data-view="form">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v8M8 12h8"></path></svg>
+      Añadir
+    </button>
+  </nav>
+
+  <section class="panel" id="detail" hidden aria-label="Ficha del restaurante"></section>
+
+  <div class="sheet" id="sheet-filters" hidden>
+    <button class="sheet-backdrop" type="button" data-close aria-label="Cerrar filtros"></button>
+    <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="flt-title">
+      <div class="sheet-head">
+        <h2 id="flt-title">Filtros</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Cerrar">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+        <div class="field">
+          <div class="inline">
+            <label for="flt-field" class="field-label">Nota mínima en</label>
+            <select id="flt-field"></select>
+          </div>
+          <div class="range-row">
+            <input id="flt-min" type="range" min="0" max="10" step="0.5" value="0" aria-label="Nota mínima">
+            <output id="flt-min-out" for="flt-min">Cualquiera</output>
+          </div>
+        </div>
+        <div class="field"><span class="field-label">Tipo de cocina</span><div class="chipset" id="flt-cuisines"></div></div>
+        <div class="field"><span class="field-label">Municipio</span><div class="chipset" id="flt-munis"></div></div>
+        <div class="field"><span class="field-label">Precio</span><div class="chipset" id="flt-prices"></div></div>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn" type="button" id="flt-clear">Quitar filtros</button>
+        <button class="btn btn-primary" type="button" id="flt-apply" data-close>Ver restaurantes</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet" id="sheet-confirm" hidden>
+    <button class="sheet-backdrop" type="button" data-close aria-label="Cancelar"></button>
+    <div class="sheet-panel" role="alertdialog" aria-modal="true" aria-labelledby="cf-title">
+      <div class="sheet-head"><h2 id="cf-title">¿Borrar este restaurante?</h2></div>
+      <div class="sheet-body"><p id="cf-text" class="meta"></p></div>
+      <div class="sheet-foot">
+        <button class="btn" type="button" data-close>Cancelar</button>
+        <button class="btn btn-danger" type="button" id="cf-ok">Borrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" hidden>
+    <img id="lightbox-img" alt="">
+    <button class="icon-btn" type="button" id="lightbox-close" aria-label="Cerrar foto">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+    </button>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+function startApp() {
+  'use strict';
+
+  var GEO = {"munis":[{"name":"Alaró","c":[39.7234,2.8024],"p":[[[[2.7527,39.7185],[2.7588,39.7096],[2.7653,39.7055],[2.7668,39.6981],[2.765,39.6929],[2.7709,39.6912],[2.7788,39.6841],[2.7851,39.6723],[2.8082,39.682],[2.8163,39.688],[2.8173,39.6898],[2.8131,39.6899],[2.8117,39.6935],[2.8147,39.6956],[2.8149,39.7007],[2.8252,39.706],[2.8323,39.7144],[2.8366,39.7153],[2.8481,39.7103],[2.8505,39.7131],[2.8454,39.722],[2.8374,39.7237],[2.8288,39.7233],[2.8247,39.7342],[2.8301,39.7371],[2.8263,39.7417],[2.8361,39.7466],[2.8384,39.7457],[2.8369,39.7512],[2.8342,39.7519],[2.8486,39.7688],[2.8397,39.7743],[2.8319,39.771],[2.8287,39.7681],[2.8148,39.7642],[2.812,39.7652],[2.8104,39.7692],[2.808,39.7697],[2.8071,39.7723],[2.8024,39.7755],[2.799,39.7731],[2.8017,39.7689],[2.7965,39.7654],[2.7911,39.7563],[2.7866,39.7522],[2.7948,39.7495],[2.8013,39.7433],[2.7778,39.7324],[2.7785,39.7306],[2.7728,39.7275],[2.7674,39.7281],[2.7636,39.7269],[2.7545,39.7216],[2.7527,39.7185]]]]},{"name":"Alcúdia","c":[39.8425,3.1119],"p":[[[[3.1698,39.8346],[3.1714,39.8359],[3.1697,39.836],[3.1698,39.8346]]],[[[3.0356,39.821],[3.037,39.8112],[3.0402,39.8053],[3.0433,39.8064],[3.0448,39.8044],[3.0509,39.807],[3.0608,39.804],[3.0688,39.8046],[3.0781,39.7989],[3.0844,39.8015],[3.0843,39.8032],[3.0901,39.8077],[3.1064,39.8144],[3.1171,39.8157],[3.1171,39.822],[3.1206,39.8318],[3.1254,39.8377],[3.1301,39.8407],[3.1327,39.841],[3.1301,39.8388],[3.1331,39.836],[3.1347,39.8358],[3.1361,39.837],[3.1335,39.8361],[3.135,39.8369],[3.132,39.838],[3.1341,39.8386],[3.1326,39.8395],[3.1343,39.839],[3.1328,39.8398],[3.1345,39.8394],[3.1329,39.8401],[3.1346,39.8397],[3.1333,39.841],[3.1369,39.8404],[3.1352,39.838],[3.1368,39.839],[3.1409,39.8367],[3.138,39.8351],[3.1413,39.8356],[3.1431,39.8342],[3.1408,39.8319],[3.144,39.8342],[3.1575,39.8377],[3.1595,39.8368],[3.1646,39.8389],[3.1689,39.837],[3.1785,39.8406],[3.1869,39.8514],[3.1946,39.8571],[3.1972,39.8619],[3.1971,39.8628],[3.1883,39.8619],[3.1866,39.8632],[3.1859,39.8701],[3.1841,39.8709],[3.1887,39.8737],[3.1871,39.877],[3.1905,39.8773],[3.1883,39.8816],[3.1927,39.8818],[3.2045,39.8888],[3.2033,39.8904],[3.1988,39.8906],[3.1946,39.8934],[3.1904,39.8924],[3.1874,39.8881],[3.1898,39.887],[3.1856,39.8841],[3.1797,39.8832],[3.1732,39.8779],[3.172,39.8793],[3.1704,39.8761],[3.169,39.8777],[3.1665,39.8776],[3.1638,39.8738],[3.1599,39.8731],[3.1593,39.8716],[3.1524,39.8721],[3.1478,39.8669],[3.1426,39.8671],[3.1456,39.8661],[3.145,39.8655],[3.1441,39.8663],[3.1435,39.865],[3.1431,39.8667],[3.1414,39.8647],[3.1352,39.8655],[3.1345,39.868],[3.1318,39.8693],[3.1253,39.863],[3.1226,39.8643],[3.1208,39.8618],[3.1188,39.8618],[3.1185,39.8641],[3.1161,39.8646],[3.1155,39.8621],[3.1115,39.8615],[3.1103,39.8585],[3.1064,39.8576],[3.0992,39.8598],[3.0908,39.8659],[3.0869,39.8709],[3.0813,39.8692],[3.0645,39.8539],[3.0602,39.8532],[3.0573,39.848],[3.0527,39.8497],[3.0481,39.8472],[3.05,39.8326],[3.0474,39.8268],[3.0477,39.8227],[3.0434,39.8179],[3.0382,39.8212],[3.0356,39.821]]]]},{"name":"Algaida","c":[39.5649,2.9039],"p":[[[[2.8284,39.5519],[2.8475,39.5433],[2.8644,39.5339],[2.8643,39.5321],[2.8809,39.5269],[2.8881,39.5225],[2.8989,39.5219],[2.9031,39.5185],[2.9106,39.5207],[2.9121,39.5185],[2.914,39.5191],[2.9204,39.5168],[2.9294,39.5194],[2.9331,39.524],[2.9326,39.5256],[2.9361,39.5251],[2.9435,39.5303],[2.9623,39.5251],[2.9689,39.5396],[2.9655,39.5458],[2.9681,39.5548],[2.9656,39.5613],[2.9665,39.5624],[2.9605,39.5697],[2.9558,39.5794],[2.944,39.5867],[2.9425,39.59],[2.9485,39.5931],[2.9544,39.6021],[2.9435,39.6141],[2.9067,39.6054],[2.9022,39.6108],[2.8926,39.6083],[2.892,39.61],[2.8882,39.6089],[2.8792,39.6045],[2.8763,39.6071],[2.8641,39.6044],[2.865,39.6035],[2.839,39.5883],[2.8438,39.5832],[2.8452,39.5788],[2.8472,39.5787],[2.8469,39.5748],[2.8454,39.5748],[2.8465,39.57],[2.8354,39.5697],[2.8383,39.5608],[2.8284,39.5519]]]]},{"name":"Andratx","c":[39.582,2.4053],"p":[[[[2.306,39.5722],[2.3078,39.573],[2.3075,39.5754],[2.3116,39.574],[2.3187,39.5767],[2.3267,39.5866],[2.3336,39.5889],[2.3368,39.5938],[2.3354,39.5944],[2.3389,39.5982],[2.3237,39.5929],[2.3136,39.5857],[2.3138,39.5844],[2.3077,39.5819],[2.3031,39.573],[2.306,39.5722]]],[[[2.422,39.5239],[2.4276,39.535],[2.4321,39.5382],[2.433,39.5424],[2.4419,39.5477],[2.4436,39.5522],[2.4483,39.5542],[2.4521,39.5584],[2.4488,39.558],[2.4477,39.5613],[2.4385,39.5655],[2.4404,39.5754],[2.4427,39.5789],[2.4551,39.5791],[2.4604,39.5862],[2.4568,39.5967],[2.4575,39.6001],[2.4558,39.6014],[2.4564,39.609],[2.4525,39.6119],[2.4519,39.6157],[2.4479,39.6186],[2.4459,39.6225],[2.4468,39.6272],[2.4478,39.6337],[2.4388,39.6378],[2.4367,39.6434],[2.4309,39.6418],[2.4257,39.6379],[2.4231,39.6387],[2.4238,39.637],[2.4213,39.6361],[2.4228,39.633],[2.4219,39.63],[2.4156,39.6296],[2.4115,39.6279],[2.4038,39.6222],[2.3949,39.6194],[2.3954,39.6177],[2.3906,39.6174],[2.385,39.6136],[2.3781,39.615],[2.369,39.6141],[2.3586,39.6056],[2.356,39.6055],[2.355,39.5964],[2.3497,39.5964],[2.3471,39.5949],[2.3478,39.5929],[2.3446,39.5872],[2.3461,39.5836],[2.3487,39.5841],[2.3498,39.5788],[2.3544,39.5767],[2.3465,39.5646],[2.3498,39.5629],[2.3531,39.5642],[2.3553,39.563],[2.3564,39.5599],[2.354,39.5579],[2.3604,39.5567],[2.3609,39.5543],[2.3663,39.5552],[2.3688,39.5524],[2.3687,39.5473],[2.3722,39.5443],[2.3772,39.5447],[2.379,39.5428],[2.3791,39.5463],[2.3818,39.5471],[2.3838,39.5455],[2.3824,39.547],[2.3842,39.5475],[2.3853,39.5462],[2.3842,39.5477],[2.3852,39.5469],[2.3856,39.5481],[2.3905,39.5462],[2.3873,39.5443],[2.386,39.5452],[2.3873,39.5442],[2.3845,39.5418],[2.3786,39.5394],[2.3718,39.5373],[2.3714,39.5383],[2.3683,39.5381],[2.3651,39.5332],[2.3631,39.533],[2.3639,39.5315],[2.3717,39.5316],[2.3768,39.5375],[2.3795,39.533],[2.3881,39.5339],[2.3891,39.5276],[2.3862,39.5259],[2.3857,39.5218],[2.3876,39.5209],[2.4049,39.5269],[2.4071,39.531],[2.4056,39.5368],[2.4122,39.5373],[2.4137,39.539],[2.4183,39.5387],[2.4236,39.5368],[2.4217,39.5342],[2.4233,39.5311],[2.4189,39.5232],[2.422,39.5239]]]]},{"name":"Ariany","c":[39.6559,3.1328],"p":[[[[3.0842,39.6567],[3.0848,39.6529],[3.0819,39.6519],[3.0856,39.6456],[3.0835,39.645],[3.0844,39.6341],[3.1003,39.6425],[3.1041,39.6353],[3.1022,39.634],[3.1062,39.6308],[3.1171,39.6345],[3.1211,39.6309],[3.1279,39.6308],[3.1328,39.6343],[3.1339,39.6333],[3.1392,39.6364],[3.1483,39.6438],[3.1494,39.6431],[3.1545,39.6502],[3.1573,39.6498],[3.1605,39.6557],[3.1597,39.6581],[3.1648,39.6582],[3.171,39.6673],[3.1793,39.6851],[3.183,39.6841],[3.1851,39.6915],[3.1881,39.6933],[3.1855,39.6957],[3.1778,39.6951],[3.172,39.6889],[3.1661,39.6901],[3.1533,39.6759],[3.1619,39.6739],[3.1521,39.6672],[3.1431,39.6687],[3.1397,39.6675],[3.1365,39.6629],[3.1269,39.6587],[3.1238,39.6629],[3.0842,39.6567]]]]},{"name":"Artà","c":[39.7146,3.3287],"p":[[[[3.2252,39.7035],[3.2268,39.702],[3.2251,39.6984],[3.2326,39.6967],[3.2361,39.692],[3.2394,39.6952],[3.2513,39.684],[3.2554,39.6802],[3.2763,39.681],[3.2807,39.6797],[3.2986,39.666],[3.2904,39.6525],[3.2942,39.6501],[3.2983,39.6524],[3.3035,39.6442],[3.306,39.6439],[3.3113,39.6394],[3.3207,39.6411],[3.3282,39.6475],[3.3278,39.6564],[3.325,39.661],[3.3216,39.6622],[3.3304,39.6674],[3.3372,39.6675],[3.3415,39.6622],[3.3555,39.6714],[3.3639,39.6725],[3.3664,39.6677],[3.3754,39.6641],[3.3849,39.6645],[3.3912,39.6721],[3.3991,39.6847],[3.3895,39.6846],[3.3869,39.6875],[3.3811,39.6885],[3.3821,39.6919],[3.386,39.692],[3.3816,39.7038],[3.3891,39.711],[3.3991,39.7178],[3.4023,39.7234],[3.4101,39.7268],[3.4151,39.7349],[3.4169,39.743],[3.415,39.7452],[3.4172,39.7455],[3.4209,39.7518],[3.4182,39.7507],[3.4167,39.7526],[3.414,39.7523],[3.4095,39.7592],[3.4043,39.759],[3.4059,39.7609],[3.404,39.764],[3.3991,39.7627],[3.3972,39.7647],[3.3844,39.7641],[3.3739,39.7684],[3.3739,39.7721],[3.3716,39.7746],[3.3604,39.7785],[3.3515,39.7873],[3.3471,39.7893],[3.3351,39.7841],[3.3346,39.7767],[3.3321,39.7751],[3.3329,39.7738],[3.3347,39.7741],[3.3359,39.7691],[3.334,39.7661],[3.3306,39.7648],[3.3305,39.7609],[3.3257,39.758],[3.308,39.7546],[3.3028,39.7501],[3.3002,39.7499],[3.3009,39.748],[3.2945,39.7478],[3.2893,39.7451],[3.2859,39.7401],[3.2763,39.7395],[3.2757,39.7379],[3.2723,39.7377],[3.2757,39.7376],[3.2748,39.7364],[3.2734,39.7374],[3.2662,39.7336],[3.2604,39.7354],[3.2547,39.7295],[3.2367,39.7322],[3.2338,39.7187],[3.2252,39.7035]]]]},{"name":"Banyalbufar","c":[39.6813,2.5273],"p":[[[[2.4875,39.6713],[2.4876,39.6688],[2.4974,39.6634],[2.503,39.6572],[2.5074,39.6548],[2.5106,39.6596],[2.5152,39.6629],[2.52,39.6641],[2.5286,39.6721],[2.5341,39.6755],[2.5546,39.672],[2.5633,39.676],[2.5586,39.6851],[2.5648,39.6872],[2.5662,39.6945],[2.5557,39.7003],[2.546,39.6989],[2.5432,39.7007],[2.5417,39.6987],[2.528,39.7016],[2.516,39.6905],[2.5138,39.6918],[2.51,39.6894],[2.5076,39.6903],[2.5045,39.6869],[2.4982,39.6844],[2.4942,39.6803],[2.4932,39.6756],[2.4875,39.6713]]]]},{"name":"Binissalem","c":[39.6845,2.8567],"p":[[[[2.8163,39.688],[2.8216,39.6842],[2.8195,39.6832],[2.8264,39.675],[2.83,39.6764],[2.8349,39.6711],[2.8371,39.6723],[2.8505,39.661],[2.8593,39.6614],[2.8672,39.6545],[2.8716,39.6569],[2.8726,39.6557],[2.8776,39.6573],[2.8848,39.6553],[2.889,39.6645],[2.8932,39.6688],[2.8912,39.6706],[2.8986,39.6716],[2.8968,39.673],[2.8996,39.674],[2.8983,39.676],[2.9001,39.6779],[2.8987,39.6788],[2.9052,39.6847],[2.8991,39.6877],[2.8884,39.6898],[2.8819,39.6936],[2.8782,39.6979],[2.8716,39.6953],[2.8605,39.7067],[2.8505,39.7131],[2.8481,39.7103],[2.8366,39.7153],[2.8323,39.7144],[2.8252,39.706],[2.8149,39.7007],[2.8147,39.6956],[2.8117,39.6935],[2.8131,39.6899],[2.8173,39.6898],[2.8163,39.688]]]]},{"name":"Búger","c":[39.7578,2.985],"p":[[[[2.9597,39.7508],[2.9713,39.7488],[2.9761,39.7498],[2.9886,39.7381],[3.0015,39.7476],[2.9952,39.753],[2.9977,39.7561],[3.0002,39.7565],[2.9977,39.7603],[3.0032,39.7696],[3.0017,39.7715],[3.0023,39.7752],[3.0134,39.7834],[3.0082,39.7812],[3.0048,39.7821],[2.9926,39.7701],[2.9963,39.7679],[2.9937,39.7653],[2.988,39.7687],[2.9813,39.7691],[2.9804,39.7711],[2.9671,39.7624],[2.9624,39.756],[2.9597,39.7508]]]]},{"name":"Bunyola","c":[39.7077,2.7125],"p":[[[[2.8024,39.7755],[2.7963,39.7775],[2.7826,39.7744],[2.7743,39.7677],[2.7767,39.7651],[2.7762,39.7605],[2.7717,39.7586],[2.7649,39.7518],[2.7585,39.7511],[2.7533,39.7482],[2.7492,39.7498],[2.7462,39.7472],[2.7418,39.7497],[2.7355,39.7444],[2.728,39.7472],[2.7255,39.7462],[2.7167,39.7467],[2.7169,39.7501],[2.7093,39.7511],[2.6932,39.7336],[2.6886,39.7363],[2.6797,39.7384],[2.6685,39.7381],[2.6597,39.7246],[2.6622,39.7228],[2.6617,39.7196],[2.6595,39.7189],[2.6576,39.7154],[2.6574,39.7036],[2.6499,39.6986],[2.6477,39.6916],[2.6566,39.6847],[2.6572,39.682],[2.653,39.6768],[2.6512,39.6644],[2.6598,39.6614],[2.6591,39.6584],[2.6831,39.6522],[2.6988,39.6503],[2.7072,39.6488],[2.7254,39.6593],[2.7315,39.6605],[2.7385,39.6592],[2.7368,39.6619],[2.7331,39.6893],[2.7364,39.6919],[2.7315,39.6986],[2.7348,39.7063],[2.7369,39.7065],[2.7412,39.7127],[2.7491,39.7146],[2.7527,39.7185],[2.7545,39.7216],[2.7636,39.7269],[2.7674,39.7281],[2.7728,39.7275],[2.7785,39.7306],[2.7778,39.7324],[2.8013,39.7433],[2.7948,39.7495],[2.7866,39.7522],[2.7911,39.7563],[2.7965,39.7654],[2.8017,39.7689],[2.799,39.7731],[2.8024,39.7755]]]]},{"name":"Calvià","c":[39.5511,2.5081],"p":[[[[2.4478,39.4953],[2.4551,39.5011],[2.451,39.4999],[2.4478,39.4953]]],[[[2.5455,39.5025],[2.5468,39.5036],[2.5432,39.5052],[2.5455,39.5025]]],[[[2.5734,39.5288],[2.5739,39.5299],[2.5725,39.5299],[2.5734,39.5288]]],[[[2.5869,39.5276],[2.5894,39.5296],[2.5888,39.5314],[2.5858,39.5282],[2.5869,39.5276]]],[[[2.422,39.5239],[2.4245,39.5237],[2.4279,39.5277],[2.4306,39.527],[2.4309,39.5291],[2.4347,39.527],[2.4405,39.5288],[2.4381,39.5326],[2.4395,39.532],[2.4401,39.5335],[2.448,39.5352],[2.4501,39.537],[2.453,39.5356],[2.4517,39.5347],[2.4567,39.5343],[2.4584,39.5309],[2.4624,39.5283],[2.4623,39.5259],[2.4649,39.5259],[2.4664,39.5224],[2.4683,39.5223],[2.4669,39.5189],[2.4728,39.5195],[2.4796,39.5176],[2.4789,39.5137],[2.4742,39.5138],[2.473,39.5118],[2.4658,39.5129],[2.47,39.5099],[2.4676,39.5093],[2.4653,39.5136],[2.4592,39.5098],[2.4597,39.5073],[2.4562,39.5048],[2.4609,39.5042],[2.4594,39.4988],[2.4623,39.499],[2.4675,39.4951],[2.4656,39.4945],[2.4676,39.4905],[2.4727,39.4937],[2.4791,39.4919],[2.4783,39.4877],[2.4762,39.4911],[2.4774,39.4853],[2.4762,39.4836],[2.4778,39.4777],[2.4819,39.476],[2.4761,39.4663],[2.4856,39.4725],[2.4903,39.4728],[2.4997,39.4682],[2.5002,39.4617],[2.5059,39.4623],[2.5097,39.4583],[2.5213,39.4583],[2.5217,39.4566],[2.5244,39.4606],[2.5193,39.4626],[2.5223,39.4635],[2.524,39.4718],[2.5213,39.4721],[2.5208,39.4763],[2.5259,39.4744],[2.5257,39.479],[2.5298,39.48],[2.5306,39.4838],[2.5335,39.4852],[2.5329,39.4874],[2.5353,39.4864],[2.5365,39.4879],[2.5371,39.4934],[2.5341,39.4953],[2.5367,39.4964],[2.5371,39.5005],[2.5338,39.5045],[2.5372,39.5079],[2.5433,39.5086],[2.5472,39.5111],[2.5393,39.5132],[2.5374,39.5175],[2.5391,39.5228],[2.541,39.5248],[2.5452,39.5239],[2.5463,39.526],[2.5512,39.527],[2.5522,39.5247],[2.5542,39.5285],[2.5616,39.5319],[2.5648,39.5317],[2.5653,39.5294],[2.5653,39.5312],[2.5674,39.5295],[2.5668,39.5312],[2.5679,39.5297],[2.5677,39.5312],[2.5689,39.5298],[2.5684,39.5313],[2.5694,39.53],[2.569,39.5314],[2.5699,39.5301],[2.5695,39.5315],[2.5703,39.5304],[2.57,39.5316],[2.5712,39.5311],[2.5705,39.5298],[2.5634,39.5284],[2.5647,39.528],[2.5706,39.5294],[2.5719,39.5315],[2.5754,39.5311],[2.5761,39.5336],[2.5792,39.5317],[2.5883,39.5335],[2.5903,39.5311],[2.5903,39.5366],[2.5971,39.5435],[2.5957,39.5467],[2.6004,39.549],[2.5974,39.5483],[2.589,39.5508],[2.5795,39.557],[2.5844,39.5617],[2.596,39.5678],[2.5949,39.5691],[2.581,39.5759],[2.5732,39.5776],[2.5756,39.5839],[2.5662,39.5858],[2.5639,39.5906],[2.5731,39.5981],[2.5776,39.598],[2.5849,39.6041],[2.5878,39.6045],[2.5902,39.6082],[2.5703,39.608],[2.5682,39.6098],[2.5649,39.6086],[2.5627,39.6047],[2.5576,39.6024],[2.55,39.6018],[2.547,39.6038],[2.5445,39.6016],[2.5395,39.6017],[2.5227,39.5953],[2.5242,39.5919],[2.5195,39.591],[2.5163,39.5949],[2.5081,39.5915],[2.5034,39.5997],[2.495,39.6052],[2.4946,39.6079],[2.4831,39.6123],[2.4843,39.6147],[2.4828,39.6227],[2.4866,39.6339],[2.4735,39.6389],[2.4622,39.6414],[2.4582,39.6374],[2.4569,39.6326],[2.4522,39.6327],[2.4518,39.6307],[2.4468,39.6272],[2.4459,39.6225],[2.4479,39.6186],[2.4519,39.6157],[2.4525,39.6119],[2.4564,39.609],[2.4558,39.6014],[2.4575,39.6001],[2.4568,39.5967],[2.4604,39.5862],[2.4551,39.5791],[2.4427,39.5789],[2.4404,39.5754],[2.4385,39.5655],[2.4477,39.5613],[2.4488,39.558],[2.4521,39.5584],[2.4483,39.5542],[2.4436,39.5522],[2.4419,39.5477],[2.433,39.5424],[2.4321,39.5382],[2.4276,39.535],[2.422,39.5239]]]]},{"name":"Campanet","c":[39.7975,2.9666],"p":[[[[3.0048,39.7821],[2.9995,39.7839],[2.9952,39.7834],[2.9907,39.7875],[2.9891,39.7927],[2.9877,39.7914],[2.9871,39.7924],[2.9851,39.8009],[2.9881,39.8047],[2.9932,39.8069],[2.9977,39.8113],[3.0088,39.8166],[2.9898,39.834],[2.9541,39.8224],[2.9453,39.8314],[2.9528,39.8222],[2.9467,39.8186],[2.9432,39.8198],[2.9339,39.8176],[2.927,39.8136],[2.9312,39.8043],[2.9279,39.8005],[2.9286,39.7946],[2.9346,39.7899],[2.9427,39.7789],[2.9467,39.7713],[2.9443,39.7695],[2.9516,39.7667],[2.9504,39.7658],[2.9519,39.7642],[2.9624,39.756],[2.9671,39.7624],[2.9804,39.7711],[2.9813,39.7691],[2.988,39.7687],[2.9937,39.7653],[2.9963,39.7679],[2.9926,39.7701],[3.0048,39.7821]]]]},{"name":"Campos","c":[39.4068,3.0144],"p":[[[[2.9309,39.3642],[2.9386,39.3643],[2.9532,39.3597],[2.9513,39.3611],[2.9554,39.3629],[2.9533,39.3604],[2.9568,39.3628],[2.9657,39.3587],[2.9722,39.3526],[2.9743,39.3529],[2.9908,39.3368],[2.9901,39.3333],[2.9919,39.3322],[2.9884,39.3255],[3.0064,39.3315],[3.0301,39.3443],[3.0397,39.3508],[3.0566,39.3711],[3.0692,39.3792],[3.096,39.3996],[3.0914,39.4018],[3.0854,39.4078],[3.101,39.4172],[3.099,39.4229],[3.0954,39.4288],[3.0888,39.4285],[3.0847,39.44],[3.0887,39.4413],[3.0806,39.4532],[3.0597,39.4753],[3.0569,39.4724],[3.051,39.4764],[3.045,39.4722],[3.0304,39.467],[3.0281,39.4684],[3.0227,39.4669],[3.0172,39.4711],[3.0052,39.4613],[2.9972,39.4651],[2.9881,39.4603],[2.9641,39.464],[2.9603,39.4632],[2.9559,39.4613],[2.9542,39.4554],[2.9564,39.4477],[2.9599,39.4458],[2.9616,39.4414],[2.9665,39.4383],[2.9675,39.4352],[2.9625,39.4281],[2.9575,39.4244],[2.952,39.4229],[2.9444,39.4148],[2.933,39.3789],[2.9309,39.3642]]]]},{"name":"Capdepera","c":[39.6972,3.4273],"p":[[[[3.3912,39.6721],[3.3966,39.669],[3.4001,39.6642],[3.4059,39.6618],[3.4067,39.6561],[3.4152,39.653],[3.4184,39.6458],[3.4259,39.645],[3.4253,39.6422],[3.4327,39.6399],[3.434,39.6356],[3.4364,39.6345],[3.4354,39.637],[3.4382,39.6402],[3.4389,39.6441],[3.4365,39.6479],[3.441,39.6565],[3.4433,39.6575],[3.4538,39.6548],[3.4559,39.6563],[3.4561,39.6615],[3.4547,39.6609],[3.4536,39.6628],[3.4548,39.6671],[3.4524,39.6695],[3.4572,39.6708],[3.4528,39.6749],[3.4568,39.6799],[3.4524,39.6822],[3.458,39.6844],[3.4576,39.6895],[3.4549,39.6889],[3.4535,39.6931],[3.456,39.6958],[3.4549,39.6999],[3.4567,39.7055],[3.4612,39.7076],[3.463,39.7112],[3.4653,39.7105],[3.463,39.709],[3.4693,39.7113],[3.4697,39.7129],[3.4746,39.7093],[3.4755,39.7121],[3.4776,39.7129],[3.4759,39.7149],[3.4776,39.7146],[3.4787,39.716],[3.4767,39.7165],[3.4762,39.7202],[3.4731,39.7197],[3.4715,39.7219],[3.4663,39.7202],[3.4623,39.7212],[3.4611,39.7199],[3.4566,39.7217],[3.4541,39.721],[3.4527,39.7225],[3.4524,39.725],[3.4567,39.728],[3.452,39.726],[3.4528,39.7294],[3.4576,39.7335],[3.4582,39.7374],[3.4618,39.7382],[3.4614,39.7408],[3.4586,39.7412],[3.4573,39.7441],[3.4613,39.7481],[3.4597,39.7485],[3.4586,39.7466],[3.4507,39.7435],[3.4396,39.7454],[3.4358,39.7443],[3.4322,39.7451],[3.4304,39.7492],[3.4268,39.7517],[3.4209,39.7518],[3.4172,39.7455],[3.415,39.7452],[3.4169,39.743],[3.4151,39.7349],[3.4101,39.7268],[3.4023,39.7234],[3.3991,39.7178],[3.3891,39.711],[3.3816,39.7038],[3.386,39.692],[3.3821,39.6919],[3.3811,39.6885],[3.3869,39.6875],[3.3895,39.6846],[3.3991,39.6847],[3.3912,39.6721]]]]},{"name":"Consell","c":[39.665,2.8179],"p":[[[[2.7851,39.6723],[2.7953,39.6608],[2.7972,39.6617],[2.8211,39.6431],[2.828,39.6455],[2.8373,39.6518],[2.8456,39.6585],[2.8448,39.6595],[2.8505,39.661],[2.8371,39.6723],[2.8349,39.6711],[2.83,39.6764],[2.8264,39.675],[2.8195,39.6832],[2.8216,39.6842],[2.8163,39.688],[2.8082,39.682],[2.7851,39.6723]]]]},{"name":"Costitx","c":[39.6556,2.9494],"p":[[[[2.9435,39.6747],[2.9394,39.6725],[2.9425,39.6687],[2.9187,39.661],[2.9222,39.6536],[2.9251,39.652],[2.9289,39.6387],[2.9386,39.6404],[2.9407,39.635],[2.9465,39.6358],[2.9488,39.631],[2.946,39.6305],[2.9468,39.6278],[2.9568,39.6298],[2.9601,39.6382],[2.9577,39.6401],[2.9671,39.6486],[2.965,39.6505],[2.9716,39.6573],[2.9779,39.6683],[2.9762,39.6694],[2.976,39.6742],[2.9729,39.6759],[2.9729,39.6791],[2.9689,39.6793],[2.9681,39.6748],[2.9618,39.6707],[2.9604,39.6723],[2.9638,39.674],[2.9626,39.6764],[2.956,39.6731],[2.9492,39.6763],[2.9435,39.6747]]]]},{"name":"Deià","c":[39.7487,2.6487],"p":[[[[2.6685,39.7381],[2.6777,39.7498],[2.672,39.7613],[2.6622,39.7721],[2.6549,39.7694],[2.6451,39.7619],[2.6418,39.7625],[2.6414,39.7602],[2.6357,39.7653],[2.6277,39.7533],[2.6253,39.7526],[2.6228,39.7571],[2.6203,39.7563],[2.6194,39.7555],[2.6217,39.7558],[2.6229,39.754],[2.6234,39.7488],[2.6157,39.7436],[2.6195,39.7401],[2.6213,39.7315],[2.6241,39.7277],[2.632,39.7314],[2.6386,39.737],[2.6517,39.737],[2.6554,39.7341],[2.6559,39.731],[2.6583,39.7295],[2.6567,39.7269],[2.6597,39.7246],[2.6685,39.7381]]]]},{"name":"Escorca","c":[39.8279,2.848],"p":[[[[2.8397,39.7743],[2.8437,39.78],[2.8517,39.7817],[2.8672,39.7922],[2.8692,39.796],[2.878,39.8016],[2.8807,39.8015],[2.8883,39.8055],[2.9039,39.8152],[2.9191,39.8163],[2.9246,39.8155],[2.927,39.8136],[2.9339,39.8176],[2.9432,39.8198],[2.9467,39.8186],[2.9528,39.8222],[2.9453,39.8314],[2.9393,39.8407],[2.9368,39.8517],[2.9385,39.8578],[2.9363,39.8668],[2.9334,39.8693],[2.9337,39.8732],[2.9294,39.8746],[2.9241,39.8805],[2.9211,39.8979],[2.9246,39.9001],[2.9198,39.9019],[2.9185,39.897],[2.915,39.8973],[2.9086,39.8951],[2.9053,39.8982],[2.9028,39.8977],[2.8977,39.8933],[2.8892,39.8913],[2.8877,39.887],[2.8792,39.883],[2.8749,39.878],[2.8537,39.8744],[2.8522,39.8698],[2.8475,39.8678],[2.8445,39.8616],[2.8422,39.8614],[2.8403,39.8649],[2.8381,39.8653],[2.8331,39.8611],[2.8274,39.8597],[2.8273,39.8576],[2.8249,39.8567],[2.8242,39.8609],[2.8227,39.8576],[2.8202,39.8586],[2.8154,39.8569],[2.815,39.8581],[2.8089,39.8588],[2.8093,39.862],[2.8045,39.8624],[2.8018,39.8582],[2.8048,39.8569],[2.8036,39.8555],[2.8056,39.8526],[2.8023,39.853],[2.8002,39.8512],[2.7991,39.8536],[2.7923,39.8566],[2.7905,39.8566],[2.7868,39.8527],[2.783,39.8558],[2.7794,39.856],[2.7743,39.8513],[2.7756,39.8399],[2.7703,39.8407],[2.7672,39.843],[2.765,39.8417],[2.7663,39.8352],[2.7549,39.8289],[2.7479,39.8278],[2.7461,39.8327],[2.7424,39.833],[2.7326,39.827],[2.7383,39.8235],[2.749,39.8205],[2.7615,39.8227],[2.7616,39.8192],[2.7705,39.8126],[2.7694,39.8086],[2.774,39.8061],[2.7747,39.8026],[2.7851,39.7989],[2.7682,39.7806],[2.76,39.7743],[2.7541,39.7722],[2.7602,39.7673],[2.7593,39.7639],[2.7522,39.7598],[2.7474,39.7598],[2.7459,39.753],[2.7418,39.7497],[2.7462,39.7472],[2.7492,39.7498],[2.7533,39.7482],[2.7585,39.7511],[2.7649,39.7518],[2.7717,39.7586],[2.7762,39.7605],[2.7767,39.7651],[2.7743,39.7677],[2.7826,39.7744],[2.7963,39.7775],[2.8024,39.7755],[2.8071,39.7723],[2.808,39.7697],[2.8104,39.7692],[2.812,39.7652],[2.8148,39.7642],[2.8287,39.7681],[2.8319,39.771],[2.8397,39.7743]]]]},{"name":"Esporles","c":[39.6628,2.5867],"p":[[[[2.5286,39.6721],[2.5442,39.6627],[2.5519,39.6519],[2.5508,39.6443],[2.5462,39.6377],[2.5478,39.6319],[2.5522,39.6319],[2.5554,39.6288],[2.5652,39.6308],[2.5687,39.6302],[2.5727,39.63],[2.5742,39.6318],[2.5713,39.6346],[2.5814,39.6397],[2.5836,39.6487],[2.5885,39.6519],[2.6009,39.6501],[2.601,39.6551],[2.6035,39.6557],[2.619,39.6522],[2.6298,39.6465],[2.6399,39.646],[2.6422,39.6481],[2.6462,39.6476],[2.6428,39.6527],[2.6493,39.6549],[2.6455,39.66],[2.6412,39.6594],[2.6408,39.668],[2.6285,39.6726],[2.6231,39.6802],[2.6159,39.6782],[2.611,39.68],[2.6052,39.679],[2.599,39.6842],[2.5986,39.6871],[2.5947,39.6892],[2.5946,39.692],[2.5902,39.6944],[2.5872,39.6951],[2.573,39.689],[2.5648,39.6872],[2.5586,39.6851],[2.5633,39.676],[2.5546,39.672],[2.5341,39.6755],[2.5286,39.6721]]]]},{"name":"Estellencs","c":[39.6488,2.4765],"p":[[[[2.4468,39.6272],[2.4518,39.6307],[2.4522,39.6327],[2.4569,39.6326],[2.4582,39.6374],[2.4622,39.6414],[2.4735,39.6389],[2.4866,39.6339],[2.4979,39.6388],[2.5029,39.6459],[2.5052,39.6463],[2.5074,39.6548],[2.503,39.6572],[2.4974,39.6634],[2.4876,39.6688],[2.4875,39.6713],[2.4818,39.6723],[2.4816,39.6697],[2.4753,39.6619],[2.4719,39.6586],[2.4674,39.6575],[2.4622,39.652],[2.4504,39.6487],[2.4484,39.6492],[2.4446,39.6459],[2.4421,39.6462],[2.4415,39.6446],[2.4367,39.6434],[2.4388,39.6378],[2.4478,39.6337],[2.4468,39.6272]]]]},{"name":"Felanitx","c":[39.4515,3.16],"p":[[[[3.096,39.3996],[3.1039,39.396],[3.1146,39.3946],[3.1376,39.3955],[3.1534,39.3979],[3.1635,39.4004],[3.1681,39.4115],[3.1924,39.3971],[3.1975,39.4013],[3.1976,39.4037],[3.2,39.4057],[3.1983,39.4087],[3.2018,39.4116],[3.2146,39.4014],[3.2395,39.377],[3.2398,39.3797],[3.2409,39.3784],[3.2418,39.3794],[3.2421,39.376],[3.2436,39.3767],[3.248,39.3826],[3.249,39.3852],[3.2458,39.3865],[3.2466,39.3882],[3.2479,39.3864],[3.2504,39.3872],[3.2503,39.3907],[3.2527,39.392],[3.2502,39.3914],[3.2477,39.3932],[3.2506,39.3926],[3.2545,39.3945],[3.2544,39.4001],[3.2524,39.3993],[3.2565,39.4029],[3.2543,39.4037],[3.2583,39.4037],[3.2635,39.4093],[3.2604,39.4088],[3.2567,39.4103],[3.2608,39.4099],[3.2616,39.4119],[3.2645,39.4112],[3.2643,39.4138],[3.2679,39.4154],[3.2666,39.4171],[3.2631,39.4151],[3.2589,39.4161],[3.2628,39.4213],[3.2617,39.4231],[3.263,39.4237],[3.261,39.424],[3.2633,39.4259],[3.2654,39.4248],[3.2661,39.4279],[3.2681,39.4201],[3.2709,39.4187],[3.2701,39.4142],[3.2724,39.414],[3.2749,39.4159],[3.2769,39.4257],[3.2748,39.4283],[3.2726,39.4283],[3.276,39.4316],[3.2771,39.4389],[3.2244,39.4546],[3.2057,39.4631],[3.2165,39.4749],[3.2013,39.4851],[3.1959,39.4942],[3.1953,39.5006],[3.1911,39.502],[3.1824,39.5004],[3.175,39.5008],[3.1695,39.5041],[3.1697,39.5105],[3.1682,39.5115],[3.1667,39.5096],[3.1624,39.5122],[3.1641,39.5147],[3.1592,39.5184],[3.1552,39.5169],[3.1523,39.5196],[3.1473,39.5169],[3.1495,39.5145],[3.1478,39.5113],[3.1386,39.519],[3.1406,39.5205],[3.1393,39.5221],[3.1326,39.5208],[3.1319,39.5257],[3.1276,39.5254],[3.1226,39.5299],[3.1104,39.5344],[3.1035,39.5349],[3.0981,39.5333],[3.0993,39.5325],[3.0882,39.5154],[3.1116,39.4968],[3.1102,39.4938],[3.1091,39.4924],[3.1067,39.4937],[3.1032,39.4916],[3.0789,39.4988],[3.0597,39.4753],[3.0806,39.4532],[3.0887,39.4413],[3.0847,39.44],[3.0888,39.4285],[3.0954,39.4288],[3.099,39.4229],[3.101,39.4172],[3.0854,39.4078],[3.0914,39.4018],[3.096,39.3996]]]]},{"name":"Fornalutx","c":[39.7962,2.7512],"p":[[[[2.7326,39.827],[2.7279,39.8255],[2.7278,39.8234],[2.7297,39.8198],[2.7365,39.8164],[2.7384,39.8129],[2.7366,39.8114],[2.74,39.8064],[2.7347,39.8033],[2.7323,39.7958],[2.7298,39.7947],[2.7263,39.7959],[2.7269,39.7933],[2.7234,39.7875],[2.7235,39.7842],[2.7274,39.7837],[2.73,39.7742],[2.736,39.7757],[2.7357,39.7722],[2.7386,39.7685],[2.7431,39.7674],[2.7512,39.7721],[2.7541,39.7722],[2.76,39.7743],[2.7682,39.7806],[2.7851,39.7989],[2.7747,39.8026],[2.774,39.8061],[2.7694,39.8086],[2.7705,39.8126],[2.7616,39.8192],[2.7615,39.8227],[2.749,39.8205],[2.7383,39.8235],[2.7326,39.827]]]]},{"name":"Inca","c":[39.7117,2.9421],"p":[[[[2.9052,39.6847],[2.9094,39.6827],[2.9281,39.6906],[2.9333,39.683],[2.9435,39.6747],[2.9492,39.6763],[2.956,39.6731],[2.9626,39.6764],[2.9638,39.674],[2.9604,39.6723],[2.9618,39.6707],[2.9681,39.6748],[2.9689,39.6793],[2.9729,39.6791],[2.9822,39.6894],[2.9855,39.6916],[2.9906,39.6995],[2.9892,39.7034],[2.998,39.7074],[2.9917,39.7157],[2.9934,39.7208],[2.9915,39.7234],[2.9937,39.7275],[2.9997,39.7306],[2.9873,39.7347],[2.9882,39.7362],[2.9865,39.7368],[2.9886,39.7381],[2.9761,39.7498],[2.9713,39.7488],[2.9597,39.7508],[2.947,39.7424],[2.9424,39.7414],[2.9394,39.7377],[2.9304,39.7399],[2.9249,39.7371],[2.9217,39.7396],[2.9206,39.737],[2.9061,39.7337],[2.9061,39.7348],[2.8982,39.7308],[2.8935,39.7339],[2.8838,39.7246],[2.8886,39.7153],[2.8884,39.7136],[2.8832,39.7115],[2.8842,39.7101],[2.8781,39.7059],[2.8834,39.7009],[2.8814,39.7],[2.8852,39.6957],[2.8819,39.6936],[2.8884,39.6898],[2.8991,39.6877],[2.9052,39.6847]]]]},{"name":"Lloret de Vistalegre","c":[39.6189,2.9762],"p":[[[[2.9544,39.6021],[2.96,39.6032],[2.9634,39.6065],[2.9696,39.5995],[2.9764,39.5962],[2.9804,39.5971],[2.9806,39.5985],[2.9841,39.6041],[2.9945,39.6051],[2.9999,39.6074],[3.0075,39.606],[3.0116,39.6107],[3.0239,39.6061],[3.024,39.609],[3.012,39.6143],[2.9975,39.6242],[2.9912,39.6258],[2.9814,39.635],[2.9826,39.6386],[2.9808,39.6412],[2.9704,39.6437],[2.9671,39.6486],[2.9577,39.6401],[2.9601,39.6382],[2.9568,39.6298],[2.9503,39.6204],[2.9435,39.6141],[2.9544,39.6021]]]]},{"name":"Lloseta","c":[39.7202,2.8583],"p":[[[[2.8505,39.7131],[2.8605,39.7067],[2.8716,39.6953],[2.8782,39.6979],[2.8819,39.6936],[2.8852,39.6957],[2.8814,39.7],[2.8834,39.7009],[2.8781,39.7059],[2.8842,39.7101],[2.8832,39.7115],[2.8884,39.7136],[2.8886,39.7153],[2.8838,39.7246],[2.8805,39.7276],[2.876,39.724],[2.8744,39.7259],[2.8707,39.7244],[2.8698,39.7262],[2.8662,39.7242],[2.853,39.7315],[2.845,39.7342],[2.8435,39.7382],[2.8384,39.7457],[2.8361,39.7466],[2.8263,39.7417],[2.8301,39.7371],[2.8247,39.7342],[2.8288,39.7233],[2.8374,39.7237],[2.8454,39.722],[2.8505,39.7131]]]]},{"name":"Llubí","c":[39.6997,3.0239],"p":[[[[2.9822,39.6894],[3.013,39.6744],[3.0366,39.6599],[3.0591,39.6876],[3.0575,39.6904],[3.0618,39.6924],[3.0702,39.7029],[3.0692,39.7019],[3.0541,39.7092],[3.055,39.7099],[3.0409,39.7146],[3.044,39.7177],[3.0443,39.7207],[3.0294,39.7298],[3.0291,39.7281],[3.0259,39.7274],[3.0225,39.7315],[3.0196,39.7402],[2.9997,39.7306],[2.9937,39.7275],[2.9915,39.7234],[2.9934,39.7208],[2.9917,39.7157],[2.998,39.7074],[2.9892,39.7034],[2.9906,39.6995],[2.9855,39.6916],[2.9822,39.6894]]]]},{"name":"Llucmajor","c":[39.4502,2.8513],"p":[[[[2.8284,39.5519],[2.8115,39.5419],[2.8095,39.5426],[2.805,39.5376],[2.7998,39.5355],[2.8017,39.5343],[2.786,39.524],[2.7756,39.5105],[2.7599,39.5046],[2.751,39.5038],[2.7489,39.5021],[2.7478,39.503],[2.7512,39.4994],[2.7477,39.5016],[2.748,39.4993],[2.7457,39.5004],[2.7469,39.5026],[2.7453,39.5003],[2.7477,39.4983],[2.7372,39.4926],[2.7367,39.4872],[2.7339,39.4826],[2.7257,39.4795],[2.722,39.4757],[2.7303,39.4625],[2.7391,39.4556],[2.7473,39.4415],[2.7464,39.4322],[2.7395,39.4164],[2.7395,39.4113],[2.742,39.4062],[2.7537,39.3928],[2.7708,39.3837],[2.7738,39.3769],[2.785,39.3684],[2.7873,39.3631],[2.7901,39.3621],[2.7986,39.3635],[2.8055,39.3672],[2.8094,39.3657],[2.8174,39.3587],[2.8291,39.3561],[2.8319,39.3581],[2.8301,39.3589],[2.8336,39.3602],[2.8361,39.3659],[2.8349,39.361],[2.8444,39.3659],[2.8521,39.3654],[2.8557,39.363],[2.8596,39.3638],[2.86,39.3628],[2.87,39.3627],[2.8758,39.3629],[2.8819,39.3662],[2.8869,39.365],[2.8925,39.3613],[2.8981,39.361],[2.8988,39.3589],[2.9015,39.3579],[2.909,39.3565],[2.9086,39.3539],[2.9136,39.3524],[2.9141,39.3582],[2.9187,39.3588],[2.9199,39.36],[2.9176,39.3595],[2.9194,39.3613],[2.9309,39.3642],[2.933,39.3789],[2.9444,39.4148],[2.952,39.4229],[2.9575,39.4244],[2.9625,39.4281],[2.9675,39.4352],[2.9665,39.4383],[2.9616,39.4414],[2.9599,39.4458],[2.9564,39.4477],[2.9542,39.4554],[2.9559,39.4613],[2.9603,39.4632],[2.9571,39.4722],[2.9581,39.4805],[2.9646,39.4809],[2.9696,39.4835],[2.9765,39.4936],[2.9641,39.497],[2.9674,39.5009],[2.9625,39.5051],[2.9726,39.5191],[2.9623,39.5251],[2.9435,39.5303],[2.9361,39.5251],[2.9326,39.5256],[2.9331,39.524],[2.9294,39.5194],[2.9204,39.5168],[2.914,39.5191],[2.9121,39.5185],[2.9106,39.5207],[2.9031,39.5185],[2.8989,39.5219],[2.8881,39.5225],[2.8809,39.5269],[2.8643,39.5321],[2.8644,39.5339],[2.8475,39.5433],[2.8284,39.5519]]]]},{"name":"Manacor","c":[39.555,3.2354],"p":[[[[3.2771,39.4389],[3.2786,39.4516],[3.2769,39.4522],[3.2798,39.4553],[3.2777,39.4568],[3.2806,39.4582],[3.2818,39.4624],[3.2804,39.4633],[3.2827,39.4649],[3.2797,39.4668],[3.2833,39.4671],[3.2825,39.4689],[3.2843,39.469],[3.2839,39.4709],[3.2868,39.4727],[3.286,39.4753],[3.2883,39.475],[3.2912,39.4809],[3.2864,39.4825],[3.2904,39.483],[3.2863,39.484],[3.2885,39.4847],[3.2873,39.4863],[3.2926,39.4846],[3.2943,39.487],[3.2941,39.4909],[3.2917,39.4914],[3.2944,39.4932],[3.2918,39.4943],[3.2968,39.4946],[3.2966,39.4975],[3.2993,39.4973],[3.2963,39.4998],[3.3017,39.5006],[3.2999,39.5039],[3.303,39.5049],[3.3127,39.5143],[3.3109,39.5168],[3.3164,39.5173],[3.3173,39.5188],[3.3148,39.5207],[3.3171,39.5208],[3.3176,39.5237],[3.3186,39.5214],[3.3211,39.5217],[3.3243,39.5259],[3.3338,39.5314],[3.332,39.5327],[3.3361,39.5322],[3.3403,39.5349],[3.3366,39.5366],[3.3368,39.5404],[3.3327,39.5377],[3.3319,39.5404],[3.3329,39.5386],[3.3381,39.5417],[3.3382,39.5385],[3.3407,39.5378],[3.3412,39.5412],[3.3554,39.5465],[3.353,39.5484],[3.3542,39.5475],[3.3592,39.5489],[3.3609,39.5513],[3.3684,39.551],[3.3695,39.5543],[3.3671,39.556],[3.3706,39.5577],[3.3729,39.5562],[3.3752,39.5597],[3.3743,39.5626],[3.3759,39.5644],[3.3738,39.5647],[3.3733,39.567],[3.3688,39.5674],[3.3658,39.5658],[3.3629,39.569],[3.3522,39.5725],[3.3474,39.5721],[3.3466,39.577],[3.342,39.5759],[3.3414,39.578],[3.3451,39.5799],[3.3424,39.5844],[3.3395,39.5858],[3.337,39.5825],[3.3399,39.5775],[3.3344,39.577],[3.3302,39.5809],[3.327,39.5816],[3.3193,39.5776],[3.3148,39.5814],[3.2973,39.5725],[3.2853,39.5838],[3.2843,39.5821],[3.278,39.58],[3.2679,39.5937],[3.2714,39.5958],[3.2693,39.5991],[3.2679,39.5979],[3.2643,39.5987],[3.2524,39.6051],[3.2548,39.6094],[3.2539,39.6122],[3.2459,39.6228],[3.2469,39.6257],[3.2415,39.634],[3.2482,39.6429],[3.251,39.6428],[3.2534,39.6495],[3.253,39.6623],[3.2467,39.6665],[3.2423,39.6767],[3.2286,39.6681],[3.2097,39.6789],[3.2055,39.6684],[3.1978,39.6661],[3.197,39.6603],[3.189,39.6546],[3.1877,39.6511],[3.1798,39.6538],[3.1661,39.6385],[3.1575,39.6271],[3.1606,39.6227],[3.1584,39.6189],[3.1636,39.6169],[3.1613,39.6002],[3.1588,39.5972],[3.1492,39.5947],[3.1501,39.5901],[3.1558,39.5883],[3.1591,39.5853],[3.1521,39.5803],[3.1532,39.5758],[3.1445,39.5689],[3.1493,39.5644],[3.1561,39.5504],[3.1544,39.5491],[3.1582,39.546],[3.1496,39.5459],[3.1381,39.5382],[3.1291,39.5424],[3.1226,39.5299],[3.1276,39.5254],[3.1319,39.5257],[3.1326,39.5208],[3.1393,39.5221],[3.1406,39.5205],[3.1386,39.519],[3.1478,39.5113],[3.1495,39.5145],[3.1473,39.5169],[3.1523,39.5196],[3.1552,39.5169],[3.1592,39.5184],[3.1641,39.5147],[3.1624,39.5122],[3.1667,39.5096],[3.1682,39.5115],[3.1697,39.5105],[3.1695,39.5041],[3.175,39.5008],[3.1824,39.5004],[3.1911,39.502],[3.1953,39.5006],[3.1959,39.4942],[3.2013,39.4851],[3.2165,39.4749],[3.2057,39.4631],[3.2244,39.4546],[3.2771,39.4389]]]]},{"name":"Mancor de la Vall","c":[39.7609,2.8642],"p":[[[[2.8384,39.7457],[2.8435,39.7382],[2.8486,39.7419],[2.8498,39.7361],[2.853,39.7337],[2.8586,39.7393],[2.8652,39.7397],[2.8696,39.7424],[2.8745,39.7391],[2.8856,39.7397],[2.8877,39.7384],[2.8934,39.7415],[2.8872,39.7478],[2.8853,39.757],[2.8873,39.7596],[2.8892,39.7596],[2.8895,39.7615],[2.8923,39.7622],[2.8888,39.7638],[2.891,39.7649],[2.8849,39.7763],[2.879,39.7797],[2.8672,39.7922],[2.8517,39.7817],[2.8437,39.78],[2.8397,39.7743],[2.8486,39.7688],[2.8342,39.7519],[2.8369,39.7512],[2.8384,39.7457]]]]},{"name":"Maria de la Salut","c":[39.6745,3.0948],"p":[[[[3.0366,39.6599],[3.0497,39.6549],[3.0543,39.6565],[3.0636,39.6542],[3.0842,39.6567],[3.1238,39.6629],[3.1269,39.6587],[3.1365,39.6629],[3.1397,39.6675],[3.1431,39.6687],[3.1521,39.6672],[3.1619,39.6739],[3.1533,39.6759],[3.1661,39.6901],[3.1555,39.6955],[3.1521,39.6906],[3.1464,39.6886],[3.1409,39.6831],[3.1346,39.6843],[3.1263,39.6783],[3.1225,39.6791],[3.1191,39.6761],[3.1146,39.6784],[3.1118,39.6766],[3.1073,39.6818],[3.0964,39.6886],[3.0856,39.6987],[3.0769,39.6969],[3.0702,39.7029],[3.0618,39.6924],[3.0575,39.6904],[3.0591,39.6876],[3.0366,39.6599]]]]},{"name":"Marratxí","c":[39.6238,2.7285],"p":[[[[2.6988,39.6503],[2.6985,39.6474],[2.6674,39.6333],[2.6823,39.6121],[2.6826,39.6063],[2.6859,39.6038],[2.6899,39.5965],[2.687,39.5835],[2.6959,39.5863],[2.7036,39.5822],[2.7077,39.5911],[2.739,39.6008],[2.7755,39.602],[2.7777,39.6089],[2.7976,39.614],[2.7836,39.6283],[2.7784,39.6388],[2.7675,39.6399],[2.7633,39.6454],[2.7658,39.6476],[2.7544,39.6482],[2.7546,39.6564],[2.7523,39.658],[2.7385,39.6592],[2.7315,39.6605],[2.7254,39.6593],[2.7072,39.6488],[2.6988,39.6503]]]]},{"name":"Montuïri","c":[39.5647,2.9911],"p":[[[[2.9623,39.5251],[2.9726,39.5191],[2.9749,39.5179],[2.9865,39.5313],[2.9915,39.5324],[3.0044,39.5405],[3.0282,39.5443],[3.031,39.5463],[3.0419,39.5485],[3.0397,39.5505],[3.0446,39.5522],[3.0413,39.5601],[3.0424,39.5643],[3.0377,39.5667],[3.0377,39.5651],[3.0299,39.5703],[3.0277,39.5809],[3.0187,39.5824],[3.0146,39.5765],[3.0061,39.5787],[3.0065,39.5836],[3.0108,39.588],[3.008,39.5906],[3.0009,39.5909],[2.9977,39.5931],[2.9895,39.5933],[2.9868,39.5962],[2.9886,39.5977],[2.9861,39.5997],[2.986,39.5983],[2.9806,39.5985],[2.9804,39.5971],[2.9764,39.5962],[2.9696,39.5995],[2.9634,39.6065],[2.96,39.6032],[2.9544,39.6021],[2.9485,39.5931],[2.9425,39.59],[2.944,39.5867],[2.9558,39.5794],[2.9605,39.5697],[2.9665,39.5624],[2.9656,39.5613],[2.9681,39.5548],[2.9655,39.5458],[2.9689,39.5396],[2.9623,39.5251]]]]},{"name":"Muro","c":[39.7579,3.0856],"p":[[[[3.0843,39.8032],[3.0923,39.7949],[3.0819,39.7911],[3.0674,39.7811],[3.0641,39.776],[3.0634,39.7684],[3.0565,39.7592],[3.0473,39.7542],[3.0461,39.7484],[3.0411,39.7457],[3.0383,39.7409],[3.0267,39.7444],[3.0196,39.7402],[3.0225,39.7315],[3.0259,39.7274],[3.0291,39.7281],[3.0294,39.7298],[3.0443,39.7207],[3.044,39.7177],[3.0409,39.7146],[3.055,39.7099],[3.0541,39.7092],[3.0692,39.7019],[3.0702,39.7029],[3.0893,39.7243],[3.145,39.7738],[3.135,39.7827],[3.125,39.7947],[3.1221,39.8008],[3.1237,39.802],[3.1212,39.8016],[3.1199,39.8041],[3.1171,39.8157],[3.1064,39.8144],[3.0901,39.8077],[3.0843,39.8032]]]]},{"name":"Palma","c":[39.5834,2.6999],"p":[[[[2.839,39.5883],[2.8373,39.5886],[2.8397,39.5945],[2.8344,39.5961],[2.8354,39.5982],[2.8326,39.5964],[2.8287,39.5969],[2.825,39.6006],[2.821,39.5971],[2.8183,39.5985],[2.8172,39.5953],[2.8091,39.6049],[2.8063,39.6113],[2.801,39.6149],[2.7976,39.614],[2.7777,39.6089],[2.7755,39.602],[2.739,39.6008],[2.7077,39.5911],[2.7036,39.5822],[2.6959,39.5863],[2.687,39.5835],[2.6899,39.5965],[2.6859,39.6038],[2.6826,39.6063],[2.6823,39.6121],[2.6674,39.6333],[2.6985,39.6474],[2.6988,39.6503],[2.6831,39.6522],[2.6591,39.6584],[2.6493,39.6549],[2.6428,39.6527],[2.6462,39.6476],[2.6422,39.6481],[2.6399,39.646],[2.6298,39.6465],[2.619,39.6522],[2.6035,39.6557],[2.601,39.6551],[2.6009,39.6501],[2.5885,39.6519],[2.5836,39.6487],[2.5814,39.6397],[2.5713,39.6346],[2.5742,39.6318],[2.5727,39.63],[2.5687,39.6302],[2.5693,39.6254],[2.5736,39.6214],[2.5785,39.6193],[2.5857,39.6195],[2.5886,39.617],[2.5915,39.617],[2.5902,39.6082],[2.5878,39.6045],[2.5849,39.6041],[2.5776,39.598],[2.5731,39.5981],[2.5639,39.5906],[2.5662,39.5858],[2.5756,39.5839],[2.5732,39.5776],[2.581,39.5759],[2.5949,39.5691],[2.596,39.5678],[2.5844,39.5617],[2.5795,39.557],[2.589,39.5508],[2.5974,39.5483],[2.6005,39.551],[2.6079,39.5519],[2.611,39.5494],[2.6154,39.5489],[2.619,39.5449],[2.6325,39.5452],[2.6393,39.5503],[2.6394,39.5527],[2.6391,39.5504],[2.6322,39.5456],[2.6252,39.5458],[2.625,39.5483],[2.6199,39.5496],[2.6244,39.5502],[2.6274,39.5529],[2.6324,39.5529],[2.6265,39.5542],[2.6273,39.5561],[2.626,39.554],[2.6245,39.5545],[2.6259,39.5569],[2.6285,39.5558],[2.6286,39.5574],[2.626,39.557],[2.6283,39.5581],[2.627,39.559],[2.6286,39.5587],[2.6271,39.5598],[2.6297,39.5593],[2.6299,39.5568],[2.6298,39.56],[2.6271,39.5599],[2.6292,39.5616],[2.6278,39.5623],[2.6299,39.5617],[2.6279,39.5624],[2.6293,39.566],[2.6327,39.5684],[2.639,39.5687],[2.6335,39.5673],[2.6325,39.5659],[2.634,39.5646],[2.635,39.5652],[2.633,39.5659],[2.6342,39.5666],[2.6354,39.5654],[2.6343,39.5666],[2.636,39.5658],[2.6349,39.567],[2.6365,39.5661],[2.6354,39.5673],[2.6372,39.5667],[2.6363,39.5678],[2.6388,39.5685],[2.6377,39.5672],[2.6395,39.566],[2.6415,39.5688],[2.6441,39.5671],[2.6364,39.5628],[2.635,39.5635],[2.6359,39.5625],[2.6331,39.5611],[2.6345,39.5591],[2.6453,39.5657],[2.6574,39.5639],[2.6656,39.5609],[2.6655,39.5595],[2.6669,39.5604],[2.6682,39.5586],[2.6671,39.5603],[2.6693,39.5625],[2.6705,39.5605],[2.6684,39.5604],[2.6692,39.5587],[2.6721,39.5601],[2.6749,39.5575],[2.6755,39.5584],[2.6867,39.5534],[2.6863,39.5522],[2.6873,39.5531],[2.69,39.5517],[2.6913,39.5486],[2.6894,39.5482],[2.6954,39.5461],[2.695,39.548],[2.6973,39.5471],[2.6968,39.5437],[2.7,39.5438],[2.7054,39.54],[2.7084,39.5365],[2.7105,39.5363],[2.7091,39.5349],[2.7111,39.5337],[2.7135,39.5346],[2.7162,39.5313],[2.7152,39.5342],[2.717,39.5335],[2.7162,39.5321],[2.7192,39.5344],[2.7275,39.5303],[2.7445,39.5155],[2.7508,39.5066],[2.751,39.5038],[2.7599,39.5046],[2.7756,39.5105],[2.786,39.524],[2.8017,39.5343],[2.7998,39.5355],[2.805,39.5376],[2.8095,39.5426],[2.8115,39.5419],[2.8284,39.5519],[2.8383,39.5608],[2.8354,39.5697],[2.8465,39.57],[2.8454,39.5748],[2.8469,39.5748],[2.8472,39.5787],[2.8452,39.5788],[2.8438,39.5832],[2.839,39.5883]]]]},{"name":"Petra","c":[39.6286,3.143],"p":[[[[3.2252,39.7035],[3.2245,39.6984],[3.2149,39.6961],[3.2131,39.6853],[3.2015,39.6906],[3.1994,39.6997],[3.1855,39.6957],[3.1881,39.6933],[3.1851,39.6915],[3.183,39.6841],[3.1793,39.6851],[3.171,39.6673],[3.1648,39.6582],[3.1597,39.6581],[3.1605,39.6557],[3.1573,39.6498],[3.1545,39.6502],[3.1494,39.6431],[3.1483,39.6438],[3.1392,39.6364],[3.1339,39.6333],[3.1328,39.6343],[3.1279,39.6308],[3.1211,39.6309],[3.1171,39.6345],[3.1062,39.6308],[3.1022,39.634],[3.1041,39.6353],[3.1003,39.6425],[3.0844,39.6341],[3.0637,39.6217],[3.0659,39.6196],[3.0645,39.6185],[3.0703,39.6148],[3.0713,39.6103],[3.0631,39.6034],[3.0716,39.5965],[3.0861,39.5884],[3.095,39.5809],[3.1016,39.5726],[3.1188,39.5755],[3.1532,39.5758],[3.1521,39.5803],[3.1591,39.5853],[3.1558,39.5883],[3.1501,39.5901],[3.1492,39.5947],[3.1588,39.5972],[3.1613,39.6002],[3.1636,39.6169],[3.1584,39.6189],[3.1606,39.6227],[3.1575,39.6271],[3.1661,39.6385],[3.1798,39.6538],[3.1877,39.6511],[3.189,39.6546],[3.197,39.6603],[3.1978,39.6661],[3.2055,39.6684],[3.2097,39.6789],[3.2286,39.6681],[3.2423,39.6767],[3.2513,39.684],[3.2394,39.6952],[3.2361,39.692],[3.2326,39.6967],[3.2251,39.6984],[3.2268,39.702],[3.2252,39.7035]]]]},{"name":"Pollença","c":[39.8867,3.0294],"p":[[[[3.1472,39.9196],[3.1498,39.9198],[3.1498,39.921],[3.1444,39.923],[3.1446,39.9207],[3.1472,39.9196]]],[[[3.0869,39.8709],[3.0823,39.8781],[3.0785,39.8897],[3.0789,39.8919],[3.0811,39.8919],[3.0788,39.8927],[3.0802,39.9013],[3.0818,39.9018],[3.08,39.9023],[3.0819,39.902],[3.0818,39.9043],[3.0847,39.9027],[3.0855,39.9036],[3.0821,39.9045],[3.0831,39.9061],[3.0879,39.9046],[3.0856,39.9019],[3.0875,39.9029],[3.0885,39.9047],[3.0832,39.9065],[3.0875,39.9105],[3.0915,39.9111],[3.0962,39.9089],[3.0988,39.9096],[3.099,39.9077],[3.0998,39.9092],[3.103,39.9068],[3.0997,39.907],[3.1074,39.906],[3.1108,39.8993],[3.1112,39.9041],[3.1087,39.9081],[3.1098,39.9112],[3.116,39.9108],[3.1199,39.9149],[3.1274,39.9168],[3.1313,39.9269],[3.1384,39.9281],[3.1423,39.927],[3.1455,39.9239],[3.1488,39.9248],[3.1544,39.9232],[3.1646,39.9288],[3.1636,39.9301],[3.169,39.9314],[3.1782,39.9374],[3.1837,39.9377],[3.1805,39.9406],[3.1879,39.9401],[3.1894,39.944],[3.1928,39.9399],[3.196,39.9424],[3.2022,39.9438],[3.2085,39.9526],[3.2131,39.9556],[3.2142,39.9622],[3.2102,39.9613],[3.206,39.9576],[3.1945,39.9544],[3.192,39.9549],[3.1925,39.9582],[3.1905,39.9575],[3.1796,39.9511],[3.1731,39.9521],[3.1801,39.9585],[3.1798,39.9612],[3.1745,39.9606],[3.1712,39.9581],[3.1712,39.9596],[3.1667,39.9588],[3.1657,39.9599],[3.1597,39.9556],[3.1593,39.9573],[3.1562,39.9571],[3.1462,39.9534],[3.145,39.95],[3.1326,39.9447],[3.1314,39.9383],[3.1205,39.9314],[3.1177,39.9332],[3.1181,39.9351],[3.1136,39.931],[3.1119,39.9324],[3.1095,39.9311],[3.106,39.9323],[3.0975,39.9279],[3.0946,39.9291],[3.1016,39.9352],[3.0956,39.9359],[3.0808,39.925],[3.0731,39.9222],[3.0659,39.9231],[3.0603,39.9198],[3.0582,39.9202],[3.059,39.9222],[3.0554,39.9221],[3.0611,39.9326],[3.052,39.9334],[3.0465,39.9319],[3.0439,39.9296],[3.0378,39.9302],[3.0428,39.9364],[3.0421,39.9377],[3.0371,39.932],[3.0331,39.9303],[3.0311,39.9317],[3.0345,39.9345],[3.0281,39.9351],[3.0118,39.9269],[3.0077,39.9264],[3.0052,39.9239],[3.0011,39.9235],[2.9976,39.9181],[2.9945,39.9174],[2.9942,39.9149],[2.9914,39.9144],[2.987,39.9091],[2.9836,39.9098],[2.9827,39.9082],[2.9805,39.9095],[2.975,39.9092],[2.9737,39.9106],[2.9703,39.9092],[2.9647,39.9105],[2.9624,39.9125],[2.9637,39.9145],[2.9565,39.9153],[2.9505,39.9201],[2.9461,39.9171],[2.9448,39.914],[2.9408,39.9125],[2.936,39.9041],[2.9246,39.9001],[2.9211,39.8979],[2.9241,39.8805],[2.9294,39.8746],[2.9337,39.8732],[2.9334,39.8693],[2.9363,39.8668],[2.9385,39.8578],[2.9368,39.8517],[2.9393,39.8407],[2.9453,39.8314],[2.9541,39.8224],[2.9898,39.834],[3.0088,39.8166],[3.0265,39.8258],[3.0321,39.8217],[3.0356,39.821],[3.0382,39.8212],[3.0434,39.8179],[3.0477,39.8227],[3.0474,39.8268],[3.05,39.8326],[3.0481,39.8472],[3.0527,39.8497],[3.0573,39.848],[3.0602,39.8532],[3.0645,39.8539],[3.0813,39.8692],[3.0869,39.8709]]]]},{"name":"Porreres","c":[39.5074,3.0308],"p":[[[[3.0597,39.4753],[3.0789,39.4988],[3.1032,39.4916],[3.1067,39.4937],[3.1091,39.4924],[3.1102,39.4938],[3.1116,39.4968],[3.0882,39.5154],[3.0993,39.5325],[3.0981,39.5333],[3.1035,39.5349],[3.0892,39.5481],[3.0883,39.5519],[3.0788,39.5547],[3.0665,39.5502],[3.0536,39.5544],[3.0446,39.5522],[3.0397,39.5505],[3.0419,39.5485],[3.031,39.5463],[3.0282,39.5443],[3.0044,39.5405],[2.9915,39.5324],[2.9865,39.5313],[2.9749,39.5179],[2.9726,39.5191],[2.9625,39.5051],[2.9674,39.5009],[2.9641,39.497],[2.9765,39.4936],[2.9696,39.4835],[2.9646,39.4809],[2.9581,39.4805],[2.9571,39.4722],[2.9603,39.4632],[2.9641,39.464],[2.9881,39.4603],[2.9972,39.4651],[3.0052,39.4613],[3.0172,39.4711],[3.0227,39.4669],[3.0281,39.4684],[3.0304,39.467],[3.045,39.4722],[3.051,39.4764],[3.0569,39.4724],[3.0597,39.4753]]]]},{"name":"Puigpunyent","c":[39.6268,2.5289],"p":[[[[2.5074,39.6548],[2.5052,39.6463],[2.5029,39.6459],[2.4979,39.6388],[2.4866,39.6339],[2.4828,39.6227],[2.4843,39.6147],[2.4831,39.6123],[2.4946,39.6079],[2.495,39.6052],[2.5034,39.5997],[2.5081,39.5915],[2.5163,39.5949],[2.5195,39.591],[2.5242,39.5919],[2.5227,39.5953],[2.5395,39.6017],[2.5445,39.6016],[2.547,39.6038],[2.55,39.6018],[2.5576,39.6024],[2.5627,39.6047],[2.5649,39.6086],[2.5682,39.6098],[2.5703,39.608],[2.5902,39.6082],[2.5915,39.617],[2.5886,39.617],[2.5857,39.6195],[2.5785,39.6193],[2.5736,39.6214],[2.5693,39.6254],[2.5687,39.6302],[2.5652,39.6308],[2.5554,39.6288],[2.5522,39.6319],[2.5478,39.6319],[2.5462,39.6377],[2.5508,39.6443],[2.5519,39.6519],[2.5442,39.6627],[2.5286,39.6721],[2.52,39.6641],[2.5152,39.6629],[2.5106,39.6596],[2.5074,39.6548]]]]},{"name":"Sa Pobla","c":[39.7804,3.029],"p":[[[[3.0356,39.821],[3.0321,39.8217],[3.0265,39.8258],[3.0088,39.8166],[2.9977,39.8113],[2.9932,39.8069],[2.9881,39.8047],[2.9851,39.8009],[2.9871,39.7924],[2.9877,39.7914],[2.9891,39.7927],[2.9907,39.7875],[2.9952,39.7834],[2.9995,39.7839],[3.0048,39.7821],[3.0082,39.7812],[3.0134,39.7834],[3.0023,39.7752],[3.0017,39.7715],[3.0032,39.7696],[2.9977,39.7603],[3.0002,39.7565],[2.9977,39.7561],[2.9952,39.753],[3.0015,39.7476],[2.9886,39.7381],[2.9865,39.7368],[2.9882,39.7362],[2.9873,39.7347],[2.9997,39.7306],[3.0196,39.7402],[3.0267,39.7444],[3.0383,39.7409],[3.0411,39.7457],[3.0461,39.7484],[3.0473,39.7542],[3.0565,39.7592],[3.0634,39.7684],[3.0641,39.776],[3.0674,39.7811],[3.0819,39.7911],[3.0923,39.7949],[3.0843,39.8032],[3.0844,39.8015],[3.0781,39.7989],[3.0688,39.8046],[3.0608,39.804],[3.0509,39.807],[3.0448,39.8044],[3.0433,39.8064],[3.0402,39.8053],[3.037,39.8112],[3.0356,39.821]]]]},{"name":"Sant Joan","c":[39.588,3.0453],"p":[[[[2.9806,39.5985],[2.986,39.5983],[2.9861,39.5997],[2.9886,39.5977],[2.9868,39.5962],[2.9895,39.5933],[2.9977,39.5931],[3.0009,39.5909],[3.008,39.5906],[3.0108,39.588],[3.0065,39.5836],[3.0061,39.5787],[3.0146,39.5765],[3.0187,39.5824],[3.0277,39.5809],[3.0299,39.5703],[3.0377,39.5651],[3.0377,39.5667],[3.0424,39.5643],[3.0413,39.5601],[3.0446,39.5522],[3.0536,39.5544],[3.0665,39.5502],[3.0788,39.5547],[3.0828,39.5647],[3.0848,39.5653],[3.0825,39.5692],[3.0809,39.5694],[3.0796,39.5744],[3.0891,39.5763],[3.095,39.5809],[3.0861,39.5884],[3.0716,39.5965],[3.0631,39.6034],[3.0713,39.6103],[3.0703,39.6148],[3.0645,39.6185],[3.0659,39.6196],[3.0637,39.6217],[3.0568,39.6156],[3.05,39.6187],[3.0422,39.6249],[3.0274,39.616],[3.0257,39.6139],[3.0284,39.6121],[3.0249,39.6112],[3.024,39.609],[3.0239,39.6061],[3.0116,39.6107],[3.0075,39.606],[2.9999,39.6074],[2.9945,39.6051],[2.9841,39.6041],[2.9806,39.5985]]]]},{"name":"Sant Llorenç des Cardassar","c":[39.6172,3.3054],"p":[[[[3.2513,39.684],[3.2423,39.6767],[3.2467,39.6665],[3.253,39.6623],[3.2534,39.6495],[3.251,39.6428],[3.2482,39.6429],[3.2415,39.634],[3.2469,39.6257],[3.2459,39.6228],[3.2539,39.6122],[3.2548,39.6094],[3.2524,39.6051],[3.2643,39.5987],[3.2679,39.5979],[3.2693,39.5991],[3.2714,39.5958],[3.2679,39.5937],[3.278,39.58],[3.2843,39.5821],[3.2853,39.5838],[3.2973,39.5725],[3.3148,39.5814],[3.3193,39.5776],[3.327,39.5816],[3.3302,39.5809],[3.3344,39.577],[3.3399,39.5775],[3.337,39.5825],[3.3395,39.5858],[3.3424,39.5844],[3.3451,39.5799],[3.3414,39.578],[3.342,39.5759],[3.3466,39.577],[3.3474,39.5721],[3.3522,39.5725],[3.3629,39.569],[3.3658,39.5658],[3.3688,39.5674],[3.3733,39.567],[3.3769,39.5699],[3.3757,39.572],[3.3795,39.5761],[3.3952,39.5756],[3.4005,39.5769],[3.4042,39.5797],[3.4027,39.5836],[3.3943,39.5835],[3.3932,39.5852],[3.3867,39.5874],[3.385,39.5934],[3.3856,39.6001],[3.3631,39.6049],[3.3626,39.607],[3.3563,39.6085],[3.3519,39.6157],[3.3507,39.6153],[3.3294,39.6333],[3.3284,39.6357],[3.3236,39.6358],[3.3207,39.6411],[3.3113,39.6394],[3.306,39.6439],[3.3035,39.6442],[3.2983,39.6524],[3.2942,39.6501],[3.2904,39.6525],[3.2986,39.666],[3.2807,39.6797],[3.2763,39.681],[3.2554,39.6802],[3.2513,39.684]]]]},{"name":"Santa Eugènia","c":[39.6188,2.8342],"p":[[[[2.8641,39.6044],[2.8484,39.6249],[2.8519,39.6263],[2.8487,39.63],[2.8553,39.6314],[2.8536,39.6368],[2.8501,39.6411],[2.8452,39.6424],[2.8373,39.6518],[2.828,39.6455],[2.8211,39.6431],[2.8244,39.6375],[2.8107,39.6381],[2.811,39.6217],[2.8135,39.6194],[2.8114,39.6179],[2.8159,39.6151],[2.8063,39.6113],[2.8091,39.6049],[2.8172,39.5953],[2.8183,39.5985],[2.821,39.5971],[2.825,39.6006],[2.8287,39.5969],[2.8326,39.5964],[2.8354,39.5982],[2.8344,39.5961],[2.8397,39.5945],[2.8373,39.5886],[2.839,39.5883],[2.865,39.6035],[2.8641,39.6044]]]]},{"name":"Santa Margalida","c":[39.721,3.1548],"p":[[[[3.2367,39.7322],[3.2203,39.7403],[3.2217,39.7389],[3.2121,39.7416],[3.202,39.7483],[3.1969,39.7487],[3.1904,39.7519],[3.1895,39.754],[3.1881,39.753],[3.178,39.7561],[3.1663,39.7629],[3.1639,39.7629],[3.1592,39.7673],[3.1616,39.7647],[3.1532,39.7677],[3.145,39.7738],[3.0893,39.7243],[3.0702,39.7029],[3.0769,39.6969],[3.0856,39.6987],[3.0964,39.6886],[3.1073,39.6818],[3.1118,39.6766],[3.1146,39.6784],[3.1191,39.6761],[3.1225,39.6791],[3.1263,39.6783],[3.1346,39.6843],[3.1409,39.6831],[3.1464,39.6886],[3.1521,39.6906],[3.1555,39.6955],[3.1661,39.6901],[3.172,39.6889],[3.1778,39.6951],[3.1855,39.6957],[3.1994,39.6997],[3.2015,39.6906],[3.2131,39.6853],[3.2149,39.6961],[3.2245,39.6984],[3.2252,39.7035],[3.2338,39.7187],[3.2367,39.7322]]]]},{"name":"Santa Maria del Camí","c":[39.6641,2.772],"p":[[[[2.7527,39.7185],[2.7491,39.7146],[2.7412,39.7127],[2.7369,39.7065],[2.7348,39.7063],[2.7315,39.6986],[2.7364,39.6919],[2.7331,39.6893],[2.7368,39.6619],[2.7385,39.6592],[2.7523,39.658],[2.7546,39.6564],[2.7544,39.6482],[2.7658,39.6476],[2.7633,39.6454],[2.7675,39.6399],[2.7784,39.6388],[2.7836,39.6283],[2.7976,39.614],[2.801,39.6149],[2.8063,39.6113],[2.8159,39.6151],[2.8114,39.6179],[2.8135,39.6194],[2.811,39.6217],[2.8107,39.6381],[2.8244,39.6375],[2.8211,39.6431],[2.7972,39.6617],[2.7953,39.6608],[2.7851,39.6723],[2.7788,39.6841],[2.7709,39.6912],[2.765,39.6929],[2.7668,39.6981],[2.7653,39.7055],[2.7588,39.7096],[2.7527,39.7185]]]]},{"name":"Santanyí","c":[39.3493,3.1321],"p":[[[[3.0692,39.3792],[3.0871,39.3644],[3.0856,39.3604],[3.0785,39.3532],[3.0789,39.351],[3.083,39.349],[3.0777,39.3444],[3.0815,39.338],[3.0751,39.3277],[3.0707,39.3299],[3.0686,39.3257],[3.064,39.3264],[3.0567,39.3207],[3.0694,39.3024],[3.0335,39.2937],[3.0295,39.2898],[3.0309,39.2884],[3.0276,39.2856],[3.0302,39.2826],[3.038,39.2805],[3.0372,39.2795],[3.0421,39.2796],[3.0438,39.2765],[3.0416,39.2748],[3.0434,39.2746],[3.0501,39.2656],[3.0556,39.2645],[3.0688,39.2667],[3.0733,39.2688],[3.087,39.2818],[3.0918,39.287],[3.0902,39.2891],[3.0936,39.2886],[3.0956,39.2902],[3.0952,39.2926],[3.0995,39.2937],[3.1035,39.297],[3.1047,39.3007],[3.107,39.3023],[3.11,39.3022],[3.1182,39.3131],[3.121,39.3122],[3.1246,39.3159],[3.1297,39.3135],[3.1375,39.3168],[3.1425,39.3206],[3.1422,39.3237],[3.1393,39.3243],[3.1414,39.3246],[3.1409,39.3257],[3.1451,39.3256],[3.1465,39.33],[3.149,39.327],[3.1518,39.3279],[3.1605,39.3259],[3.171,39.3265],[3.1738,39.3281],[3.1726,39.3304],[3.1674,39.3318],[3.17,39.3319],[3.1693,39.3335],[3.1746,39.3297],[3.1774,39.3294],[3.1802,39.3311],[3.1788,39.333],[3.1801,39.3348],[3.187,39.3352],[3.1894,39.3385],[3.1871,39.3387],[3.1891,39.3437],[3.192,39.3451],[3.1892,39.3473],[3.1901,39.3482],[3.1855,39.3504],[3.1887,39.3521],[3.1888,39.3502],[3.1916,39.3502],[3.1915,39.3519],[3.193,39.3525],[3.1934,39.3512],[3.1979,39.3527],[3.197,39.3512],[3.202,39.3507],[3.2153,39.3549],[3.2139,39.3565],[3.2093,39.3556],[3.2087,39.3579],[3.2112,39.3575],[3.2123,39.3599],[3.2122,39.3609],[3.2102,39.3601],[3.2083,39.361],[3.2114,39.3608],[3.211,39.3647],[3.2126,39.3623],[3.2162,39.3616],[3.216,39.3578],[3.2205,39.3593],[3.2198,39.357],[3.2237,39.3568],[3.2253,39.3581],[3.2245,39.3608],[3.2266,39.3584],[3.2293,39.359],[3.2339,39.3639],[3.2314,39.3643],[3.2347,39.3652],[3.2348,39.3674],[3.2289,39.3661],[3.2272,39.3687],[3.2235,39.3691],[3.2223,39.3731],[3.2235,39.3731],[3.2229,39.3709],[3.2289,39.3681],[3.2314,39.3686],[3.2302,39.371],[3.2337,39.3692],[3.233,39.373],[3.2372,39.3694],[3.2405,39.3734],[3.2375,39.3759],[3.2401,39.3753],[3.2395,39.377],[3.2146,39.4014],[3.2018,39.4116],[3.1983,39.4087],[3.2,39.4057],[3.1976,39.4037],[3.1975,39.4013],[3.1924,39.3971],[3.1681,39.4115],[3.1635,39.4004],[3.1534,39.3979],[3.1376,39.3955],[3.1146,39.3946],[3.1039,39.396],[3.096,39.3996],[3.0692,39.3792]]]]},{"name":"Selva","c":[39.7688,2.9091],"p":[[[[2.9624,39.756],[2.9519,39.7642],[2.9504,39.7658],[2.9516,39.7667],[2.9443,39.7695],[2.9467,39.7713],[2.9427,39.7789],[2.9346,39.7899],[2.9286,39.7946],[2.9279,39.8005],[2.9312,39.8043],[2.927,39.8136],[2.9246,39.8155],[2.9191,39.8163],[2.9039,39.8152],[2.8883,39.8055],[2.8807,39.8015],[2.878,39.8016],[2.8692,39.796],[2.8672,39.7922],[2.879,39.7797],[2.8849,39.7763],[2.891,39.7649],[2.8888,39.7638],[2.8923,39.7622],[2.8895,39.7615],[2.8892,39.7596],[2.8873,39.7596],[2.8853,39.757],[2.8872,39.7478],[2.8934,39.7415],[2.8877,39.7384],[2.8856,39.7397],[2.8745,39.7391],[2.8696,39.7424],[2.8652,39.7397],[2.8586,39.7393],[2.853,39.7337],[2.8498,39.7361],[2.8486,39.7419],[2.8435,39.7382],[2.845,39.7342],[2.853,39.7315],[2.8662,39.7242],[2.8698,39.7262],[2.8707,39.7244],[2.8744,39.7259],[2.876,39.724],[2.8805,39.7276],[2.8838,39.7246],[2.8935,39.7339],[2.8982,39.7308],[2.9061,39.7348],[2.9061,39.7337],[2.9206,39.737],[2.9217,39.7396],[2.9249,39.7371],[2.9304,39.7399],[2.9394,39.7377],[2.9424,39.7414],[2.947,39.7424],[2.9597,39.7508],[2.9624,39.756]]]]},{"name":"Sencelles","c":[39.6404,2.8979],"p":[[[[2.9435,39.6141],[2.9503,39.6204],[2.9568,39.6298],[2.9468,39.6278],[2.946,39.6305],[2.9488,39.631],[2.9465,39.6358],[2.9407,39.635],[2.9386,39.6404],[2.9289,39.6387],[2.9251,39.652],[2.9222,39.6536],[2.9187,39.661],[2.9425,39.6687],[2.9394,39.6725],[2.9435,39.6747],[2.9333,39.683],[2.9281,39.6906],[2.9094,39.6827],[2.9052,39.6847],[2.8987,39.6788],[2.9001,39.6779],[2.8983,39.676],[2.8996,39.674],[2.8968,39.673],[2.8986,39.6716],[2.8912,39.6706],[2.8932,39.6688],[2.889,39.6645],[2.8848,39.6553],[2.8776,39.6573],[2.8726,39.6557],[2.8716,39.6569],[2.8672,39.6545],[2.8593,39.6614],[2.8505,39.661],[2.8448,39.6595],[2.8456,39.6585],[2.8373,39.6518],[2.8452,39.6424],[2.8501,39.6411],[2.8536,39.6368],[2.8553,39.6314],[2.8487,39.63],[2.8519,39.6263],[2.8484,39.6249],[2.8641,39.6044],[2.8763,39.6071],[2.8792,39.6045],[2.8882,39.6089],[2.892,39.61],[2.8926,39.6083],[2.9022,39.6108],[2.9067,39.6054],[2.9435,39.6141]]]]},{"name":"Ses Salines","c":[39.3309,3.0435],"p":[[[[3.0015,39.3094],[3.0019,39.3109],[3.0003,39.3111],[3.0015,39.3094]]],[[[3.0094,39.3034],[3.012,39.3035],[3.0125,39.3053],[3.0082,39.3048],[3.0094,39.3034]]],[[[2.9884,39.3255],[2.9861,39.3265],[2.9866,39.3254],[2.9843,39.3249],[2.9841,39.3214],[2.987,39.3213],[2.9866,39.3189],[2.9844,39.318],[2.9862,39.3176],[2.9861,39.3159],[2.9937,39.3148],[2.9919,39.3128],[2.9935,39.3122],[2.9995,39.3155],[2.997,39.3152],[2.9987,39.3175],[3.003,39.3173],[3.0052,39.3151],[3.0048,39.3123],[3.0133,39.3106],[3.0158,39.3064],[3.0197,39.3039],[3.0176,39.296],[3.0239,39.2888],[3.0259,39.2877],[3.0295,39.2898],[3.0335,39.2937],[3.0694,39.3024],[3.0567,39.3207],[3.064,39.3264],[3.0686,39.3257],[3.0707,39.3299],[3.0751,39.3277],[3.0815,39.338],[3.0777,39.3444],[3.083,39.349],[3.0789,39.351],[3.0785,39.3532],[3.0856,39.3604],[3.0871,39.3644],[3.0692,39.3792],[3.0566,39.3711],[3.0397,39.3508],[3.0301,39.3443],[3.0064,39.3315],[2.9884,39.3255]]]]},{"name":"Sineu","c":[39.6462,3.0213],"p":[[[[2.9671,39.6486],[2.9704,39.6437],[2.9808,39.6412],[2.9826,39.6386],[2.9814,39.635],[2.9912,39.6258],[2.9975,39.6242],[3.012,39.6143],[3.024,39.609],[3.0249,39.6112],[3.0284,39.6121],[3.0257,39.6139],[3.0274,39.616],[3.0422,39.6249],[3.05,39.6187],[3.0568,39.6156],[3.0637,39.6217],[3.0844,39.6341],[3.0835,39.645],[3.0856,39.6456],[3.0819,39.6519],[3.0848,39.6529],[3.0842,39.6567],[3.0636,39.6542],[3.0543,39.6565],[3.0497,39.6549],[3.0366,39.6599],[3.013,39.6744],[2.9822,39.6894],[2.9729,39.6791],[2.9729,39.6759],[2.976,39.6742],[2.9762,39.6694],[2.9779,39.6683],[2.9716,39.6573],[2.965,39.6505],[2.9671,39.6486]]]]},{"name":"Sóller","c":[39.775,2.7064],"p":[[[[2.7418,39.7497],[2.7459,39.753],[2.7474,39.7598],[2.7522,39.7598],[2.7593,39.7639],[2.7602,39.7673],[2.7541,39.7722],[2.7512,39.7721],[2.7431,39.7674],[2.7386,39.7685],[2.7357,39.7722],[2.736,39.7757],[2.73,39.7742],[2.7274,39.7837],[2.7235,39.7842],[2.7234,39.7875],[2.7269,39.7933],[2.7263,39.7959],[2.7298,39.7947],[2.7323,39.7958],[2.7347,39.8033],[2.74,39.8064],[2.7366,39.8114],[2.7384,39.8129],[2.7365,39.8164],[2.7297,39.8198],[2.7278,39.8234],[2.717,39.8178],[2.715,39.8182],[2.7042,39.8086],[2.7014,39.8095],[2.7015,39.8118],[2.6995,39.8108],[2.6984,39.8078],[2.6943,39.8047],[2.6935,39.8001],[2.6913,39.7979],[2.6891,39.7979],[2.6916,39.7952],[2.6932,39.7978],[2.6956,39.7973],[2.6966,39.7941],[2.6944,39.7913],[2.691,39.7907],[2.6898,39.7935],[2.6837,39.7939],[2.6838,39.7971],[2.6799,39.7985],[2.6693,39.7921],[2.6671,39.7842],[2.6635,39.7803],[2.6656,39.7756],[2.6622,39.7721],[2.672,39.7613],[2.6777,39.7498],[2.6685,39.7381],[2.6797,39.7384],[2.6886,39.7363],[2.6932,39.7336],[2.7093,39.7511],[2.7169,39.7501],[2.7167,39.7467],[2.7255,39.7462],[2.728,39.7472],[2.7355,39.7444],[2.7418,39.7497]]],[[[2.7104,39.8158],[2.7097,39.8191],[2.7089,39.8167],[2.7104,39.8158]]]]},{"name":"Son Servera","c":[39.6402,3.3712],"p":[[[[3.3207,39.6411],[3.3236,39.6358],[3.3284,39.6357],[3.3294,39.6333],[3.3507,39.6153],[3.3519,39.6157],[3.3563,39.6085],[3.3626,39.607],[3.3631,39.6049],[3.3856,39.6001],[3.3917,39.6091],[3.3904,39.6102],[3.3924,39.6107],[3.3934,39.6143],[3.3914,39.6139],[3.393,39.6147],[3.3919,39.6181],[3.3943,39.6197],[3.3931,39.6209],[3.3969,39.6283],[3.4048,39.6362],[3.41,39.6377],[3.4138,39.635],[3.4267,39.6323],[3.4334,39.6325],[3.4364,39.6345],[3.434,39.6356],[3.4327,39.6399],[3.4253,39.6422],[3.4259,39.645],[3.4184,39.6458],[3.4152,39.653],[3.4067,39.6561],[3.4059,39.6618],[3.4001,39.6642],[3.3966,39.669],[3.3912,39.6721],[3.3849,39.6645],[3.3754,39.6641],[3.3664,39.6677],[3.3639,39.6725],[3.3555,39.6714],[3.3415,39.6622],[3.3372,39.6675],[3.3304,39.6674],[3.3216,39.6622],[3.325,39.661],[3.3278,39.6564],[3.3282,39.6475],[3.3207,39.6411]]]]},{"name":"Valldemossa","c":[39.704,2.62],"p":[[[[2.5648,39.6872],[2.573,39.689],[2.5872,39.6951],[2.5902,39.6944],[2.5946,39.692],[2.5947,39.6892],[2.5986,39.6871],[2.599,39.6842],[2.6052,39.679],[2.611,39.68],[2.6159,39.6782],[2.6231,39.6802],[2.6285,39.6726],[2.6408,39.668],[2.6412,39.6594],[2.6455,39.66],[2.6493,39.6549],[2.6591,39.6584],[2.6598,39.6614],[2.6512,39.6644],[2.653,39.6768],[2.6572,39.682],[2.6566,39.6847],[2.6477,39.6916],[2.6499,39.6986],[2.6574,39.7036],[2.6576,39.7154],[2.6595,39.7189],[2.6617,39.7196],[2.6622,39.7228],[2.6597,39.7246],[2.6567,39.7269],[2.6583,39.7295],[2.6559,39.731],[2.6554,39.7341],[2.6517,39.737],[2.6386,39.737],[2.632,39.7314],[2.6241,39.7277],[2.6213,39.7315],[2.6195,39.7401],[2.6157,39.7436],[2.5996,39.7328],[2.5965,39.7261],[2.5917,39.7228],[2.5891,39.7187],[2.573,39.7112],[2.5557,39.7003],[2.5662,39.6945],[2.5648,39.6872]]]]},{"name":"Vilafranca de Bonany","c":[39.557,3.1173],"p":[[[[3.1226,39.5299],[3.1291,39.5424],[3.1381,39.5382],[3.1496,39.5459],[3.1582,39.546],[3.1544,39.5491],[3.1561,39.5504],[3.1493,39.5644],[3.1445,39.5689],[3.1532,39.5758],[3.1188,39.5755],[3.1016,39.5726],[3.095,39.5809],[3.0891,39.5763],[3.0796,39.5744],[3.0809,39.5694],[3.0825,39.5692],[3.0848,39.5653],[3.0828,39.5647],[3.0788,39.5547],[3.0883,39.5519],[3.0892,39.5481],[3.1035,39.5349],[3.1104,39.5344],[3.1226,39.5299]]]]}],"roads":[{"t":1,"l":[[39.571,2.6808],[39.5808,2.6793],[39.5902,2.6791],[39.5995,2.6802],[39.6092,2.6826],[39.6175,2.6865],[39.6252,2.6924],[39.6319,2.6995],[39.6373,2.707],[39.6459,2.7239],[39.7119,2.8878],[39.751,2.9577],[39.7884,3.0094]]},{"t":1,"l":[[39.5136,2.5013],[39.5443,2.5286],[39.5577,2.5424],[39.5756,2.565],[39.5937,2.599],[39.6011,2.6164],[39.6093,2.6453],[39.6156,2.6823]]},{"t":2,"l":[[39.7884,3.0094],[39.8258,3.0515],[39.8334,3.0634],[39.8388,3.0756],[39.842,3.0886],[39.8432,3.1027]]},{"t":2,"l":[[39.5992,2.6796],[39.5818,2.7517],[39.5519,3.0673],[39.5569,3.1869],[39.5601,3.2074],[39.5662,3.2266],[39.5708,3.2359],[39.5939,3.2692],[39.6122,3.3038],[39.6182,3.3112],[39.6326,3.3247],[39.6403,3.3305],[39.6517,3.3377],[39.6557,3.3395],[39.6598,3.3409],[39.6635,3.3414],[39.6735,3.3415],[39.6833,3.3424],[39.6924,3.3452],[39.7004,3.3512],[39.7057,3.3577],[39.7099,3.3647],[39.7132,3.3721],[39.7313,3.4474]]},{"t":1,"l":[[39.463,2.9126],[39.4771,2.8312],[39.4867,2.799],[39.4992,2.7678],[39.5155,2.7356],[39.5251,2.7202],[39.5358,2.7058],[39.5453,2.6951],[39.5562,2.6855],[39.5684,2.6781],[39.5821,2.674],[39.5851,2.6737]]},{"t":2,"l":[[39.5612,3.2053],[39.5036,3.1807],[39.4801,3.1355],[39.4643,3.0834],[39.4298,3.0381]]},{"t":2,"l":[[39.37,3.1874],[39.3682,3.1397],[39.37,3.1241],[39.3757,3.106],[39.4244,3.0214],[39.4415,2.9849],[39.4539,2.9493],[39.463,2.9126]]},{"t":2,"l":[[39.8539,3.0918],[39.8167,3.1053],[39.7833,3.1251],[39.7545,3.1511],[39.7309,3.1828],[39.7163,3.211],[39.7053,3.2406],[39.6978,3.2714],[39.6938,3.3028],[39.6951,3.343]]}]};
+
+  // ---------- Model ----------
+  var CRITERIA = [
+    { k: 'producto', label: 'Calidad del producto' },
+    { k: 'plato', label: 'Plato estrella' },
+    { k: 'tecnica', label: 'Técnica y creatividad' },
+    { k: 'servicio', label: 'Servicio' },
+    { k: 'precio', label: 'Calidad/precio' },
+    { k: 'ambiente', label: 'Ambiente' }
+  ];
+  var CUISINES = ['Mallorquina', 'Mediterránea', 'Arroces', 'Pescado y marisco', 'Brasa', 'Tapas', 'De autor', 'Italiana', 'Japonesa', 'Otra'];
+  var PRICES = ['€', '€€', '€€€', '€€€€'];
+  var TIER1 = ['Palma', 'Calvià', 'Andratx', 'Sóller', 'Pollença', 'Alcúdia', 'Inca', 'Manacor', 'Artà', 'Felanitx', 'Santanyí', 'Llucmajor', 'Campos'];
+
+  function ph(hue, label) {
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">' +
+      '<rect width="300" height="300" fill="hsl(' + hue + ',28%,82%)"/>' +
+      '<circle cx="150" cy="150" r="92" fill="hsl(' + hue + ',30%,96%)"/>' +
+      '<circle cx="150" cy="150" r="64" fill="none" stroke="hsl(' + hue + ',25%,80%)" stroke-width="3"/>' +
+      '<circle cx="132" cy="138" r="26" fill="hsl(' + hue + ',45%,55%)"/>' +
+      '<circle cx="172" cy="162" r="18" fill="hsl(' + ((hue + 40) % 360) + ',45%,48%)"/>' +
+      '<text x="150" y="282" font-family="sans-serif" font-size="15" text-anchor="middle" fill="hsl(' + hue + ',25%,35%)">' + label + '</text>' +
+      '</svg>';
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  }
+
+  var restaurants = [
+    { id: 's1', sample: true, name: 'Can Exemple', muni: 'Palma', lat: 39.5712, lng: 2.6498, cuisines: ['Mallorquina', 'Arroces'], price: '€€', date: '2026-10-17',
+      scores: { producto: 8.5, plato: 9, tecnica: 7, servicio: 8, precio: 8.5, ambiente: 7.5 }, dish: 'Arròs brut',
+      review: 'Cocina de mercado sin florituras. El arròs brut llega caldoso y con caza de verdad. Sala ruidosa a mediodía, mejor reservar el segundo turno.',
+      photos: [ph(28, 'Foto de ejemplo'), ph(150, 'Foto de ejemplo')] },
+    { id: 's2', sample: true, name: 'Sa Fonda Fictícia', muni: 'Sóller', lat: 39.7665, lng: 2.7152, cuisines: ['Mediterránea', 'Pescado y marisco'], price: '€€€', date: '2026-09-05',
+      scores: { producto: 9, plato: 9.5, tecnica: 8.5, servicio: 9, precio: 7, ambiente: 9 }, dish: 'Gamba roja a la sal',
+      review: 'Producto del puerto tratado con respeto. La gamba, apenas hecha. Terraza entre naranjos. La cuenta sube rápido con el vino.',
+      photos: [ph(8, 'Foto de ejemplo')] },
+    { id: 's3', sample: true, name: 'Celler de Mentida', muni: 'Inca', lat: 39.7205, lng: 2.9105, cuisines: ['Mallorquina'], price: '€€', date: '2026-06-21',
+      scores: { producto: 7.5, plato: 8, tecnica: 6, servicio: 7, precio: 8, ambiente: 8.5 }, dish: 'Frit mallorquí',
+      review: 'Celler clásico con botas de vino y raciones grandes. El frit, sabroso y poco grasiento. Postres del montón.',
+      photos: [] },
+    { id: 's4', sample: true, name: 'Ca na Ficció', muni: 'Pollença', lat: 39.8772, lng: 3.0160, cuisines: ['Mediterránea', 'De autor'], price: '€€€€', date: '2026-08-14',
+      scores: { producto: 9.5, plato: 10, tecnica: 9.5, servicio: 9, precio: 8, ambiente: 9 }, dish: 'Tàrtar de llampuga',
+      review: 'Menú degustación de doce pases con producto local y mucha técnica. Ritmo perfecto. Caro, pero se entiende en cada plato.',
+      photos: [ph(200, 'Foto de ejemplo'), ph(320, 'Foto de ejemplo'), ph(95, 'Foto de ejemplo')] },
+    { id: 's5', sample: true, name: 'Es Forn Imaginari', muni: 'Santanyí', lat: 39.3548, lng: 3.1285, cuisines: ['Brasa'], price: '€€€', date: '2026-07-30',
+      scores: { producto: 8, plato: 8.5, tecnica: 7, servicio: 6.5, precio: 6.5, ambiente: 8 }, dish: 'Porcella al forn',
+      review: 'Buena brasa y porcella crujiente. Servicio desbordado en agosto, cuarenta minutos entre platos.',
+      photos: [] },
+    { id: 's6', sample: true, name: 'Bodega Sense Nom', muni: 'Palma', lat: 39.5745, lng: 2.6551, cuisines: ['Tapas'], price: '€', date: '2026-11-07',
+      scores: { producto: 7, plato: 7.5, tecnica: 6, servicio: 7.5, precio: 9, ambiente: 7 }, dish: 'Variat',
+      review: 'Barra de toda la vida. Variat generoso y vermut de grifo. Sitio para ir sin prisa y sin esperar sorpresas.',
+      photos: [] },
+    { id: 's7', sample: true, name: 'Sa Cuina Inventada', muni: 'Artà', lat: 39.6938, lng: 3.3495, cuisines: ['Arroces'], price: '€€', date: '2026-05-10',
+      scores: { producto: 6.5, plato: 6, tecnica: 5.5, servicio: 5, precio: 6, ambiente: 6.5 }, dish: 'Arròs de peix',
+      review: 'Arroz pasado de punto y fondo flojo. El pescado sí era fresco. No volvería expresamente.',
+      photos: [] },
+    { id: 's8', sample: true, name: 'Can Mostra', muni: 'Andratx', lat: 39.5755, lng: 2.4205, cuisines: ['Pescado y marisco'], price: '€€€', date: '2026-04-18',
+      scores: { producto: 5, plato: 4.5, tecnica: 4, servicio: 4, precio: 3.5, ambiente: 6 }, dish: 'Caldereta de llagosta',
+      review: 'Precio de primera línea y cocina de batalla. La caldereta, aguada. Lo único que acompaña es la vista.',
+      photos: [] }
+  ];
+
+  var filters = { q: '', min: 0, field: 'global', cuisines: new Set(), munis: new Set(), prices: new Set() };
+  var sortBy = 'nota';
+  var view = 'map';
+  var lastBrowse = 'map';
+  var selectedId = null;
+  var detailId = null;
+  var draft = null;
+
+  // ---------- Helpers ----------
+  function $(s, el) { return (el || document).querySelector(s); }
+  function $$(s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function round1(n) { return Math.round(n * 10) / 10; }
+  function fmt(n) { return n == null ? 'Sin nota' : round1(n).toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
+  function globalOf(scores) {
+    var v = CRITERIA.map(function (c) { return scores[c.k]; }).filter(function (x) { return x != null; });
+    if (!v.length) return null;
+    return v.reduce(function (a, b) { return a + b; }, 0) / v.length;
+  }
+  function cls(n) {
+    if (n == null) return 's0';
+    var r = round1(n);
+    return r >= 9 ? 's5' : r >= 8 ? 's4' : r >= 7 ? 's3' : r >= 5 ? 's2' : 's1';
+  }
+  // Rosette in the style of football player cards: hexagonal grid, one outline, names at the corners.
+  var SHORT = { producto: 'Producto', plato: 'Plato estrella', tecnica: 'Técnica', servicio: 'Servicio', precio: 'Calidad/precio', ambiente: 'Ambiente' };
+  function chartSVG(scores) {
+    var W = 380, H = 252, cx = 190, cy = 128, R = 88, n = CRITERIA.length, step = 360 / n;
+    function pt(rad, deg) { var a = deg * Math.PI / 180; return [cx + rad * Math.cos(a), cy + rad * Math.sin(a)]; }
+    function f(x) { return Math.round(x * 10) / 10; }
+    function hex(rad) { return CRITERIA.map(function (c, i) { var q = pt(rad, -90 + i * step); return f(q[0]) + ',' + f(q[1]); }).join(' '); }
+    var desc = CRITERIA.map(function (c) { return SHORT[c.k] + ' ' + fmt(scores[c.k]); }).join(', ');
+    var o = '<svg class="rose" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Roseta de puntuaciones. ' + esc(desc) + '">';
+    o += '<polygon class="hex-outer" points="' + hex(R) + '"></polygon>';
+    o += '<polygon class="hex-inner" points="' + hex(R / 2) + '"></polygon>';
+    CRITERIA.forEach(function (c, i) {
+      var e = pt(R, -90 + i * step);
+      o += '<line class="rose-spoke" x1="' + cx + '" y1="' + cy + '" x2="' + f(e[0]) + '" y2="' + f(e[1]) + '"></line>';
+    });
+    var pts = CRITERIA.map(function (c, i) {
+      var v = scores[c.k], q = pt(R * (v == null ? 0 : v) / 10, -90 + i * step);
+      return f(q[0]) + ',' + f(q[1]);
+    }).join(' ');
+    o += '<polygon class="radar-line ' + cls(globalOf(scores)) + '" points="' + pts + '"><title>' + esc(desc) + '</title></polygon>';
+    CRITERIA.forEach(function (c, i) {
+      var deg = -90 + i * step, q = pt(R + 12, deg), cos = Math.cos(deg * Math.PI / 180), sin = Math.sin(deg * Math.PI / 180);
+      var anchor = cos > 0.3 ? 'start' : cos < -0.3 ? 'end' : 'middle';
+      var y = sin < -0.9 ? q[1] - 2 : sin > 0.9 ? q[1] + 12 : q[1] + 5;
+      o += '<text class="rose-name" text-anchor="' + anchor + '" x="' + f(q[0]) + '" y="' + f(y) + '">' + SHORT[c.k] + '</text>';
+    });
+    return o + '</svg>';
+  }
+  function chartCard(r) {
+    return '<div class="card"><p class="section-title">Roseta</p>' + chartSVG(r.scores) + '</div>';
+  }
+  function word(n) {
+    if (n == null) return 'Sin valorar';
+    var r = round1(n);
+    return r >= 9 ? 'Excelente' : r >= 8 ? 'Muy bueno' : r >= 7 ? 'Bueno' : r >= 5 ? 'Correcto' : 'Flojo';
+  }
+  function fmtDate(iso) {
+    if (!iso) return '';
+    var p = iso.split('-');
+    var d = new Date(+p[0], +p[1] - 1, +p[2]);
+    return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+  function todayISO() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function placeLine(r, withPrice) {
+    return [r.muni, r.cuisines.join(', '), withPrice ? r.price : ''].filter(Boolean).map(esc).join(' · ');
+  }
+  function byId(id) { return restaurants.filter(function (r) { return r.id === id; })[0]; }
+  function norm(s) { return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+  var STAR = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 16.9 6.6 19.8l1.1-6.1L3.2 9.4l6.1-.8L12 3z"></path></svg>';
+  var XICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>';
+
+  function toast(msg) {
+    var t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('is-on');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { t.classList.remove('is-on'); }, 2200);
+  }
+
+  // ---------- Geometry ----------
+  function inRing(lng, lat, ring) {
+    var inside = false;
+    for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      var xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
+      if (((yi > lat) !== (yj > lat)) && (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi)) inside = !inside;
+    }
+    return inside;
+  }
+  function findMuni(lat, lng) {
+    for (var i = 0; i < GEO.munis.length; i++) {
+      var m = GEO.munis[i];
+      for (var k = 0; k < m.p.length; k++) {
+        var poly = m.p[k];
+        if (!inRing(lng, lat, poly[0])) continue;
+        var hole = false;
+        for (var h = 1; h < poly.length; h++) if (inRing(lng, lat, poly[h])) { hole = true; break; }
+        if (!hole) return m.name;
+      }
+    }
+    return null;
+  }
+  function muniLatLngs(m) {
+    return m.p.map(function (poly) { return poly.map(function (ring) { return ring.map(function (pt) { return [pt[1], pt[0]]; }); }); });
+  }
+
+  // ---------- Base map (shared by main map and location picker) ----------
+  var ISLAND = L.latLngBounds([39.26, 2.3], [39.97, 3.49]);
+  function makeMap(el) {
+    var map = L.map(el, {
+      zoomControl: false, minZoom: 8, maxZoom: 15, zoomSnap: 0.25, zoomDelta: 0.5,
+      maxBounds: ISLAND.pad(0.5), maxBoundsViscosity: 0.8, attributionControl: true
+    });
+    L.control.zoom({ position: 'topright', zoomInTitle: 'Acercar', zoomOutTitle: 'Alejar' }).addTo(map);
+    map.attributionControl.setPrefix(false);
+    map.attributionControl.addAttribution('Municipios: IGN, CC BY 4.0. Carreteras: Natural Earth');
+    map.createPane('labels');
+    map.getPane('labels').style.zIndex = 450;
+    map.getPane('labels').style.pointerEvents = 'none';
+    var base = L.featureGroup().addTo(map);
+    GEO.munis.forEach(function (m) {
+      L.polygon(muniLatLngs(m), { className: 'muni', interactive: false }).addTo(base);
+    });
+    GEO.roads.forEach(function (r) {
+      L.polyline(r.l, { className: 'road r' + r.t, interactive: false }).addTo(base);
+    });
+    GEO.munis.forEach(function (m) {
+      var tier = TIER1.indexOf(m.name) >= 0 ? 't1' : 't2';
+      L.marker(m.c, {
+        pane: 'labels', interactive: false, keyboard: false,
+        icon: L.divIcon({ className: 'muni-label ' + tier, html: '<span>' + esc(m.name) + '</span>', iconSize: [0, 0] })
+      }).addTo(map);
+    });
+    function zoomClass() { map.getContainer().classList.toggle('z-all', map.getZoom() >= 10.25); }
+    map.on('zoomend', zoomClass);
+    map.fitBounds(ISLAND, { padding: [8, 8] });
+    zoomClass();
+    return map;
+  }
+  function pinIcon(text, klass) {
+    return L.divIcon({ className: 'pin-wrap', html: '<div class="pin ' + klass + '"><span>' + text + '</span></div>', iconSize: [38, 38], iconAnchor: [19, 46] });
+  }
+
+  // ---------- Filtering ----------
+  function passes(r) {
+    if (filters.q && norm(r.name).indexOf(norm(filters.q)) < 0) return false;
+    if (filters.min > 0) {
+      var v = filters.field === 'global' ? globalOf(r.scores) : r.scores[filters.field];
+      if (v == null || round1(v) < filters.min) return false;
+    }
+    if (filters.cuisines.size && !r.cuisines.some(function (c) { return filters.cuisines.has(c); })) return false;
+    if (filters.munis.size && !filters.munis.has(r.muni)) return false;
+    if (filters.prices.size && !filters.prices.has(r.price)) return false;
+    return true;
+  }
+  function filtered() {
+    var out = restaurants.filter(passes);
+    out.sort(function (a, b) {
+      if (sortBy === 'nombre') return a.name.localeCompare(b.name, 'es');
+      if (sortBy === 'fecha') return (b.date || '').localeCompare(a.date || '');
+      var ga = globalOf(a.scores), gb = globalOf(b.scores);
+      return (gb == null ? -1 : gb) - (ga == null ? -1 : ga);
+    });
+    return out;
+  }
+  function activeCount() {
+    return (filters.min > 0 ? 1 : 0) + filters.cuisines.size + filters.munis.size + filters.prices.size;
+  }
+  function clearFilters() {
+    filters.q = ''; filters.min = 0; filters.field = 'global';
+    filters.cuisines.clear(); filters.munis.clear(); filters.prices.clear();
+    $('#q').value = '';
+  }
+  function fieldLabel(k) {
+    if (k === 'global') return 'Nota global';
+    return CRITERIA.filter(function (c) { return c.k === k; })[0].label;
+  }
+
+  // ---------- Rendering ----------
+  function rowHTML(r) {
+    var g = globalOf(r.scores);
+    return '<span class="row">' +
+      '<span class="score ' + cls(g) + (g == null ? ' is-empty' : '') + '">' + fmt(g) + '</span>' +
+      '<span class="row-main">' +
+        '<span class="row-title"><strong class="row-name">' + esc(r.name) + '</strong><span class="price">' + esc(r.price) + '</span></span>' +
+        '<span class="meta">' + placeLine(r, false) + '</span>' +
+        (r.dish ? '<span class="dish">' + STAR + '<b>' + esc(r.dish) + '</b>' + (r.scores.plato != null ? '<span class="num">' + fmt(r.scores.plato) + '</span>' : '') + '</span>' : '') +
+        '<span class="meta">' + esc(fmtDate(r.date)) + (r.sample ? ' · dato de ejemplo' : '') + '</span>' +
+      '</span></span>';
+  }
+
+  var mainMap = null, markerLayer = null, markers = {};
+  function renderMarkers(list) {
+    markerLayer.clearLayers();
+    markers = {};
+    list.slice().reverse().forEach(function (r) {
+      var g = globalOf(r.scores);
+      var mk = L.marker([r.lat, r.lng], {
+        icon: pinIcon(g == null ? '·' : fmt(g), cls(g) + (r.id === selectedId ? ' is-selected' : '')),
+        title: r.name, alt: r.name + ', nota ' + fmt(g), riseOnHover: true,
+        zIndexOffset: r.id === selectedId ? 1000 : 0
+      });
+      mk.on('click', function () { selectOnMap(r.id); });
+      mk.addTo(markerLayer);
+      markers[r.id] = mk;
+    });
+  }
+  function renderPreview() {
+    var box = $('#preview');
+    var r = selectedId && byId(selectedId);
+    if (!r || !passes(r)) { box.hidden = true; $('#legend').hidden = false; return; }
+    box.innerHTML = rowHTML(r) +
+      '<div class="preview-actions">' +
+        '<button class="btn" type="button" data-act="close-preview">Cerrar</button>' +
+        '<button class="btn btn-primary" type="button" data-act="open" data-id="' + r.id + '">Ver ficha</button>' +
+      '</div>';
+    box.hidden = false;
+    $('#legend').hidden = true;
+  }
+  function selectOnMap(id) {
+    selectedId = id;
+    render();
+    revealSelected(true);
+  }
+  // Keep the selected pin clear of the preview card that covers the bottom of the map.
+  function revealSelected(animate) {
+    var r = selectedId && byId(selectedId);
+    if (!r) return;
+    var pt = mainMap.latLngToContainerPoint([r.lat, r.lng]);
+    var limit = mainMap.getSize().y - $('#preview').offsetHeight - 36;
+    if (pt.y > limit) mainMap.panBy([0, pt.y - limit], { animate: !!animate });
+  }
+  // Centre on one restaurant, zooming in only as far as needed to pull it out of a group.
+  function focusOnMap(r) {
+    mainMap.invalidateSize();
+    var z = Math.max(mainMap.getZoom(), 12);
+    mainMap.setView([r.lat, r.lng], z, { animate: false });
+    var mk = markers[r.id];
+    while (mk && markerLayer.getVisibleParent && markerLayer.getVisibleParent(mk) !== mk && z < mainMap.getMaxZoom()) {
+      z += 1;
+      mainMap.setView([r.lat, r.lng], z, { animate: false });
+    }
+    var shift = ($('#preview').offsetHeight + 12) / 2;
+    mainMap.panBy([0, shift], { animate: false });
+  }
+
+  function renderList(list) {
+    var el = $('#list');
+    if (!list.length) {
+      el.innerHTML = '<div class="empty"><p>Ningún restaurante cumple estos filtros.</p><button class="btn" type="button" data-act="clear">Quitar filtros</button></div>';
+      return;
+    }
+    el.innerHTML = list.map(function (r) {
+      return '<button class="card" type="button" data-act="open" data-id="' + r.id + '">' + rowHTML(r) + '</button>';
+    }).join('');
+  }
+
+  function renderChips() {
+    var chips = [];
+    if (filters.min > 0) chips.push({ t: fieldLabel(filters.field) + ' ≥ ' + fmt(filters.min), k: 'min' });
+    filters.cuisines.forEach(function (c) { chips.push({ t: c, k: 'cuisines', v: c }); });
+    filters.munis.forEach(function (c) { chips.push({ t: c, k: 'munis', v: c }); });
+    filters.prices.forEach(function (c) { chips.push({ t: c, k: 'prices', v: c }); });
+    var box = $('#active-chips');
+    box.hidden = !chips.length;
+    box.innerHTML = chips.map(function (c) {
+      return '<button class="chip chip-x" type="button" data-rm="' + c.k + '" data-v="' + esc(c.v || '') + '" aria-label="Quitar filtro ' + esc(c.t) + '">' + esc(c.t) + XICON + '</button>';
+    }).join('') + (chips.length ? '<button class="chip chip-clear" type="button" data-act="clear">Quitar todos</button>' : '');
+    var n = activeCount();
+    var badge = $('#filter-count');
+    badge.hidden = !n;
+    badge.textContent = n;
+  }
+
+  function countText(n) {
+    var total = restaurants.length;
+    if (n === total) return total + (total === 1 ? ' restaurante' : ' restaurantes');
+    return n + ' de ' + total;
+  }
+
+  function render() {
+    var list = filtered();
+    if (selectedId && !list.some(function (r) { return r.id === selectedId; })) selectedId = null;
+    renderChips();
+    $('#map-count').textContent = countText(list.length);
+    $('#list-count').textContent = countText(list.length);
+    $('#flt-apply').textContent = 'Ver ' + list.length + (list.length === 1 ? ' restaurante' : ' restaurantes');
+    renderMarkers(list);
+    renderPreview();
+    renderList(list);
+  }
+
+  // ---------- Views ----------
+  function setView(v) {
+    view = v;
+    if (v !== 'form') lastBrowse = v;
+    $$('.view').forEach(function (s) { s.classList.toggle('is-active', s.id === 'view-' + v); });
+    $$('.tabs button').forEach(function (b) {
+      if (b.dataset.view === v) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+    });
+    $('#tools').hidden = v === 'form';
+    $('#active-chips').hidden = v === 'form' || !activeCount();
+    if (v === 'map') setTimeout(function () { mainMap.invalidateSize(); }, 0);
+    if (v === 'form') setTimeout(function () { ensurePickMap(); pickMap.invalidateSize(); placeDraftOnPickMap(); }, 0);
+  }
+
+  // ---------- Detail ----------
+  function openDetail(id) {
+    var r = byId(id);
+    if (!r) return;
+    detailId = id;
+    var g = globalOf(r.scores);
+    var rows = CRITERIA.map(function (c) {
+      var v = r.scores[c.k];
+      var sub = c.k === 'plato' && r.dish ? '<span class="crit-sub"> · ' + esc(r.dish) + '</span>' : '';
+      return '<div class="crit-row ' + cls(v) + '">' +
+        '<span class="crit-name">' + c.label + sub + '</span>' +
+        '<span class="crit-val">' + (v == null ? '<span class="meta">Sin nota</span>' : fmt(v)) + '</span>' +
+        '<div class="crit-bar"><i style="width:' + (v == null ? 0 : v * 10) + '%"></i></div>' +
+        '</div>';
+    }).join('');
+    var photos = (r.photos || []).map(function (p, i) {
+      return '<button class="thumb" type="button" data-act="photo" data-i="' + i + '" aria-label="Ampliar foto ' + (i + 1) + '"><img src="' + p + '" alt="Foto ' + (i + 1) + ' de ' + esc(r.name) + '"></button>';
+    }).join('');
+    $('#detail').innerHTML =
+      '<div class="panel-bar">' +
+        '<button class="link-btn" type="button" data-act="back">' +
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>Volver</button>' +
+        '<div class="panel-actions">' +
+          '<button class="link-btn" type="button" data-act="edit">Editar</button>' +
+          '<button class="link-btn is-danger" type="button" data-act="delete">Borrar</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="panel-body">' +
+        '<div class="d-head">' +
+          '<h2>' + esc(r.name) + '</h2>' +
+          '<p class="meta">' + placeLine(r, true) + '</p>' +
+          '<p class="meta">Visitado el ' + esc(fmtDate(r.date)) + (r.sample ? ' · <span class="tag">Ejemplo</span>' : '') + '</p>' +
+        '</div>' +
+        '<div class="card d-score">' +
+          '<div class="score is-big ' + cls(g) + (g == null ? ' is-empty' : '') + '">' + fmt(g) + '</div>' +
+          '<div class="d-score-text"><strong>' + word(g) + '</strong><span class="meta">Nota global, media de los seis criterios</span></div>' +
+        '</div>' +
+        '<div class="card crit">' + rows + '</div>' +
+        chartCard(r) +
+        (r.review ? '<div class="card"><p class="section-title">Reseña</p><p class="review" style="margin-top:8px">' + esc(r.review) + '</p></div>' : '') +
+        (photos ? '<div class="card"><p class="section-title">Fotos</p><div class="thumbs" style="margin-top:10px">' + photos + '</div></div>' : '') +
+        '<button class="btn btn-block" type="button" data-act="show-on-map">Ver en el mapa</button>' +
+      '</div>';
+    $('#detail').hidden = false;
+    $('#detail .panel-body').scrollTop = 0;
+  }
+  function closeDetail() { $('#detail').hidden = true; detailId = null; }
+
+  // ---------- Form ----------
+  var pickMap = null, pickMarker = null;
+  function ensurePickMap() {
+    if (pickMap) return;
+    pickMap = makeMap('pick-map');
+    pickMap.on('click', function (e) { setDraftLocation(e.latlng.lat, e.latlng.lng, true); });
+  }
+  function setDraftLocation(lat, lng, detect) {
+    draft.lat = round5(lat); draft.lng = round5(lng);
+    if (!pickMarker) {
+      pickMarker = L.marker([lat, lng], { icon: pinIcon('', 'pin-new'), draggable: true, title: 'Ubicación del restaurante' }).addTo(pickMap);
+      pickMarker.on('dragend', function () { var p = pickMarker.getLatLng(); setDraftLocation(p.lat, p.lng, true); });
+    } else {
+      pickMarker.setLatLng([lat, lng]);
+    }
+    $('#err-loc').hidden = true;
+    var status = 'Punto marcado. Puedes arrastrar el pin para afinar.';
+    if (detect) {
+      var m = findMuni(lat, lng);
+      if (m) { draft.muni = m; $('#f-muni').value = m; $('#err-muni').hidden = true; status = 'Punto marcado en ' + m + '. Puedes arrastrar el pin para afinar.'; }
+      else { status = 'El punto cae fuera del contorno. Si es correcto, elige el municipio a mano.'; }
+    }
+    $('#pick-status').textContent = status;
+  }
+  function round5(n) { return Math.round(n * 1e5) / 1e5; }
+  function placeDraftOnPickMap() {
+    if (!pickMap || !draft) return;
+    if (pickMarker) { pickMap.removeLayer(pickMarker); pickMarker = null; }
+    if (draft.lat != null) {
+      setDraftLocation(draft.lat, draft.lng, false);
+      pickMap.setView([draft.lat, draft.lng], 12);
+    } else {
+      pickMap.fitBounds(ISLAND, { padding: [8, 8] });
+      $('#pick-status').textContent = 'Toca el mapa para situar el restaurante. Al elegir municipio el mapa se acerca a él.';
+    }
+  }
+
+  function buildFormStatics() {
+    $('#f-cuisines').innerHTML = CUISINES.map(function (c) {
+      return '<button class="chip" type="button" aria-pressed="false" data-c="' + esc(c) + '">' + esc(c) + '</button>';
+    }).join('');
+    $('#f-muni').innerHTML = '<option value="">Elige municipio</option>' + GEO.munis.map(function (m) { return '<option>' + esc(m.name) + '</option>'; }).join('');
+    $('#f-price').innerHTML = PRICES.map(function (p, i) {
+      return '<input type="radio" name="f-price" id="f-price-' + i + '" value="' + p + '"><label for="f-price-' + i + '">' + p + '</label>';
+    }).join('');
+    $('#rates').innerHTML = CRITERIA.map(function (c) {
+      var extra = c.k === 'plato'
+        ? '<input class="input" id="f-dish" type="text" maxlength="80" placeholder="Nombre del plato" aria-label="Nombre del plato estrella" autocomplete="off">'
+        : '';
+      return '<div class="rate" data-k="' + c.k + '">' +
+        '<div class="rate-head"><label for="f-r-' + c.k + '">' + c.label + '</label><span class="rate-val is-empty" id="f-v-' + c.k + '">Sin nota</span></div>' +
+        extra +
+        '<div class="rate-ctl">' +
+          '<button class="step" type="button" data-step="-0.5" aria-label="Bajar medio punto en ' + c.label + '">−</button>' +
+          '<input type="range" id="f-r-' + c.k + '" min="1" max="10" step="0.5" value="5">' +
+          '<button class="step" type="button" data-step="0.5" aria-label="Subir medio punto en ' + c.label + '">+</button>' +
+        '</div></div>';
+    }).join('');
+    $('#flt-field').innerHTML = '<option value="global">Nota global</option>' + CRITERIA.map(function (c) { return '<option value="' + c.k + '">' + c.label + '</option>'; }).join('');
+  }
+
+  function setRate(k, v) {
+    draft.scores[k] = v;
+    var out = $('#f-v-' + k);
+    out.textContent = fmt(v);
+    out.classList.toggle('is-empty', v == null);
+    if (v != null) $('#f-r-' + k).value = v;
+    var g = globalOf(draft.scores);
+    var box = $('#f-global');
+    box.className = 'score ' + cls(g) + (g == null ? ' is-empty' : '');
+    box.textContent = fmt(g);
+  }
+
+  function startForm(r) {
+    draft = r
+      ? { id: r.id, sample: r.sample, name: r.name, muni: r.muni, lat: r.lat, lng: r.lng, cuisines: r.cuisines.slice(), price: r.price, date: r.date, scores: Object.assign({}, r.scores), dish: r.dish, review: r.review, photos: (r.photos || []).slice() }
+      : { id: null, name: '', muni: '', lat: null, lng: null, cuisines: [], price: '€€', date: todayISO(), scores: {}, dish: '', review: '', photos: [] };
+    $('#form-title').textContent = r ? 'Editar restaurante' : 'Añadir restaurante';
+    $('#f-save').textContent = r ? 'Guardar cambios' : 'Guardar restaurante';
+    $('#f-name').value = draft.name;
+    $$('#f-cuisines .chip').forEach(function (b) { b.setAttribute('aria-pressed', draft.cuisines.indexOf(b.dataset.c) >= 0 ? 'true' : 'false'); });
+    $('#f-date').value = draft.date;
+    $('#f-muni').value = draft.muni;
+    $('#f-dish').value = draft.dish || '';
+    $('#f-review').value = draft.review || '';
+    $$('#f-price input').forEach(function (i) { i.checked = i.value === draft.price; });
+    CRITERIA.forEach(function (c) {
+      var v = draft.scores[c.k];
+      $('#f-r-' + c.k).value = v == null ? 5 : v;
+      setRate(c.k, v == null ? null : v);
+    });
+    ['#err-name', '#err-muni', '#err-loc'].forEach(function (s) { $(s).hidden = true; });
+    renderDraftPhotos();
+    $('#view-form').scrollTop = 0;
+  }
+  function renderDraftPhotos() {
+    var box = $('#f-thumbs');
+    box.hidden = !draft.photos.length;
+    box.innerHTML = draft.photos.map(function (p, i) {
+      return '<div class="thumb"><img src="' + p + '" alt="Foto ' + (i + 1) + '"><button class="thumb-x" type="button" data-rmphoto="' + i + '" aria-label="Quitar foto ' + (i + 1) + '">' + XICON + '</button></div>';
+    }).join('');
+  }
+  function saveForm() {
+    draft.name = $('#f-name').value.trim();
+    draft.cuisines = CUISINES.filter(function (c) { return draft.cuisines.indexOf(c) >= 0; });
+    draft.date = $('#f-date').value || todayISO();
+    draft.muni = $('#f-muni').value;
+    draft.dish = $('#f-dish').value.trim();
+    draft.review = $('#f-review').value.trim();
+    var pr = $('#f-price input:checked');
+    draft.price = pr ? pr.value : '€€';
+    var bad = null;
+    $('#err-name').hidden = !!draft.name; if (!draft.name) bad = bad || '#f-name';
+    $('#err-muni').hidden = !!draft.muni; if (!draft.muni) bad = bad || '#f-muni';
+    $('#err-loc').hidden = draft.lat != null; if (draft.lat == null) bad = bad || '#pick-map';
+    if (bad) { $(bad).scrollIntoView({ block: 'center' }); toast('Faltan datos por rellenar'); return; }
+    var isNew = !draft.id;
+    if (isNew) { draft.id = 'r' + Date.now(); restaurants.push(draft); }
+    else { var i = restaurants.findIndex(function (r) { return r.id === draft.id; }); restaurants[i] = draft; }
+    var id = draft.id;
+    draft = null;
+    selectedId = id;
+    buildFilterChips();
+    setView(lastBrowse);
+    render();
+    openDetail(id);
+    toast(isNew ? 'Restaurante añadido' : 'Cambios guardados');
+  }
+
+  // ---------- Filter sheet ----------
+  function chipToggle(v, on, group) {
+    return '<button class="chip" type="button" aria-pressed="' + (on ? 'true' : 'false') + '" data-g="' + group + '" data-v="' + esc(v) + '">' + esc(v) + '</button>';
+  }
+  function buildFilterChips() {
+    var cs = CUISINES.filter(function (c) { return restaurants.some(function (r) { return r.cuisines.indexOf(c) >= 0; }); });
+    var ms = GEO.munis.map(function (m) { return m.name; }).filter(function (m) { return restaurants.some(function (r) { return r.muni === m; }); });
+    $('#flt-cuisines').innerHTML = cs.map(function (c) { return chipToggle(c, filters.cuisines.has(c), 'cuisines'); }).join('');
+    $('#flt-munis').innerHTML = ms.map(function (c) { return chipToggle(c, filters.munis.has(c), 'munis'); }).join('');
+    $('#flt-prices').innerHTML = PRICES.map(function (c) { return chipToggle(c, filters.prices.has(c), 'prices'); }).join('');
+    $('#flt-field').value = filters.field;
+    $('#flt-min').value = filters.min;
+    $('#flt-min-out').textContent = filters.min > 0 ? fmt(filters.min) + ' o más' : 'Cualquiera';
+  }
+
+  // ---------- Events ----------
+  function wire() {
+    $$('.tabs button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        if (b.dataset.view === 'form' && view !== 'form') startForm(null);
+        setView(b.dataset.view);
+      });
+    });
+    $('#q').addEventListener('input', function (e) { filters.q = e.target.value; render(); });
+    $('#btn-filters').addEventListener('click', function () { buildFilterChips(); $('#sheet-filters').hidden = false; });
+    $$('[data-close]').forEach(function (b) { b.addEventListener('click', function () { b.closest('.sheet').hidden = true; }); });
+    $('#flt-min').addEventListener('input', function (e) {
+      filters.min = parseFloat(e.target.value);
+      $('#flt-min-out').textContent = filters.min > 0 ? fmt(filters.min) + ' o más' : 'Cualquiera';
+      render();
+    });
+    $('#flt-field').addEventListener('change', function (e) { filters.field = e.target.value; render(); });
+    $('#sheet-filters').addEventListener('click', function (e) {
+      var c = e.target.closest('.chip[data-g]');
+      if (!c) return;
+      var set = filters[c.dataset.g];
+      if (set.has(c.dataset.v)) set.delete(c.dataset.v); else set.add(c.dataset.v);
+      c.setAttribute('aria-pressed', set.has(c.dataset.v) ? 'true' : 'false');
+      render();
+    });
+    $('#flt-clear').addEventListener('click', function () { clearFilters(); buildFilterChips(); render(); });
+    $('#active-chips').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-rm]');
+      if (b) {
+        if (b.dataset.rm === 'min') { filters.min = 0; filters.field = 'global'; } else filters[b.dataset.rm].delete(b.dataset.v);
+        render();
+        return;
+      }
+      if (e.target.closest('[data-act="clear"]')) { clearFilters(); render(); }
+    });
+    $$('.seg [data-sort]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        sortBy = b.dataset.sort;
+        $$('.seg [data-sort]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+        render();
+      });
+    });
+    $('#list').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-act]');
+      if (!b) return;
+      if (b.dataset.act === 'open') openDetail(b.dataset.id);
+      if (b.dataset.act === 'clear') { clearFilters(); render(); }
+    });
+    $('#preview').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-act]');
+      if (!b) return;
+      if (b.dataset.act === 'open') openDetail(b.dataset.id);
+      if (b.dataset.act === 'close-preview') { selectedId = null; render(); }
+    });
+    $('#detail').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-act]');
+      if (!b) return;
+      var r = byId(detailId);
+      var act = b.dataset.act;
+      if (act === 'back') closeDetail();
+      if (act === 'edit') { closeDetail(); startForm(r); setView('form'); }
+      if (act === 'delete') { $('#cf-text').textContent = 'Se borrará la ficha de ' + r.name + ' con sus notas, reseña y fotos.'; $('#sheet-confirm').hidden = false; }
+      if (act === 'photo') { $('#lightbox-img').src = r.photos[+b.dataset.i]; $('#lightbox').hidden = false; }
+      if (act === 'show-on-map') {
+        if (!passes(r)) { clearFilters(); toast('Filtros quitados para mostrarlo'); }
+        selectedId = r.id;
+        closeDetail();
+        setView('map');
+        render();
+        setTimeout(function () { focusOnMap(r); }, 30);
+      }
+    });
+    $('#cf-ok').addEventListener('click', function () {
+      var id = detailId;
+      restaurants = restaurants.filter(function (r) { return r.id !== id; });
+      if (selectedId === id) selectedId = null;
+      $('#sheet-confirm').hidden = true;
+      closeDetail();
+      render();
+      toast('Restaurante borrado');
+    });
+    $('#lightbox-close').addEventListener('click', function () { $('#lightbox').hidden = true; });
+    $('#lightbox').addEventListener('click', function (e) { if (e.target.id === 'lightbox') $('#lightbox').hidden = true; });
+
+    // Form
+    $('#form').addEventListener('submit', function (e) { e.preventDefault(); saveForm(); });
+    $('#f-cancel').addEventListener('click', function () { draft = null; setView(lastBrowse); });
+    $('#f-muni').addEventListener('change', function (e) {
+      var m = GEO.munis.filter(function (x) { return x.name === e.target.value; })[0];
+      if (m && pickMap) pickMap.fitBounds(L.polygon(muniLatLngs(m)).getBounds(), { padding: [12, 12], maxZoom: 13 });
+      if (m) $('#err-muni').hidden = true;
+    });
+    $('#rates').addEventListener('input', function (e) {
+      if (e.target.type !== 'range') return;
+      setRate(e.target.closest('.rate').dataset.k, parseFloat(e.target.value));
+    });
+    $('#rates').addEventListener('change', function (e) {
+      if (e.target.type !== 'range') return;
+      setRate(e.target.closest('.rate').dataset.k, parseFloat(e.target.value));
+    });
+    $('#rates').addEventListener('pointerup', function (e) {
+      if (e.target.type !== 'range') return;
+      setRate(e.target.closest('.rate').dataset.k, parseFloat(e.target.value));
+    });
+    $('#rates').addEventListener('click', function (e) {
+      var b = e.target.closest('.step');
+      if (!b) return;
+      var k = b.closest('.rate').dataset.k;
+      var cur = draft.scores[k];
+      var next = cur == null ? parseFloat($('#f-r-' + k).value) : Math.min(10, Math.max(1, cur + parseFloat(b.dataset.step)));
+      setRate(k, next);
+    });
+    $('#f-cuisines').addEventListener('click', function (e) {
+      var b = e.target.closest('.chip');
+      if (!b) return;
+      var i = draft.cuisines.indexOf(b.dataset.c);
+      if (i >= 0) draft.cuisines.splice(i, 1); else draft.cuisines.push(b.dataset.c);
+      b.setAttribute('aria-pressed', i >= 0 ? 'false' : 'true');
+    });
+    $('#f-photos').addEventListener('change', function (e) {
+      Array.prototype.forEach.call(e.target.files, function (f) {
+        if (f.type.indexOf('image/') === 0) draft.photos.push(URL.createObjectURL(f));
+      });
+      e.target.value = '';
+      renderDraftPhotos();
+    });
+    $('#f-thumbs').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-rmphoto]');
+      if (!b) return;
+      draft.photos.splice(+b.dataset.rmphoto, 1);
+      renderDraftPhotos();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      if (!$('#lightbox').hidden) { $('#lightbox').hidden = true; return; }
+      var open = $$('.sheet').filter(function (s) { return !s.hidden; })[0];
+      if (open) { open.hidden = true; return; }
+      if (!$('#detail').hidden) closeDetail();
+    });
+  }
+
+  // ---------- Start ----------
+  buildFormStatics();
+  mainMap = makeMap('map');
+  markerLayer = L.markerClusterGroup
+    ? L.markerClusterGroup({
+        maxClusterRadius: 34, showCoverageOnHover: false, spiderfyOnMaxZoom: true,
+        iconCreateFunction: function (c) {
+          return L.divIcon({ className: 'pin-wrap', html: '<div class="cluster"><span>' + c.getChildCount() + '</span></div>', iconSize: [40, 40] });
+        }
+      })
+    : L.layerGroup();
+  markerLayer.addTo(mainMap);
+  mainMap.on('click', function () { if (selectedId) { selectedId = null; render(); } });
+  wire();
+  buildFilterChips();
+  render();
+  window.addEventListener('resize', function () { if (view === 'map') mainMap.invalidateSize(); });
+}
+
+(function () {
+  function load(urls, ready, done) {
+    var i = 0;
+    (function next() {
+      if (ready() || i >= urls.length) { done(); return; }
+      var el = document.createElement('script');
+      el.src = urls[i++];
+      el.onload = next;
+      el.onerror = next;
+      document.head.appendChild(el);
+    })();
+  }
+  load([
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js',
+    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+  ], function () { return !!window.L; }, function () {
+    if (!window.L) {
+      document.getElementById('map').innerHTML = '<p class="map-error">No se ha podido cargar la librería del mapa. Recarga la página.</p>';
+      return;
+    }
+    load([
+      'https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js',
+      'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js'
+    ], function () { return !!window.L.markerClusterGroup; }, startApp);
+  });
+})();
+</script>
+</body>
+</html>
