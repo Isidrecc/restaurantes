@@ -6,7 +6,7 @@ App web personal para puntuar y reseñar restaurantes: mapa, lista con filtros y
 
 - La fase de diseño se cerró en una conversación previa (21 a 23 de noviembre de 2026). La app real todavía no existe: este repo contiene solo la especificación y la demo de UI.
 - Siguiente paso: el punto 1 del orden de construcción (`docs/especificacion.md`, sección 6).
-- Hay dos puntos sin confirmación explícita del propietario (sección 3 de la especificación). Confirmarlos antes de construir.
+- Hay cuatro puntos sin confirmación explícita del propietario (sección 3 de la especificación). Confirmarlos antes de construir.
 
 ## Qué leer antes de tocar nada
 
