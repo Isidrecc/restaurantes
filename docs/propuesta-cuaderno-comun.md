@@ -106,11 +106,13 @@ Los nombres de campo son orientativos.
 
 | Documento | Contenido | Quién escribe |
 |---|---|---|
-| `config/access` | `owner` (correo), `editors` y `members` (listas de correos) | Solo el propietario |
-| `users/{uid}` | `displayName`, `email` | Cada uno el suyo |
-| `restaurants/{id}` | `name`, `locality`, `location`, `cuisines`, `price`, `placeId`, `source`, `createdBy`, `createdAt`, `updatedBy`, `updatedAt` | Editores |
-| `restaurants/{id}/ratings/{uid}` | `scores`, `global`, `dish`, `review`, `visitDate`, `photos`, `createdAt`, `updatedAt` | Solo su autor |
-| `accessRequests/{uid}` | `email`, `displayName`, `type` (acceso o editor), `status`, `createdAt` | Lo crea el solicitante; lo resuelve el propietario |
+| `members/{correo}` | `role`: `owner`, `editor` o `member`. El documento se llama como el correo en minúsculas. | Solo el propietario |
+| `users/{uid}` | `displayName`, `updatedAt`. Sin correo. | Cada uno el suyo |
+| `restaurants/{id}` | `name`, `locality`, `location`, `cuisines`, `price`, `placeId`, `source`, `raters` (uid de quienes han puntuado), `createdBy`, `createdAt`, `updatedBy`, `updatedAt` | Editores. Un miembro solo puede añadir o quitar su propio uid en `raters`. |
+| `restaurants/{id}/ratings/{uid}` | `scores`, `global`, `dish`, `review`, `visitDate`, `photos` (lista de `{full, thumb}` con rutas de Storage), `createdAt`, `updatedAt` | Solo su autor |
+| `accessRequests/{uid}` | `email`, `displayName`, `type` (`access` o `editor`), `status`, `createdAt` | Lo crea el solicitante; lo resuelve el propietario |
+
+Cambio respecto al borrador (23 de noviembre de 2026, al escribir las reglas): los papeles se guardan en un documento por persona (`members/{correo}`) en lugar de en dos listas dentro de `config/access`. Así cada persona solo puede leer su propio papel y los miembros no ven los correos de los demás. `raters` permite aplicar la decisión D2 en las reglas, que no pueden contar documentos de una subcolección.
 
 - La puntuación usa el identificador del usuario como clave, así que cada persona tiene como máximo una por restaurante.
 - `global` se guarda en cada puntuación para no recalcularla. Las medias se calculan en el dispositivo.
@@ -122,10 +124,13 @@ Cálculo aproximado, sin comprobar en la práctica: 100 restaurantes con unas 3 
 
 ## 7. Reglas de seguridad (resumen)
 
-- Leer cualquier cosa: solo correos de las listas, con correo verificado.
+El texto completo está en `firestore.rules` y `storage.rules`, en la raíz del repo.
+
+
+- Leer cualquier cosa: solo quien tenga documento en `members`, con correo verificado.
 - `restaurants`: crear y editar, editores. Borrar, el propietario; un editor solo si no hay opiniones de otras personas (D2).
 - `ratings/{uid}`: solo si `uid` es el del usuario y está en las listas. Se validan notas, longitudes y fechas.
-- `config/access`: solo el propietario.
+- `members`: cada uno lee el suyo; solo el propietario lee todos y escribe.
 - `accessRequests/{uid}`: cualquiera con sesión crea la suya; solo el propietario la lee entera y la resuelve.
 - Storage: lo de la sección 9 de la especificación, con la carpeta por persona.
 

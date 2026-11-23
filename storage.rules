@@ -1,0 +1,34 @@
+rules_version = '2';
+
+// Reglas de Storage de Puntuam a taula.
+// Consultan los papeles guardados en Firestore (members/{correo}).
+// Ver docs/especificacion.md, sección 9.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function signedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    function memberDoc() {
+      return /databases/(default)/documents/members/$(request.auth.token.email.lower());
+    }
+    function hasRole(roles) {
+      return signedIn()
+        && firestore.exists(memberDoc())
+        && firestore.get(memberDoc()).data.role in roles;
+    }
+    function isOwner() { return hasRole(['owner']); }
+    function isMember() { return hasRole(['owner', 'editor', 'member']); }
+
+    // Fotos: una carpeta por restaurante y persona.
+    match /restaurants/{rid}/{uid}/{file} {
+      allow read: if isMember();
+      allow create: if isMember()
+        && request.auth.uid == uid
+        && request.resource.contentType.matches('image/(jpeg|png|webp)')
+        && request.resource.size < 3 * 1024 * 1024;
+      allow delete: if (isMember() && request.auth.uid == uid) || isOwner();
+    }
+  }
+}

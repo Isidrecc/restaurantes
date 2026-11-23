@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Puntuam · prueba técnica</title>
+  <meta name="theme-color" content="#b4442c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Puntuam">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <style>
+    :root { --bg: #f6f3ef; --card: #fff; --ink: #1f1b18; --muted: #6b625b; --accent: #b4442c; --ok: #1f7a3a; --bad: #b3261e; --line: #e4ddd5; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #171412; --card: #221e1b; --ink: #f1ebe5; --muted: #a99f97; --accent: #e07a5f; --ok: #6cc28a; --bad: #f08a80; --line: #3a332e; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.45 -apple-system, system-ui, sans-serif;
+           padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); }
+    h1 { font-size: 22px; margin: 4px 0 2px; }
+    h2 { font-size: 17px; margin: 0 0 8px; }
+    p { margin: 4px 0; }
+    .meta { color: var(--muted); font-size: 14px; }
+    section { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin: 12px 0; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    button, .filebtn { font: inherit; border: 1px solid var(--line); background: var(--card); color: var(--ink);
+             border-radius: 10px; padding: 9px 12px; cursor: pointer; }
+    button.primary, .filebtn { background: var(--accent); border-color: var(--accent); color: #fff; }
+    button:disabled { opacity: .45; }
+    input[type=text] { font: inherit; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); min-width: 0; flex: 1; }
+    .filebtn input { display: none; }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 99px; background: var(--bg); border: 1px solid var(--line); font-size: 14px; }
+    .ok { color: var(--ok); } .bad { color: var(--bad); }
+    #map { height: 300px; border-radius: 10px; margin-top: 10px; background: var(--bg); }
+    #map:empty { display: none; }
+    .thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .thumbs img { width: 88px; height: 88px; object-fit: cover; border-radius: 8px; }
+    #log { white-space: pre-wrap; font: 12px/1.4 ui-monospace, Menlo, monospace; background: var(--bg); border-radius: 10px;
+           padding: 10px; max-height: 320px; overflow: auto; margin: 8px 0 0; }
+    ul { margin: 6px 0 0; padding-left: 18px; }
+  </style>
+</head>
+<body>
+  <h1>Puntuam a taula · prueba técnica</h1>
+  <p class="meta">Paso 2. Página temporal para comprobar las piezas con más riesgo. Se borra al terminar el paso 3.</p>
+
+  <section>
+    <h2>0. Entorno</h2>
+    <p id="env" class="meta"></p>
+  </section>
+
+  <section>
+    <h2>1. Entrar</h2>
+    <p>Estado: <span id="who" class="pill">sin sesión</span></p>
+    <div class="row" style="margin-top:8px">
+      <button class="primary" id="btn-popup">A · Ventana emergente</button>
+      <button id="btn-redirect">B · Redirección</button>
+      <button id="btn-out" disabled>Salir</button>
+    </div>
+    <p class="meta" style="margin-top:10px">C · Botón de Google Identity Services:</p>
+    <div id="gis"></div>
+  </section>
+
+  <section>
+    <h2>2. Acceso</h2>
+    <p>Papel: <span id="role" class="pill">desconocido</span></p>
+    <div class="row" style="margin-top:8px">
+      <button id="btn-request" hidden>Solicitar acceso</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <input type="text" id="name" maxlength="30" placeholder="Nombre visible" autocomplete="off">
+      <button id="btn-name" disabled>Guardar nombre</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>3. Datos</h2>
+    <div class="row">
+      <button class="primary" id="btn-create" disabled>Crear ficha de prueba</button>
+      <button id="btn-read">Leer todo</button>
+    </div>
+    <p class="meta" style="margin-top:8px">Documentos leídos en esta sesión: <b id="reads">0</b></p>
+    <ul id="list"></ul>
+  </section>
+
+  <section>
+    <h2>4. Foto</h2>
+    <p class="meta">Se añade a la última ficha de prueba que hayas creado.</p>
+    <div class="row" style="margin-top:8px">
+      <label class="filebtn">Elegir o hacer foto<input type="file" id="file" accept="image/*"></label>
+      <button id="btn-photos">Ver fotos</button>
+    </div>
+    <div class="thumbs" id="thumbs"></div>
+  </section>
+
+  <section>
+    <h2>5. Mapa</h2>
+    <button class="primary" id="btn-map">Cargar mapa</button>
+    <div id="map"></div>
+  </section>
+
+  <section>
+    <h2>6. Limpiar</h2>
+    <button id="btn-clean">Borrar mis fichas de prueba</button>
+  </section>
+
+  <section>
+    <h2>Registro</h2>
+    <div class="row">
+      <button id="btn-copy">Copiar registro</button>
+      <button id="btn-clear">Vaciar</button>
+    </div>
+    <pre id="log"></pre>
+  </section>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
