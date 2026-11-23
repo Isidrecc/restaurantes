@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Demo cuaderno de restaurantes</title>
+<title>Puntuam a taula · demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=Instrument+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
@@ -1084,6 +1084,53 @@ button.card { display: block; width: 100%; }
 }
 .toast.is-on { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+/* Cuaderno común: personas, opiniones, perfil y papeles */
+.avatar {
+  flex: none; width: 34px; height: 34px; border-radius: 50%; border: 0;
+  background: var(--accent); color: var(--accent-ink);
+  font: 700 15px/1 var(--font-display); display: grid; place-items: center;
+}
+#btn-who { padding: 0 12px; max-width: 120px; }
+#btn-who span { overflow: hidden; text-overflow: ellipsis; }
+.who-quick { display: grid; grid-template-columns: 1fr 1fr; }
+.people { display: flex; flex-direction: column; gap: 8px; }
+.person {
+  display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 12px;
+  border-radius: 12px; border: 1px solid var(--line); background: var(--surface); text-align: left;
+}
+.person .person-name { flex: 1; font-weight: 600; }
+.person .check { flex: none; width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--line); display: grid; place-items: center; }
+.person[aria-pressed="true"] { border-color: var(--accent); }
+.person[aria-pressed="true"] .check { background: var(--accent); border-color: var(--accent); }
+.person[aria-pressed="true"] .check::after {
+  content: ""; width: 10px; height: 6px; border: solid var(--accent-ink); border-width: 0 0 2.5px 2.5px;
+  transform: translateY(-1px) rotate(-45deg);
+}
+.sheet-foot.one { grid-template-columns: 1fr; }
+.score.is-small { width: 40px; height: 40px; border-radius: 10px; font-size: 16px; }
+.score.is-small.is-empty { font-size: 9px; padding: 2px; }
+.opinion { display: flex; flex-direction: column; gap: 8px; padding: 14px 0 4px; border-top: 1px solid var(--line); }
+.opinion:first-of-type { border-top: 0; padding-top: 10px; }
+.op-head { display: flex; align-items: center; gap: 10px; }
+.op-who { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.op-who strong { font: 700 16px/1.2 var(--font-display); }
+.op-more summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--accent); padding: 6px 0; }
+.op-more .crit { margin: 8px 0 6px; }
+.mine-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mine-sum { display: flex; align-items: center; gap: 10px; }
+.mine .btn { margin-top: 10px; }
+.radar-line.is-mine { stroke: var(--ink); stroke-width: 2; stroke-dasharray: 5 4; opacity: .7; }
+.rose-legend { display: flex; justify-content: center; gap: 18px; margin-top: 4px; font-size: 13px; color: var(--muted); }
+.rose-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.rose-legend .ln { display: inline-block; width: 22px; height: 0; border-top: 2.5px solid var(--c, var(--s0)); }
+.rose-legend .ln.is-mine { border-top: 2px dashed var(--ink); opacity: .7; }
+.tabs.is-two { grid-template-columns: repeat(2, 1fr); }
+.demo-box { padding: 12px; border: 1px dashed var(--line); border-radius: 12px; display: flex; flex-direction: column; gap: 8px; }
+.demo-box .seg-wide button { font-size: 12px; padding: 0 2px; }
+.noaccess { z-index: 2500; justify-content: center; overflow-y: auto; }
+.noaccess-body { padding: 24px; display: flex; flex-direction: column; gap: 14px; max-width: 420px; margin: 0 auto; width: 100%; }
+.noaccess-body h2 { font-size: 26px; font-weight: 700; }
+.noaccess-body .link-btn { align-self: center; }
 </style>
 </head>
 <body>
@@ -1091,16 +1138,21 @@ button.card { display: block; width: 100%; }
 
   <header class="bar">
     <div class="brand">
-      <h1 class="brand-name">Cuaderno de restaurantes</h1>
+      <h1 class="brand-name">Puntuam a taula</h1>
       <span class="tag">Demo</span>
     </div>
+    <button class="avatar" id="btn-profile" type="button" aria-label="Tu perfil"><span id="avatar-ini">B</span></button>
   </header>
 
   <div class="tools" id="tools">
     <label class="search" for="q">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
-      <input id="q" type="search" placeholder="Buscar por nombre" autocomplete="off" enterkeyhint="search">
+      <input id="q" type="search" placeholder="Buscar" autocomplete="off" enterkeyhint="search">
     </label>
+    <button class="btn" id="btn-who" type="button" aria-label="Nota de: Todos">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"></circle><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"></path><circle cx="17" cy="9" r="2.5"></circle><path d="M16 14.2c2.4-.2 4.1 1.4 4.6 4.3"></path></svg>
+      <span id="who-label">Todos</span>
+    </button>
     <button class="btn" id="btn-filters" type="button">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>
       Filtros
@@ -1139,7 +1191,7 @@ button.card { display: block; width: 100%; }
       <form class="form" id="form" novalidate>
         <h2 class="form-title" id="form-title">Añadir restaurante</h2>
 
-        <section class="group" aria-label="Datos">
+        <section class="group" id="grp-datos" aria-label="Datos">
           <h3 class="group-title">Datos</h3>
           <div class="field">
             <label for="f-name">Nombre</label>
@@ -1152,16 +1204,12 @@ button.card { display: block; width: 100%; }
             <p class="hint">Puedes marcar varios.</p>
           </div>
           <div class="field">
-            <label for="f-date">Fecha de visita</label>
-            <input class="input" id="f-date" type="date">
-          </div>
-          <div class="field">
             <span class="field-label" id="lbl-price">Precio</span>
             <div class="seg seg-wide" role="radiogroup" aria-labelledby="lbl-price" id="f-price"></div>
           </div>
         </section>
 
-        <section class="group" aria-label="Ubicación">
+        <section class="group" id="grp-ubic" aria-label="Ubicación">
           <h3 class="group-title">Ubicación</h3>
           <div class="field">
             <label for="f-muni">Municipio</label>
@@ -1175,17 +1223,23 @@ button.card { display: block; width: 100%; }
           </div>
         </section>
 
-        <section class="group" aria-label="Valoración">
-          <h3 class="group-title">Valoración</h3>
+        <section class="group" id="grp-val" aria-label="Tu valoración">
+          <h3 class="group-title">Tu valoración</h3>
+          <p class="hint" id="val-hint">Opcional. Puedes puntuarlo ahora o más tarde desde la ficha.</p>
+          <div class="field">
+            <label for="f-date">Fecha de tu visita</label>
+            <input class="input" id="f-date" type="date">
+          </div>
           <div id="rates"></div>
           <div class="global-row">
             <span>Nota global (media)</span>
             <div class="score" id="f-global">Sin nota</div>
           </div>
+          <p class="error" id="err-rate" hidden>Puntúa al menos un criterio.</p>
         </section>
 
-        <section class="group" aria-label="Reseña y fotos">
-          <h3 class="group-title">Reseña y fotos</h3>
+        <section class="group" id="grp-res" aria-label="Tu reseña y fotos">
+          <h3 class="group-title">Tu reseña y fotos</h3>
           <div class="field">
             <label for="f-review">Reseña</label>
             <textarea id="f-review" placeholder="Qué pedimos, qué repetiría, qué no."></textarea>
@@ -1209,7 +1263,7 @@ button.card { display: block; width: 100%; }
     </section>
   </main>
 
-  <nav class="tabs" aria-label="Secciones">
+  <nav class="tabs" id="tabs" aria-label="Secciones">
     <button type="button" data-view="map" aria-current="page">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"></path><path d="M9 4v14M15 6v14"></path></svg>
       Mapa
@@ -1218,7 +1272,7 @@ button.card { display: block; width: 100%; }
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"></path><circle cx="4" cy="6" r="1"></circle><circle cx="4" cy="12" r="1"></circle><circle cx="4" cy="18" r="1"></circle></svg>
       Lista
     </button>
-    <button type="button" data-view="form">
+    <button type="button" data-view="form" id="tab-add">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v8M8 12h8"></path></svg>
       Añadir
     </button>
@@ -1269,6 +1323,78 @@ button.card { display: block; width: 100%; }
     </div>
   </div>
 
+  <div class="sheet" id="sheet-who" hidden>
+    <button class="sheet-backdrop" type="button" data-close aria-label="Cerrar"></button>
+    <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="who-title">
+      <div class="sheet-head">
+        <h2 id="who-title">Nota de</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Cerrar">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+        <p class="meta">Elige de quién es la media que ves en el mapa, en la lista y en las fichas. Se guarda en este dispositivo.</p>
+        <div class="seg who-quick" role="group" aria-label="Selección rápida">
+          <button type="button" data-who="all" aria-pressed="true">Todos</button>
+          <button type="button" data-who="me" aria-pressed="false">Solo yo</button>
+        </div>
+        <div class="field">
+          <span class="field-label">Personas</span>
+          <div class="people" id="who-people"></div>
+        </div>
+      </div>
+      <div class="sheet-foot one">
+        <button class="btn btn-primary" type="button" id="who-apply" data-close>Ver restaurantes</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet" id="sheet-profile" hidden>
+    <button class="sheet-backdrop" type="button" data-close aria-label="Cerrar"></button>
+    <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="prof-title">
+      <div class="sheet-head">
+        <h2 id="prof-title">Tu perfil</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Cerrar">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+        <div class="field">
+          <label for="p-name">Nombre visible</label>
+          <input class="input" id="p-name" type="text" maxlength="30" autocomplete="off">
+          <p class="hint">Es lo que ven los demás junto a tus notas. Tu correo no se muestra.</p>
+        </div>
+        <p id="p-role"></p>
+        <div id="p-extra"></div>
+        <div class="demo-box">
+          <span class="field-label">Solo en la demo: ver la app como</span>
+          <div class="seg seg-wide" id="p-roles" role="group" aria-label="Papel de la demo">
+            <button type="button" data-role="owner">Propietario</button>
+            <button type="button" data-role="editor">Editor</button>
+            <button type="button" data-role="member">Miembro</button>
+            <button type="button" data-role="none">Sin acceso</button>
+          </div>
+        </div>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn" type="button" id="p-logout">Cerrar sesión</button>
+        <button class="btn btn-primary" type="button" id="p-save">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="panel noaccess" id="noaccess" hidden aria-label="Sin acceso">
+    <div class="noaccess-body">
+      <p class="brand-name">Puntuam a taula</p>
+      <h2>No tienes acceso</h2>
+      <p>Has entrado como <b>persona@gmail.com</b>, pero este correo no está invitado. Puntuam a taula es un cuaderno privado de un grupo de amigos.</p>
+      <button class="btn btn-primary btn-block" type="button" id="na-request">Solicitar acceso</button>
+      <p class="meta" id="na-status" hidden>Solicitud enviada. Cuando te den acceso, vuelve a abrir la app.</p>
+      <button class="btn btn-block" type="button" id="na-other">Entrar con otra cuenta</button>
+      <button class="link-btn" type="button" id="na-back">Solo en la demo: volver como propietario</button>
+    </div>
+  </section>
+
   <div class="lightbox" id="lightbox" hidden>
     <img id="lightbox-img" alt="">
     <button class="icon-btn" type="button" id="lightbox-close" aria-label="Cerrar foto">
@@ -1310,40 +1436,150 @@ function startApp() {
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
   }
 
-  var restaurants = [
-    { id: 's1', sample: true, name: 'Can Exemple', muni: 'Palma', lat: 39.5712, lng: 2.6498, cuisines: ['Mallorquina', 'Arroces'], price: '€€', date: '2026-10-17',
-      scores: { producto: 8.5, plato: 9, tecnica: 7, servicio: 8, precio: 8.5, ambiente: 7.5 }, dish: 'Arròs brut',
-      review: 'Cocina de mercado sin florituras. El arròs brut llega caldoso y con caza de verdad. Sala ruidosa a mediodía, mejor reservar el segundo turno.',
-      photos: [ph(28, 'Foto de ejemplo'), ph(150, 'Foto de ejemplo')] },
-    { id: 's2', sample: true, name: 'Sa Fonda Fictícia', muni: 'Sóller', lat: 39.7665, lng: 2.7152, cuisines: ['Mediterránea', 'Pescado y marisco'], price: '€€€', date: '2026-09-05',
-      scores: { producto: 9, plato: 9.5, tecnica: 8.5, servicio: 9, precio: 7, ambiente: 9 }, dish: 'Gamba roja a la sal',
-      review: 'Producto del puerto tratado con respeto. La gamba, apenas hecha. Terraza entre naranjos. La cuenta sube rápido con el vino.',
-      photos: [ph(8, 'Foto de ejemplo')] },
-    { id: 's3', sample: true, name: 'Celler de Mentida', muni: 'Inca', lat: 39.7205, lng: 2.9105, cuisines: ['Mallorquina'], price: '€€', date: '2026-06-21',
-      scores: { producto: 7.5, plato: 8, tecnica: 6, servicio: 7, precio: 8, ambiente: 8.5 }, dish: 'Frit mallorquí',
-      review: 'Celler clásico con botas de vino y raciones grandes. El frit, sabroso y poco grasiento. Postres del montón.',
-      photos: [] },
-    { id: 's4', sample: true, name: 'Ca na Ficció', muni: 'Pollença', lat: 39.8772, lng: 3.0160, cuisines: ['Mediterránea', 'De autor'], price: '€€€€', date: '2026-08-14',
-      scores: { producto: 9.5, plato: 10, tecnica: 9.5, servicio: 9, precio: 8, ambiente: 9 }, dish: 'Tàrtar de llampuga',
-      review: 'Menú degustación de doce pases con producto local y mucha técnica. Ritmo perfecto. Caro, pero se entiende en cada plato.',
-      photos: [ph(200, 'Foto de ejemplo'), ph(320, 'Foto de ejemplo'), ph(95, 'Foto de ejemplo')] },
-    { id: 's5', sample: true, name: 'Es Forn Imaginari', muni: 'Santanyí', lat: 39.3548, lng: 3.1285, cuisines: ['Brasa'], price: '€€€', date: '2026-07-30',
-      scores: { producto: 8, plato: 8.5, tecnica: 7, servicio: 6.5, precio: 6.5, ambiente: 8 }, dish: 'Porcella al forn',
-      review: 'Buena brasa y porcella crujiente. Servicio desbordado en agosto, cuarenta minutos entre platos.',
-      photos: [] },
-    { id: 's6', sample: true, name: 'Bodega Sense Nom', muni: 'Palma', lat: 39.5745, lng: 2.6551, cuisines: ['Tapas'], price: '€', date: '2026-11-07',
-      scores: { producto: 7, plato: 7.5, tecnica: 6, servicio: 7.5, precio: 9, ambiente: 7 }, dish: 'Variat',
-      review: 'Barra de toda la vida. Variat generoso y vermut de grifo. Sitio para ir sin prisa y sin esperar sorpresas.',
-      photos: [] },
-    { id: 's7', sample: true, name: 'Sa Cuina Inventada', muni: 'Artà', lat: 39.6938, lng: 3.3495, cuisines: ['Arroces'], price: '€€', date: '2026-05-10',
-      scores: { producto: 6.5, plato: 6, tecnica: 5.5, servicio: 5, precio: 6, ambiente: 6.5 }, dish: 'Arròs de peix',
-      review: 'Arroz pasado de punto y fondo flojo. El pescado sí era fresco. No volvería expresamente.',
-      photos: [] },
-    { id: 's8', sample: true, name: 'Can Mostra', muni: 'Andratx', lat: 39.5755, lng: 2.4205, cuisines: ['Pescado y marisco'], price: '€€€', date: '2026-04-18',
-      scores: { producto: 5, plato: 4.5, tecnica: 4, servicio: 4, precio: 3.5, ambiente: 6 }, dish: 'Caldereta de llagosta',
-      review: 'Precio de primera línea y cocina de batalla. La caldereta, aguada. Lo único que acompaña es la vista.',
-      photos: [] }
+  // Personas de la demo (inventadas). «u1» es quien usa la app.
+  var PEOPLE = [
+    { uid: 'u1', name: 'Biel' },
+    { uid: 'u2', name: 'Marta' },
+    { uid: 'u3', name: 'Joan' }
   ];
+  var ME = 'u1';
+  function sc(a) { return { producto: a[0], plato: a[1], tecnica: a[2], servicio: a[3], precio: a[4], ambiente: a[5] }; }
+
+  // Cada restaurante: datos comunes y una opinión por persona.
+  var restaurants = [
+    { id: 's1', sample: true, name: 'Can Exemple', muni: 'Palma', lat: 39.5712, lng: 2.6498, cuisines: ['Mallorquina', 'Arroces'], price: '€€', createdBy: 'u1',
+      ratings: {
+        u1: { scores: sc([8.5, 9, 7, 8, 8.5, 7.5]), dish: 'Arròs brut', date: '2026-10-17', photos: [ph(28, 'Foto de ejemplo'), ph(150, 'Foto de ejemplo')],
+          review: 'Cocina de mercado sin florituras. El arròs brut llega caldoso y con caza de verdad. Sala ruidosa a mediodía, mejor reservar el segundo turno.' },
+        u2: { scores: sc([8, 8.5, 7.5, 7, 8, 6.5]), dish: 'Arròs brut', date: '2026-10-30', photos: [],
+          review: 'Buen arròs brut, aunque algo salado. Mucho ruido.' },
+        u3: { scores: sc([9, 9, 8, 8.5, 9, 7]), dish: 'Llom amb col', date: '2026-11-12', photos: [ph(60, 'Foto de ejemplo')],
+          review: 'El llom amb col, de los mejores que he probado. Volveré.' }
+      } },
+    { id: 's2', sample: true, name: 'Sa Fonda Fictícia', muni: 'Sóller', lat: 39.7665, lng: 2.7152, cuisines: ['Mediterránea', 'Pescado y marisco'], price: '€€€', createdBy: 'u1',
+      ratings: {
+        u1: { scores: sc([9, 9.5, 8.5, 9, 7, 9]), dish: 'Gamba roja a la sal', date: '2026-09-05', photos: [ph(8, 'Foto de ejemplo')],
+          review: 'Producto del puerto tratado con respeto. La gamba, apenas hecha. Terraza entre naranjos. La cuenta sube rápido con el vino.' },
+        u2: { scores: sc([9.5, 10, 9, 9, 6, 9.5]), dish: 'Gamba roja a la sal', date: '2026-09-20', photos: [],
+          review: 'La mejor gamba del año. Caro, pero lo vale.' }
+      } },
+    { id: 's3', sample: true, name: 'Celler de Mentida', muni: 'Inca', lat: 39.7205, lng: 2.9105, cuisines: ['Mallorquina'], price: '€€', createdBy: 'u1',
+      ratings: {
+        u1: { scores: sc([7.5, 8, 6, 7, 8, 8.5]), dish: 'Frit mallorquí', date: '2026-06-21', photos: [],
+          review: 'Celler clásico con botas de vino y raciones grandes. El frit, sabroso y poco grasiento. Postres del montón.' }
+      } },
+    { id: 's4', sample: true, name: 'Ca na Ficció', muni: 'Pollença', lat: 39.8772, lng: 3.0160, cuisines: ['Mediterránea', 'De autor'], price: '€€€€', createdBy: 'u1',
+      ratings: {
+        u1: { scores: sc([9.5, 10, 9.5, 9, 8, 9]), dish: 'Tàrtar de llampuga', date: '2026-08-14', photos: [ph(200, 'Foto de ejemplo'), ph(320, 'Foto de ejemplo'), ph(95, 'Foto de ejemplo')],
+          review: 'Menú degustación de doce pases con producto local y mucha técnica. Ritmo perfecto. Caro, pero se entiende en cada plato.' },
+        u2: { scores: sc([9, 9.5, 10, 9.5, 7, 9]), dish: 'Tàrtar de llampuga', date: '2026-08-28', photos: [],
+          review: 'Técnica impecable. Para una ocasión especial.' },
+        u3: { scores: sc([8.5, 9, 9, 8, 6.5, 8.5]), dish: 'Raor a la brasa', date: '2026-09-02', photos: [],
+          review: 'Muy bueno, pero me pareció largo y caro.' }
+      } },
+    { id: 's5', sample: true, name: 'Es Forn Imaginari', muni: 'Santanyí', lat: 39.3548, lng: 3.1285, cuisines: ['Brasa'], price: '€€€', createdBy: 'u2',
+      ratings: {
+        u2: { scores: sc([8, 8.5, 7, 6.5, 6.5, 8]), dish: 'Porcella al forn', date: '2026-07-30', photos: [],
+          review: 'Buena brasa y porcella crujiente. Servicio desbordado en agosto, cuarenta minutos entre platos.' },
+        u3: { scores: sc([8.5, 9, 7, 7, 7, 8]), dish: 'Porcella al forn', date: '2026-08-09', photos: [],
+          review: 'Porcella crujiente. Paciencia con el servicio.' }
+      } },
+    { id: 's6', sample: true, name: 'Bodega Sense Nom', muni: 'Palma', lat: 39.5745, lng: 2.6551, cuisines: ['Tapas'], price: '€', createdBy: 'u1',
+      ratings: {
+        u1: { scores: sc([7, 7.5, 6, 7.5, 9, 7]), dish: 'Variat', date: '2026-11-07', photos: [],
+          review: 'Barra de toda la vida. Variat generoso y vermut de grifo. Sitio para ir sin prisa y sin esperar sorpresas.' },
+        u3: { scores: sc([7.5, 8, null, 8, 9.5, 7.5]), dish: 'Pa amb oli', date: '2026-11-15', photos: [],
+          review: 'Mi barra de confianza para el vermut.' }
+      } },
+    { id: 's7', sample: true, name: 'Sa Cuina Inventada', muni: 'Artà', lat: 39.6938, lng: 3.3495, cuisines: ['Arroces'], price: '€€', createdBy: 'u1',
+      ratings: {
+        u1: { scores: sc([6.5, 6, 5.5, 5, 6, 6.5]), dish: 'Arròs de peix', date: '2026-05-10', photos: [],
+          review: 'Arroz pasado de punto y fondo flojo. El pescado sí era fresco. No volvería expresamente.' },
+        u2: { scores: sc([5.5, 5, 5, 6, 5.5, 6]), dish: 'Arròs de peix', date: '2026-05-24', photos: [],
+          review: 'Coincido: el arroz, pasado.' }
+      } },
+    { id: 's8', sample: true, name: 'Can Mostra', muni: 'Andratx', lat: 39.5755, lng: 2.4205, cuisines: ['Pescado y marisco'], price: '€€€', createdBy: 'u3',
+      ratings: {
+        u3: { scores: sc([5, 4.5, 4, 4, 3.5, 6]), dish: 'Caldereta de llagosta', date: '2026-04-18', photos: [],
+          review: 'Precio de primera línea y cocina de batalla. La caldereta, aguada. Lo único que acompaña es la vista.' }
+      } }
+  ];
+
+  // Papel con el que se ve la demo: owner, editor, member o none (sin acceso).
+  var role = 'owner';
+  var editorRequested = false;
+  var formMode = 'add';
+  var confirmFn = null;
+
+  // Selección «Nota de», guardada en el dispositivo.
+  var who = { mode: 'all', uids: [] };
+  try {
+    var savedWho = JSON.parse(localStorage.getItem('puntuam-demo-who') || 'null');
+    if (savedWho && (savedWho.mode === 'all' || savedWho.mode === 'me' || savedWho.mode === 'some')) who = savedWho;
+  } catch (e) { /* sin almacenamiento */ }
+  function saveWho() { try { localStorage.setItem('puntuam-demo-who', JSON.stringify(who)); } catch (e) { /* sin almacenamiento */ } }
+
+  // ---------- People and averages ----------
+  function personName(uid) {
+    var p = PEOPLE.filter(function (x) { return x.uid === uid; })[0];
+    return p ? p.name : 'Antiguo miembro';
+  }
+  function allUids() { return PEOPLE.map(function (p) { return p.uid; }); }
+  function selectedUids() {
+    if (who.mode === 'me') return [ME];
+    if (who.mode === 'some') return who.uids.slice();
+    return allUids();
+  }
+  function avg(arr) { return arr.length ? arr.reduce(function (a, b) { return a + b; }, 0) / arr.length : null; }
+  // Opiniones de un restaurante, solo de las personas indicadas si se pasan.
+  function opinions(r, uids) {
+    return Object.keys(r.ratings).filter(function (u) { return !uids || uids.indexOf(u) >= 0; }).map(function (u) {
+      var x = r.ratings[u];
+      return { uid: u, scores: x.scores, dish: x.dish, review: x.review, date: x.date, photos: x.photos || [], global: globalOf(x.scores) };
+    });
+  }
+  // Nota global = media de las notas globales de cada persona seleccionada (D5).
+  // Cada criterio = media de quienes lo han puntuado.
+  function agg(r) {
+    var list = opinions(r, selectedUids());
+    var crit = {};
+    CRITERIA.forEach(function (c) {
+      crit[c.k] = avg(list.map(function (o) { return o.scores[c.k]; }).filter(function (v) { return v != null; }));
+    });
+    var dates = list.map(function (o) { return o.date; }).filter(Boolean).sort();
+    return {
+      g: avg(list.map(function (o) { return o.global; }).filter(function (v) { return v != null; })),
+      crit: crit, n: list.length, list: list, date: dates.length ? dates[dates.length - 1] : null
+    };
+  }
+  // Etiqueta completa: «Todos», «Solo yo», «Marta», «Biel y Marta».
+  function whoLabel() {
+    if (who.mode === 'me') return 'Solo yo';
+    if (who.mode === 'all') return 'Todos';
+    var names = who.uids.map(function (u) { return u === ME ? personName(u) + ' (tú)' : personName(u); });
+    return names.length === 1 ? names[0] : names.slice(0, -1).join(', ') + ' y ' + names[names.length - 1];
+  }
+  // Etiqueta corta para el botón, que comparte fila con el buscador.
+  function whoShort() {
+    if (who.mode === 'me') return 'Yo';
+    if (who.mode === 'all') return 'Todos';
+    return who.uids.length === 1 ? personName(who.uids[0]) : String(who.uids.length);
+  }
+  function setWho(uids) {
+    var all = allUids();
+    if (uids.length === all.length) who = { mode: 'all', uids: [] };
+    else if (uids.length === 1 && uids[0] === ME) who = { mode: 'me', uids: [] };
+    else who = { mode: 'some', uids: all.filter(function (u) { return uids.indexOf(u) >= 0; }) };
+    saveWho();
+  }
+  function canEditData() { return role === 'owner' || role === 'editor'; }
+  // D2: el propietario siempre; un editor solo si nadie más ha puntuado.
+  function canDelete(r) {
+    if (role === 'owner') return true;
+    if (role !== 'editor') return false;
+    return Object.keys(r.ratings).every(function (u) { return u === ME; });
+  }
+
 
   var filters = { q: '', min: 0, field: 'global', cuisines: new Set(), munis: new Set(), prices: new Set() };
   var sortBy = 'nota';
@@ -1369,14 +1605,22 @@ function startApp() {
     var r = round1(n);
     return r >= 9 ? 's5' : r >= 8 ? 's4' : r >= 7 ? 's3' : r >= 5 ? 's2' : 's1';
   }
-  // Rosette in the style of football player cards: hexagonal grid, one outline, names at the corners.
+  // Rosette in the style of football player cards: hexagonal grid, names at the corners.
+  // Two lines: the average of the selection (coloured by its score) and, dashed, the user's own.
   var SHORT = { producto: 'Producto', plato: 'Plato estrella', tecnica: 'Técnica', servicio: 'Servicio', precio: 'Calidad/precio', ambiente: 'Ambiente' };
-  function chartSVG(scores) {
+  function chartSVG(avgScores, mineScores, klass) {
     var W = 380, H = 252, cx = 190, cy = 128, R = 88, n = CRITERIA.length, step = 360 / n;
     function pt(rad, deg) { var a = deg * Math.PI / 180; return [cx + rad * Math.cos(a), cy + rad * Math.sin(a)]; }
     function f(x) { return Math.round(x * 10) / 10; }
     function hex(rad) { return CRITERIA.map(function (c, i) { var q = pt(rad, -90 + i * step); return f(q[0]) + ',' + f(q[1]); }).join(' '); }
-    var desc = CRITERIA.map(function (c) { return SHORT[c.k] + ' ' + fmt(scores[c.k]); }).join(', ');
+    function poly(scores) {
+      return CRITERIA.map(function (c, i) {
+        var v = scores[c.k], q = pt(R * (v == null ? 0 : v) / 10, -90 + i * step);
+        return f(q[0]) + ',' + f(q[1]);
+      }).join(' ');
+    }
+    function describe(scores) { return CRITERIA.map(function (c) { return SHORT[c.k] + ' ' + fmt(scores[c.k]); }).join(', '); }
+    var desc = 'Media: ' + describe(avgScores) + (mineScores ? '. Tú: ' + describe(mineScores) : '');
     var o = '<svg class="rose" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Roseta de puntuaciones. ' + esc(desc) + '">';
     o += '<polygon class="hex-outer" points="' + hex(R) + '"></polygon>';
     o += '<polygon class="hex-inner" points="' + hex(R / 2) + '"></polygon>';
@@ -1384,11 +1628,8 @@ function startApp() {
       var e = pt(R, -90 + i * step);
       o += '<line class="rose-spoke" x1="' + cx + '" y1="' + cy + '" x2="' + f(e[0]) + '" y2="' + f(e[1]) + '"></line>';
     });
-    var pts = CRITERIA.map(function (c, i) {
-      var v = scores[c.k], q = pt(R * (v == null ? 0 : v) / 10, -90 + i * step);
-      return f(q[0]) + ',' + f(q[1]);
-    }).join(' ');
-    o += '<polygon class="radar-line ' + cls(globalOf(scores)) + '" points="' + pts + '"><title>' + esc(desc) + '</title></polygon>';
+    if (mineScores) o += '<polygon class="radar-line is-mine" points="' + poly(mineScores) + '"></polygon>';
+    o += '<polygon class="radar-line ' + klass + '" points="' + poly(avgScores) + '"><title>' + esc(desc) + '</title></polygon>';
     CRITERIA.forEach(function (c, i) {
       var deg = -90 + i * step, q = pt(R + 12, deg), cos = Math.cos(deg * Math.PI / 180), sin = Math.sin(deg * Math.PI / 180);
       var anchor = cos > 0.3 ? 'start' : cos < -0.3 ? 'end' : 'middle';
@@ -1397,8 +1638,12 @@ function startApp() {
     });
     return o + '</svg>';
   }
-  function chartCard(r) {
-    return '<div class="card"><p class="section-title">Roseta</p>' + chartSVG(r.scores) + '</div>';
+  function chartCard(a, mine) {
+    var showMine = !!mine && who.mode !== 'me' && a.n > 0;
+    var legend = showMine
+      ? '<div class="rose-legend"><span><i class="ln ' + cls(a.g) + '"></i>Media (' + a.n + ')</span><span><i class="ln is-mine"></i>Tú</span></div>'
+      : '';
+    return '<div class="card"><p class="section-title">Roseta</p>' + chartSVG(a.crit, showMine ? mine.scores : null, cls(a.g)) + legend + '</div>';
   }
   function word(n) {
     if (n == null) return 'Sin valorar';
@@ -1498,7 +1743,8 @@ function startApp() {
   function passes(r) {
     if (filters.q && norm(r.name).indexOf(norm(filters.q)) < 0) return false;
     if (filters.min > 0) {
-      var v = filters.field === 'global' ? globalOf(r.scores) : r.scores[filters.field];
+      var a = agg(r);
+      var v = filters.field === 'global' ? a.g : a.crit[filters.field];
       if (v == null || round1(v) < filters.min) return false;
     }
     if (filters.cuisines.size && !r.cuisines.some(function (c) { return filters.cuisines.has(c); })) return false;
@@ -1510,8 +1756,8 @@ function startApp() {
     var out = restaurants.filter(passes);
     out.sort(function (a, b) {
       if (sortBy === 'nombre') return a.name.localeCompare(b.name, 'es');
-      if (sortBy === 'fecha') return (b.date || '').localeCompare(a.date || '');
-      var ga = globalOf(a.scores), gb = globalOf(b.scores);
+      if (sortBy === 'fecha') return (agg(b).date || '').localeCompare(agg(a).date || '');
+      var ga = agg(a).g, gb = agg(b).g;
       return (gb == null ? -1 : gb) - (ga == null ? -1 : ga);
     });
     return out;
@@ -1531,14 +1777,22 @@ function startApp() {
 
   // ---------- Rendering ----------
   function rowHTML(r) {
-    var g = globalOf(r.scores);
+    var a = agg(r);
+    var g = a.g;
+    var mine = r.ratings[ME];
+    // Plato estrella: el tuyo si has puntuado; si no, el de la opinión más reciente.
+    var dishOp = mine ? opinions(r, [ME])[0] : opinions(r).sort(function (x, y) { return (y.date || '').localeCompare(x.date || ''); })[0];
+    var nTxt = a.n === 0 ? 'Sin opiniones de tu selección' : a.n + (a.n === 1 ? ' opinión' : ' opiniones');
+    var mineTxt = mine && who.mode !== 'me' ? ' · tu nota <b class="num">' + fmt(globalOf(mine.scores)) + '</b>' : '';
     return '<span class="row">' +
       '<span class="score ' + cls(g) + (g == null ? ' is-empty' : '') + '">' + fmt(g) + '</span>' +
       '<span class="row-main">' +
         '<span class="row-title"><strong class="row-name">' + esc(r.name) + '</strong><span class="price">' + esc(r.price) + '</span></span>' +
         '<span class="meta">' + placeLine(r, false) + '</span>' +
-        (r.dish ? '<span class="dish">' + STAR + '<b>' + esc(r.dish) + '</b>' + (r.scores.plato != null ? '<span class="num">' + fmt(r.scores.plato) + '</span>' : '') + '</span>' : '') +
-        '<span class="meta">' + esc(fmtDate(r.date)) + (r.sample ? ' · dato de ejemplo' : '') + '</span>' +
+        (dishOp && dishOp.dish ? '<span class="dish">' + STAR + '<b>' + esc(dishOp.dish) + '</b>' +
+          (dishOp.scores.plato != null ? '<span class="num">' + fmt(dishOp.scores.plato) + '</span>' : '') +
+          (dishOp.uid !== ME ? '<span class="meta">· ' + esc(personName(dishOp.uid)) + '</span>' : '') + '</span>' : '') +
+        '<span class="meta">' + nTxt + mineTxt + (a.date ? ' · ' + esc(fmtDate(a.date)) : '') + (r.sample ? ' · dato de ejemplo' : '') + '</span>' +
       '</span></span>';
   }
 
@@ -1547,7 +1801,7 @@ function startApp() {
     markerLayer.clearLayers();
     markers = {};
     list.slice().reverse().forEach(function (r) {
-      var g = globalOf(r.scores);
+      var g = agg(r).g;
       var mk = L.marker([r.lat, r.lng], {
         icon: pinIcon(g == null ? '·' : fmt(g), cls(g) + (r.id === selectedId ? ' is-selected' : '')),
         title: r.name, alt: r.name + ', nota ' + fmt(g), riseOnHover: true,
@@ -1635,6 +1889,7 @@ function startApp() {
     var list = filtered();
     if (selectedId && !list.some(function (r) { return r.id === selectedId; })) selectedId = null;
     renderChips();
+    updateWhoLabel();
     $('#map-count').textContent = countText(list.length);
     $('#list-count').textContent = countText(list.length);
     $('#flt-apply').textContent = 'Ver ' + list.length + (list.length === 1 ? ' restaurante' : ' restaurantes');
@@ -1649,7 +1904,8 @@ function startApp() {
     if (v !== 'form') lastBrowse = v;
     $$('.view').forEach(function (s) { s.classList.toggle('is-active', s.id === 'view-' + v); });
     $$('.tabs button').forEach(function (b) {
-      if (b.dataset.view === v) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+      // Puntuar y editar datos también usan el formulario, pero no son «Añadir».
+      if (b.dataset.view === v && !(v === 'form' && formMode !== 'add')) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
     });
     $('#tools').hidden = v === 'form';
     $('#active-chips').hidden = v === 'form' || !activeCount();
@@ -1658,46 +1914,87 @@ function startApp() {
   }
 
   // ---------- Detail ----------
-  function openDetail(id) {
-    var r = byId(id);
-    if (!r) return;
-    detailId = id;
-    var g = globalOf(r.scores);
-    var rows = CRITERIA.map(function (c) {
-      var v = r.scores[c.k];
-      var sub = c.k === 'plato' && r.dish ? '<span class="crit-sub"> · ' + esc(r.dish) + '</span>' : '';
+  function critRows(scores, dish) {
+    return CRITERIA.map(function (c) {
+      var v = scores[c.k];
+      var sub = c.k === 'plato' && dish ? '<span class="crit-sub"> · ' + esc(dish) + '</span>' : '';
       return '<div class="crit-row ' + cls(v) + '">' +
         '<span class="crit-name">' + c.label + sub + '</span>' +
         '<span class="crit-val">' + (v == null ? '<span class="meta">Sin nota</span>' : fmt(v)) + '</span>' +
         '<div class="crit-bar"><i style="width:' + (v == null ? 0 : v * 10) + '%"></i></div>' +
         '</div>';
     }).join('');
-    var photos = (r.photos || []).map(function (p, i) {
-      return '<button class="thumb" type="button" data-act="photo" data-i="' + i + '" aria-label="Ampliar foto ' + (i + 1) + '"><img src="' + p + '" alt="Foto ' + (i + 1) + ' de ' + esc(r.name) + '"></button>';
+  }
+  function opinionHTML(o, inSel) {
+    var photos = o.photos.map(function (p, i) {
+      return '<button class="thumb" type="button" data-act="photo" data-uid="' + o.uid + '" data-i="' + i + '" aria-label="Ampliar foto ' + (i + 1) + ' de ' + esc(personName(o.uid)) + '"><img src="' + p + '" alt="Foto ' + (i + 1) + ' de ' + esc(personName(o.uid)) + '"></button>';
     }).join('');
+    return '<article class="opinion">' +
+      '<div class="op-head">' +
+        '<span class="score is-small ' + cls(o.global) + (o.global == null ? ' is-empty' : '') + '">' + fmt(o.global) + '</span>' +
+        '<span class="op-who"><strong>' + esc(personName(o.uid)) + (o.uid === ME ? ' (tú)' : '') + '</strong>' +
+        '<span class="meta">' + esc(fmtDate(o.date)) + (inSel ? '' : ' · fuera de tu selección') + '</span></span>' +
+      '</div>' +
+      (o.dish ? '<span class="dish">' + STAR + '<b>' + esc(o.dish) + '</b>' + (o.scores.plato != null ? '<span class="num">' + fmt(o.scores.plato) + '</span>' : '') + '</span>' : '') +
+      (o.review ? '<p class="review">' + esc(o.review) + '</p>' : '') +
+      (photos ? '<div class="thumbs">' + photos + '</div>' : '') +
+      '<details class="op-more"><summary>Ver sus seis notas</summary><div class="crit">' + critRows(o.scores, null) + '</div></details>' +
+    '</article>';
+  }
+  function openDetail(id) {
+    var r = byId(id);
+    if (!r) return;
+    detailId = id;
+    var a = agg(r);
+    var g = a.g;
+    var mine = r.ratings[ME] ? opinions(r, [ME])[0] : null;
+    var sel = selectedUids();
+    var all = opinions(r).sort(function (x, y) {
+      if (x.uid === ME) return -1;
+      if (y.uid === ME) return 1;
+      return (y.date || '').localeCompare(x.date || '');
+    });
+    var scoreText = a.n === 0 ? 'Nadie de tu selección lo ha puntuado'
+      : a.n === 1 ? (a.list[0].uid === ME ? 'Solo tu opinión' : 'Una sola opinión, de ' + personName(a.list[0].uid))
+      : 'Media de ' + a.n + ' personas';
+    var actions = (canEditData() ? '<button class="link-btn" type="button" data-act="edit">Editar datos</button>' : '') +
+      (canDelete(r) ? '<button class="link-btn is-danger" type="button" data-act="delete">Borrar</button>' : '');
+    var mineCard = mine
+      ? '<div class="card mine">' +
+          '<div class="mine-head"><p class="section-title">Tu opinión</p>' +
+          '<div class="panel-actions"><button class="link-btn" type="button" data-act="rate">Editar</button>' +
+          '<button class="link-btn is-danger" type="button" data-act="del-mine">Borrar</button></div></div>' +
+          '<div class="mine-sum"><span class="score is-small ' + cls(mine.global) + (mine.global == null ? ' is-empty' : '') + '">' + fmt(mine.global) + '</span>' +
+          '<span class="meta">' + esc(word(mine.global)) + ' · visitado el ' + esc(fmtDate(mine.date)) + '</span></div>' +
+        '</div>'
+      : '<div class="card mine"><p class="section-title">Tu opinión</p>' +
+          '<p class="meta" style="margin-top:6px">Aún no lo has puntuado.</p>' +
+          '<button class="btn btn-primary btn-block" type="button" data-act="rate">Puntuar este restaurante</button></div>';
+    var note = a.n > 1
+      ? '<p class="hint">Cada barra es la media de quienes han puntuado ese criterio. La nota global es la media de la nota global de cada persona, así que puede no coincidir con la media de las barras.</p>'
+      : '';
     $('#detail').innerHTML =
       '<div class="panel-bar">' +
         '<button class="link-btn" type="button" data-act="back">' +
           '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>Volver</button>' +
-        '<div class="panel-actions">' +
-          '<button class="link-btn" type="button" data-act="edit">Editar</button>' +
-          '<button class="link-btn is-danger" type="button" data-act="delete">Borrar</button>' +
-        '</div>' +
+        '<div class="panel-actions">' + actions + '</div>' +
       '</div>' +
       '<div class="panel-body">' +
         '<div class="d-head">' +
           '<h2>' + esc(r.name) + '</h2>' +
           '<p class="meta">' + placeLine(r, true) + '</p>' +
-          '<p class="meta">Visitado el ' + esc(fmtDate(r.date)) + (r.sample ? ' · <span class="tag">Ejemplo</span>' : '') + '</p>' +
+          '<p class="meta">' + (all.length ? all.length + (all.length === 1 ? ' opinión' : ' opiniones') + ' en total' : 'Sin opiniones') +
+            (r.sample ? ' · <span class="tag">Ejemplo</span>' : '') + '</p>' +
         '</div>' +
         '<div class="card d-score">' +
           '<div class="score is-big ' + cls(g) + (g == null ? ' is-empty' : '') + '">' + fmt(g) + '</div>' +
-          '<div class="d-score-text"><strong>' + word(g) + '</strong><span class="meta">Nota global, media de los seis criterios</span></div>' +
+          '<div class="d-score-text"><strong>' + word(g) + '</strong><span class="meta">' + esc(scoreText) + '</span><span class="meta">Selección: ' + esc(whoLabel()) + '</span></div>' +
         '</div>' +
-        '<div class="card crit">' + rows + '</div>' +
-        chartCard(r) +
-        (r.review ? '<div class="card"><p class="section-title">Reseña</p><p class="review" style="margin-top:8px">' + esc(r.review) + '</p></div>' : '') +
-        (photos ? '<div class="card"><p class="section-title">Fotos</p><div class="thumbs" style="margin-top:10px">' + photos + '</div></div>' : '') +
+        (a.n ? '<div class="card crit">' + critRows(a.crit, null) + note + '</div>' : '') +
+        (a.n ? chartCard(a, mine) : '') +
+        mineCard +
+        (all.length ? '<div class="card"><p class="section-title">Opiniones (' + all.length + ')</p>' +
+          all.map(function (o) { return opinionHTML(o, sel.indexOf(o.uid) >= 0); }).join('') + '</div>' : '') +
         '<button class="btn btn-block" type="button" data-act="show-on-map">Ver en el mapa</button>' +
       '</div>';
     $('#detail').hidden = false;
@@ -1778,12 +2075,26 @@ function startApp() {
     box.textContent = fmt(g);
   }
 
-  function startForm(r) {
-    draft = r
-      ? { id: r.id, sample: r.sample, name: r.name, muni: r.muni, lat: r.lat, lng: r.lng, cuisines: r.cuisines.slice(), price: r.price, date: r.date, scores: Object.assign({}, r.scores), dish: r.dish, review: r.review, photos: (r.photos || []).slice() }
-      : { id: null, name: '', muni: '', lat: null, lng: null, cuisines: [], price: '€€', date: todayISO(), scores: {}, dish: '', review: '', photos: [] };
-    $('#form-title').textContent = r ? 'Editar restaurante' : 'Añadir restaurante';
-    $('#f-save').textContent = r ? 'Guardar cambios' : 'Guardar restaurante';
+  // Modos: add (alta, editores), edit (datos comunes, editores), rate (tu opinión, todos).
+  function startForm(mode, r) {
+    formMode = mode;
+    var mine = r && r.ratings[ME];
+    draft = {
+      id: r ? r.id : null,
+      name: r ? r.name : '', muni: r ? r.muni : '', lat: r ? r.lat : null, lng: r ? r.lng : null,
+      cuisines: r ? r.cuisines.slice() : [], price: r ? r.price : '€€',
+      date: mine ? mine.date : todayISO(),
+      scores: mine ? Object.assign({}, mine.scores) : {},
+      dish: mine ? mine.dish : '', review: mine ? mine.review : '', photos: mine ? (mine.photos || []).slice() : []
+    };
+    var title = mode === 'add' ? 'Añadir restaurante' : mode === 'edit' ? 'Editar datos' : (mine ? 'Editar mi opinión' : 'Puntuar');
+    $('#form-title').textContent = title + (mode === 'rate' ? ' · ' + r.name : '');
+    $('#f-save').textContent = mode === 'add' ? 'Guardar restaurante' : mode === 'edit' ? 'Guardar cambios' : 'Guardar opinión';
+    $('#grp-datos').hidden = mode === 'rate';
+    $('#grp-ubic').hidden = mode === 'rate';
+    $('#grp-val').hidden = mode === 'edit';
+    $('#grp-res').hidden = mode === 'edit';
+    $('#val-hint').hidden = mode !== 'add';
     $('#f-name').value = draft.name;
     $$('#f-cuisines .chip').forEach(function (b) { b.setAttribute('aria-pressed', draft.cuisines.indexOf(b.dataset.c) >= 0 ? 'true' : 'false'); });
     $('#f-date').value = draft.date;
@@ -1796,7 +2107,7 @@ function startApp() {
       $('#f-r-' + c.k).value = v == null ? 5 : v;
       setRate(c.k, v == null ? null : v);
     });
-    ['#err-name', '#err-muni', '#err-loc'].forEach(function (s) { $(s).hidden = true; });
+    ['#err-name', '#err-muni', '#err-loc', '#err-rate'].forEach(function (s) { $(s).hidden = true; });
     renderDraftPhotos();
     $('#view-form').scrollTop = 0;
   }
@@ -1817,21 +2128,89 @@ function startApp() {
     var pr = $('#f-price input:checked');
     draft.price = pr ? pr.value : '€€';
     var bad = null;
-    $('#err-name').hidden = !!draft.name; if (!draft.name) bad = bad || '#f-name';
-    $('#err-muni').hidden = !!draft.muni; if (!draft.muni) bad = bad || '#f-muni';
-    $('#err-loc').hidden = draft.lat != null; if (draft.lat == null) bad = bad || '#pick-map';
+    if (formMode !== 'rate') {
+      $('#err-name').hidden = !!draft.name; if (!draft.name) bad = bad || '#f-name';
+      $('#err-muni').hidden = !!draft.muni; if (!draft.muni) bad = bad || '#f-muni';
+      $('#err-loc').hidden = draft.lat != null; if (draft.lat == null) bad = bad || '#pick-map';
+    }
+    var hasScore = CRITERIA.some(function (c) { return draft.scores[c.k] != null; });
+    var hasRating = hasScore || !!draft.review || !!draft.dish || draft.photos.length > 0;
+    var needScore = formMode === 'rate' || (formMode === 'add' && hasRating);
+    $('#err-rate').hidden = !(needScore && !hasScore);
+    if (needScore && !hasScore) bad = bad || '#rates';
     if (bad) { $(bad).scrollIntoView({ block: 'center' }); toast('Faltan datos por rellenar'); return; }
-    var isNew = !draft.id;
-    if (isNew) { draft.id = 'r' + Date.now(); restaurants.push(draft); }
-    else { var i = restaurants.findIndex(function (r) { return r.id === draft.id; }); restaurants[i] = draft; }
-    var id = draft.id;
+    var rating = { scores: Object.assign({}, draft.scores), dish: draft.dish, review: draft.review, date: draft.date, photos: draft.photos.slice() };
+    var r, msg;
+    if (formMode === 'add') {
+      r = { id: 'r' + Date.now(), name: draft.name, muni: draft.muni, lat: draft.lat, lng: draft.lng, cuisines: draft.cuisines, price: draft.price, createdBy: ME, ratings: {} };
+      if (hasScore) r.ratings[ME] = rating;
+      restaurants.push(r);
+      msg = 'Restaurante añadido';
+    } else {
+      r = byId(draft.id);
+      if (formMode === 'edit') {
+        r.name = draft.name; r.muni = draft.muni; r.lat = draft.lat; r.lng = draft.lng; r.cuisines = draft.cuisines; r.price = draft.price;
+        msg = 'Cambios guardados';
+      } else {
+        r.ratings[ME] = rating;
+        msg = 'Opinión guardada';
+      }
+    }
+    var id = r.id;
     draft = null;
     selectedId = id;
     buildFilterChips();
     setView(lastBrowse);
     render();
     openDetail(id);
-    toast(isNew ? 'Restaurante añadido' : 'Cambios guardados');
+    toast(msg);
+  }
+
+  // ---------- Who, profile and roles ----------
+  function updateWhoLabel() {
+    $('#who-label').textContent = whoShort();
+    $('#btn-who').setAttribute('aria-label', 'Nota de: ' + whoLabel());
+  }
+  function renderWho() {
+    var sel = selectedUids();
+    $('#who-people').innerHTML = PEOPLE.map(function (p) {
+      var n = restaurants.filter(function (r) { return r.ratings[p.uid]; }).length;
+      return '<button class="person" type="button" data-uid="' + p.uid + '" aria-pressed="' + (sel.indexOf(p.uid) >= 0 ? 'true' : 'false') + '">' +
+        '<span class="check" aria-hidden="true"></span>' +
+        '<span class="person-name">' + esc(p.name) + (p.uid === ME ? ' (tú)' : '') + '</span>' +
+        '<span class="meta">' + n + (n === 1 ? ' opinión' : ' opiniones') + '</span></button>';
+    }).join('');
+    $$('#sheet-who [data-who]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.who === who.mode ? 'true' : 'false'); });
+    var n = filtered().length;
+    $('#who-apply').textContent = 'Ver ' + n + (n === 1 ? ' restaurante' : ' restaurantes');
+  }
+  var ROLE_NAMES = { owner: 'Propietario', editor: 'Editor', member: 'Miembro', none: 'Sin acceso' };
+  function renderProfile() {
+    $('#p-name').value = personName(ME);
+    $('#p-role').innerHTML = 'Papel: <b>' + ROLE_NAMES[role] + '</b>';
+    var extra = '';
+    if (role === 'member') {
+      extra = editorRequested
+        ? '<p class="meta">Solicitud para ser editor enviada. La verá el propietario.</p>'
+        : '<button class="btn btn-block" type="button" id="p-req">Solicitar ser editor</button><p class="hint" style="margin-top:6px">Los editores dan de alta restaurantes y corrigen sus datos.</p>';
+    }
+    if (role === 'owner') extra = '<p class="meta">Solicitudes pendientes: <b>1</b>. La pantalla de accesos llega en el paso 4.</p>';
+    $('#p-extra').innerHTML = extra;
+    $$('#p-roles [data-role]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.role === role ? 'true' : 'false'); });
+  }
+  function applyRole() {
+    $('#tab-add').hidden = !canEditData();
+    $('#tabs').classList.toggle('is-two', !canEditData());
+    if (!canEditData() && view === 'form' && formMode !== 'rate') { draft = null; setView(lastBrowse); }
+    $('#noaccess').hidden = role !== 'none';
+    $('#avatar-ini').textContent = personName(ME).charAt(0).toUpperCase();
+    if (detailId && !$('#detail').hidden) openDetail(detailId);
+  }
+  function askConfirm(title, text, fn) {
+    $('#cf-title').textContent = title;
+    $('#cf-text').textContent = text;
+    confirmFn = fn;
+    $('#sheet-confirm').hidden = false;
   }
 
   // ---------- Filter sheet ----------
@@ -1853,7 +2232,7 @@ function startApp() {
   function wire() {
     $$('.tabs button').forEach(function (b) {
       b.addEventListener('click', function () {
-        if (b.dataset.view === 'form' && view !== 'form') startForm(null);
+        if (b.dataset.view === 'form' && view !== 'form') startForm('add', null);
         setView(b.dataset.view);
       });
     });
@@ -1909,9 +2288,29 @@ function startApp() {
       var r = byId(detailId);
       var act = b.dataset.act;
       if (act === 'back') closeDetail();
-      if (act === 'edit') { closeDetail(); startForm(r); setView('form'); }
-      if (act === 'delete') { $('#cf-text').textContent = 'Se borrará la ficha de ' + r.name + ' con sus notas, reseña y fotos.'; $('#sheet-confirm').hidden = false; }
-      if (act === 'photo') { $('#lightbox-img').src = r.photos[+b.dataset.i]; $('#lightbox').hidden = false; }
+      if (act === 'edit') { closeDetail(); startForm('edit', r); setView('form'); }
+      if (act === 'rate') { closeDetail(); startForm('rate', r); setView('form'); }
+      if (act === 'delete') {
+        var n = Object.keys(r.ratings).length;
+        askConfirm('¿Borrar este restaurante?', 'Se borrará la ficha de ' + r.name + (n === 0 ? '.' : ' con ' + (n === 1 ? 'su opinión' : 'sus ' + n + ' opiniones') + ' y todas las fotos.'), function () {
+          var id = r.id;
+          restaurants = restaurants.filter(function (x) { return x.id !== id; });
+          if (selectedId === id) selectedId = null;
+          closeDetail();
+          buildFilterChips();
+          render();
+          toast('Restaurante borrado');
+        });
+      }
+      if (act === 'del-mine') {
+        askConfirm('¿Borrar tu opinión?', 'Se borrarán tus notas, tu reseña y tus fotos de ' + r.name + '. Las opiniones de los demás se quedan.', function () {
+          delete r.ratings[ME];
+          render();
+          openDetail(r.id);
+          toast('Opinión borrada');
+        });
+      }
+      if (act === 'photo') { $('#lightbox-img').src = r.ratings[b.dataset.uid].photos[+b.dataset.i]; $('#lightbox').hidden = false; }
       if (act === 'show-on-map') {
         if (!passes(r)) { clearFilters(); toast('Filtros quitados para mostrarlo'); }
         selectedId = r.id;
@@ -1922,20 +2321,17 @@ function startApp() {
       }
     });
     $('#cf-ok').addEventListener('click', function () {
-      var id = detailId;
-      restaurants = restaurants.filter(function (r) { return r.id !== id; });
-      if (selectedId === id) selectedId = null;
+      var fn = confirmFn;
+      confirmFn = null;
       $('#sheet-confirm').hidden = true;
-      closeDetail();
-      render();
-      toast('Restaurante borrado');
+      if (fn) fn();
     });
     $('#lightbox-close').addEventListener('click', function () { $('#lightbox').hidden = true; });
     $('#lightbox').addEventListener('click', function (e) { if (e.target.id === 'lightbox') $('#lightbox').hidden = true; });
 
     // Form
     $('#form').addEventListener('submit', function (e) { e.preventDefault(); saveForm(); });
-    $('#f-cancel').addEventListener('click', function () { draft = null; setView(lastBrowse); });
+    $('#f-cancel').addEventListener('click', function () { var back = draft && draft.id; draft = null; setView(lastBrowse); if (back && byId(back)) openDetail(back); });
     $('#f-muni').addEventListener('change', function (e) {
       var m = GEO.munis.filter(function (x) { return x.name === e.target.value; })[0];
       if (m && pickMap) pickMap.fitBounds(L.polygon(muniLatLngs(m)).getBounds(), { padding: [12, 12], maxZoom: 13 });
@@ -1981,6 +2377,53 @@ function startApp() {
       draft.photos.splice(+b.dataset.rmphoto, 1);
       renderDraftPhotos();
     });
+    // Who
+    $('#btn-who').addEventListener('click', function () { renderWho(); $('#sheet-who').hidden = false; });
+    $('#sheet-who').addEventListener('click', function (e) {
+      var q = e.target.closest('[data-who]');
+      if (q) { setWho(q.dataset.who === 'me' ? [ME] : allUids()); render(); renderWho(); return; }
+      var p = e.target.closest('.person');
+      if (!p) return;
+      var sel = selectedUids();
+      var i = sel.indexOf(p.dataset.uid);
+      if (i >= 0) {
+        if (sel.length === 1) { toast('Elige al menos una persona'); return; }
+        sel.splice(i, 1);
+      } else sel.push(p.dataset.uid);
+      setWho(sel);
+      render();
+      renderWho();
+    });
+
+    // Profile and roles
+    $('#btn-profile').addEventListener('click', function () { renderProfile(); $('#sheet-profile').hidden = false; });
+    $('#sheet-profile').addEventListener('click', function (e) {
+      var rb = e.target.closest('[data-role]');
+      if (rb) {
+        role = rb.dataset.role;
+        applyRole();
+        render();
+        renderProfile();
+        if (role === 'none') $('#sheet-profile').hidden = true;
+        else toast('Viendo la demo como ' + ROLE_NAMES[role].toLowerCase());
+        return;
+      }
+      if (e.target.closest('#p-req')) { editorRequested = true; renderProfile(); toast('Solicitud enviada'); }
+    });
+    $('#p-save').addEventListener('click', function () {
+      var name = $('#p-name').value.trim();
+      if (!name) { toast('Escribe un nombre'); return; }
+      PEOPLE.forEach(function (p) { if (p.uid === ME) p.name = name; });
+      applyRole();
+      render();
+      $('#sheet-profile').hidden = true;
+      toast('Nombre guardado');
+    });
+    $('#p-logout').addEventListener('click', function () { toast('En la demo no se cierra la sesión'); });
+    $('#na-request').addEventListener('click', function () { $('#na-request').hidden = true; $('#na-status').hidden = false; });
+    $('#na-other').addEventListener('click', function () { toast('En la demo no se cambia de cuenta'); });
+    $('#na-back').addEventListener('click', function () { role = 'owner'; $('#na-request').hidden = false; $('#na-status').hidden = true; applyRole(); render(); });
+
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
       if (!$('#lightbox').hidden) { $('#lightbox').hidden = true; return; }
@@ -2004,6 +2447,7 @@ function startApp() {
   markerLayer.addTo(mainMap);
   mainMap.on('click', function () { if (selectedId) { selectedId = null; render(); } });
   wire();
+  applyRole();
   buildFilterChips();
   render();
   window.addEventListener('resize', function () { if (view === 'map') mainMap.invalidateSize(); });
