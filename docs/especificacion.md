@@ -56,7 +56,7 @@ Los cuatro puntos que quedaban abiertos el 23 de noviembre (compartir, orden de 
 Pendiente:
 
 - Antes del paso 3, Claude actualiza la demo con las piezas nuevas y el propietario la revisa.
-- Tamaño de las fotos: sigue la propuesta de la sección 5, sin acordar.
+- Tamaño de las fotos: cerrado con la prueba técnica (sección 8).
 
 ### Copias de seguridad
 
@@ -215,11 +215,29 @@ Fuentes:
 - https://developers.google.com/maps/comms/eea/faq
 - https://developers.google.com/maps/comms/eea/places
 
-## 8. Riesgos a probar pronto
+## 8. Riesgos y resultados de la prueba técnica (paso 2)
 
-- Login con Google dentro de una PWA instalada en iPhone.
-- Restricción de la clave del mapa por dominio sin romper el desarrollo en local.
-- Consulta sin cobertura.
+Probado el 23 de noviembre de 2026 con la página `prueba/` en un iPhone (iOS 18.7) y en local. Firebase 13.4.0.
+
+| Riesgo | Resultado |
+|---|---|
+| Entrar con Google en la app instalada en el iPhone | ✅ Funciona con **ventana emergente** (`signInWithPopup`). La **redirección** no funciona (vuelve sin sesión), como avisa la documentación de Firebase para webs fuera de Firebase Hosting. Google Identity Services no hizo falta. |
+| La sesión se mantiene | ✅ Al recargar y al cerrar la app del todo. Pendiente de aclarar: en una ocasión, tras publicar una versión nueva, el propietario volvió a entrar; no se sabe si la sesión se había perdido. |
+| Cuentas de Google en la app instalada | ⚠️ La app instalada no comparte sesiones con Safari ni con Chrome. La primera vez hay que escribir el correo y la contraseña de Google. Después se recuerda. Es una norma de Apple: no tiene arreglo por nuestra parte. |
+| Permisos | ✅ Una cuenta no invitada entra con Google pero ve «sin acceso», no puede leer, crear ni subir fotos, y puede enviar una solicitud de acceso, que llega a Firestore. El propietario lee, crea y sube fotos. |
+| Reglas de Storage que consultan Firestore | ✅ Funcionan en los dos sentidos: permiten al propietario y rechazan al no invitado. |
+| Fotos | ✅ Una foto de 4,6 MB queda en 556 KB (1600 px) y una miniatura de 47 KB (400 px). ⚠️ Una foto ya pequeña (305 KB) creció a 367 KB al recomprimirla: si el original es JPEG y ya cabe en 1600 px, se sube tal cual. |
+| Mapa con clave restringida | ✅ Carga en GitHub Pages y en `localhost:8000`. |
+| Lentitud al abrir | ❌→✅ Con la conexión por defecto de Firestore, la primera lectura al abrir la app instalada se atascaba unos 30 segundos por consulta (27 a 80 s en total). Forzando **long polling** (`experimentalForceLongPolling: true`) y manteniendo la caché del dispositivo: 0,8 a 2,5 s en tres aperturas. Sin caché también es rápido, pero se pierde la consulta sin cobertura. |
+| Consulta sin cobertura | Sin probar. Queda para el paso 5. |
+
+Decisiones que salen de la prueba:
+
+- Entrar solo con ventana emergente. Quitar las otras dos vías.
+- Firestore con caché en el dispositivo y long polling forzado.
+- Fotos a 1600 px y miniatura a 400 px, en JPEG. Si el original ya es JPEG y cabe en 1600 px, se sube sin recomprimir. Esto cierra la propuesta de tamaño de la sección 5.
+- Leer las opiniones en paralelo (o con una consulta de grupo de colecciones) en lugar de una tras otra, y evitar dos lecturas a la vez.
+- La carpeta `prueba/` se borra al terminar el paso 3.
 
 ## 9. Seguridad y protección frente a abusos
 
