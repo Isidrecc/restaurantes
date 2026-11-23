@@ -27,6 +27,10 @@ App personal para puntuar y reseñar los restaurantes visitados.
 | Datos y fotos | Firebase: Auth con cuentas de Google, Firestore y Storage. |
 | Alojamiento | GitHub Pages desde este repo, que es público. |
 | UI | La de la demo (`demo/index.html`), aprobada por el propietario. |
+| Compartir | De momento editan dos personas: el propietario y una más. El resto de invitados solo mira. |
+| Ámbito | También restaurantes de fuera de Mallorca. La localidad es texto libre y el campo sugiere las ya usadas, para evitar variantes del mismo sitio. |
+| Técnica | HTML, CSS y JavaScript sin framework ni paso de compilación. |
+| Orden de construcción | El de la sección 6. |
 
 ### Opciones descartadas
 
@@ -39,10 +43,7 @@ App personal para puntuar y reseñar los restaurantes visitados.
 
 ## 3. Pendiente de confirmar con el propietario
 
-1. **Modelo de compartir.** Supuesto de trabajo: dos personas editan (el propietario y una más) y el resto de invitados solo mira. Se le planteó varias veces y no lo contradijo, pero tampoco lo confirmó de forma explícita.
-2. **Orden de construcción** (sección 6). Se le presentó el 23 de noviembre y siguió adelante con el traspaso sin objeciones, pero no dio un visto bueno explícito.
-3. **Propuesta técnica** de `CLAUDE.md` (sin framework ni compilación). No se le ha presentado todavía.
-4. **Restaurantes fuera de Mallorca.** Se le dijo que se daba por hecho que también querría apuntarlos, con la localidad como texto libre. No lo corrigió.
+Nada. Los cuatro puntos que quedaban abiertos (compartir, orden de construcción, técnica y restaurantes de fuera de Mallorca) los confirmó el propietario el 23 de noviembre de 2026 y están recogidos en la sección 2.
 
 ## 4. Pantallas y comportamiento
 
@@ -112,14 +113,14 @@ Los colores exactos están en los tokens `--s1` a `--s5` de la demo, con variant
 ### Qué cambia respecto a la demo
 
 - La base del mapa pasa a ser Google Maps. La demo dibuja un contorno de Mallorca con municipios porque no podía cargar mapas externos.
-- La localidad pasa a ser texto libre. En la demo es una lista cerrada de municipios de Mallorca que se detecta sola al tocar el mapa.
+- La localidad pasa a ser texto libre, con sugerencia de las localidades ya usadas al escribir. En la demo es una lista cerrada de municipios de Mallorca que se detecta sola al tocar el mapa.
 - Se añade "usar mi ubicación" al situar el restaurante.
 - Los datos y las fotos se guardan de verdad. Las fotos se comprimen antes de subirlas.
 - Hay modo de solo lectura para invitados.
 
 ## 5. Modelo de datos
 
-Propuesta presentada al propietario en lenguaje llano. Los nombres de campo son orientativos.
+Presentado al propietario en lenguaje llano y sin objeciones. Los nombres de campo son orientativos.
 
 ### `restaurants/{id}`
 
@@ -142,13 +143,15 @@ Propuesta presentada al propietario en lenguaje llano. Los nombres de campo son 
 
 ### Permisos
 
-Un documento de configuración con dos listas de correos: quienes editan y quienes solo miran. Las reglas de seguridad cierran todo lo demás. Solo el propietario modifica las listas.
+Un documento de configuración con dos listas de correos: quienes editan (de momento dos personas) y quienes solo miran. Las reglas de seguridad cierran todo lo demás. Solo el propietario modifica las listas.
 
 ### Fotos
 
 En Storage, una carpeta por restaurante. Propuesta sin acordar: lado mayor de unos 1600 px y una miniatura para las listas.
 
 ## 6. Orden de construcción
+
+Confirmado por el propietario.
 
 1. **Preparación.** La hace el propietario con guía, unos 20 minutos: proyecto de Google con tarjeta y alerta de presupuesto, Firebase en región europea y clave del mapa restringida al dominio de GitHub Pages. El repo ya está creado.
 2. **Prueba técnica.** Login con Google en el iPhone con la app instalada, guardar y leer una ficha, subir una foto y cargar el mapa. Es el punto con más riesgo y va antes de portar nada.

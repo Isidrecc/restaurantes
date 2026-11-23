@@ -6,7 +6,7 @@ App web personal para puntuar y reseñar restaurantes: mapa, lista con filtros y
 
 - La fase de diseño se cerró en una conversación previa (21 a 23 de noviembre de 2026). La app real todavía no existe: este repo contiene solo la especificación y la demo de UI.
 - Siguiente paso: el punto 1 del orden de construcción (`docs/especificacion.md`, sección 6).
-- Hay cuatro puntos sin confirmación explícita del propietario (sección 3 de la especificación). Confirmarlos antes de construir.
+- No queda nada pendiente de confirmar: los supuestos abiertos los aprobó el propietario el 23 de noviembre de 2026.
 
 ## Qué leer antes de tocar nada
 
@@ -32,7 +32,7 @@ App web personal para puntuar y reseñar restaurantes: mapa, lista con filtros y
 - Textos de la interfaz en español. Decimales con coma (8,5).
 - Mensajes de commit en español, con una línea de resumen en imperativo.
 
-## Propuesta técnica (a confirmar con el propietario antes de empezar)
+## Técnica (confirmada por el propietario)
 
 - HTML, CSS y JavaScript sin framework ni paso de compilación, con módulos ES. La demo ya está hecha así y GitHub Pages lo sirve tal cual.
 - Firebase (Auth con Google, Firestore y Storage) con el SDK modular.
