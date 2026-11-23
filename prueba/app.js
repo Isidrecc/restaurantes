@@ -5,8 +5,8 @@ import {
   signInWithCredential, onAuthStateChanged, signOut
 } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js';
 import {
-  initializeFirestore, persistentLocalCache, doc, collection, getDoc, getDocs, setDoc,
-  updateDoc, writeBatch, serverTimestamp, arrayUnion
+  initializeFirestore, persistentLocalCache, memoryLocalCache, doc, collection, getDoc, getDocs,
+  setDoc, updateDoc, writeBatch, serverTimestamp, arrayUnion
 } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js';
 import {
   getStorage, ref, uploadBytes, getDownloadURL, deleteObject
@@ -27,7 +27,18 @@ const GIS_CLIENT_ID = '';
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = initializeFirestore(app, { localCache: persistentLocalCache() });
+// Modo de conexión de Firestore, elegido en la sección 7 de la página.
+// auto: caché en el dispositivo y conexión por defecto.
+// longpoll: caché en el dispositivo y conexión forzada por «long polling».
+// memoria: sin caché en el dispositivo.
+const CONN_MODES = ['auto', 'longpoll', 'memoria'];
+let connMode = 'auto';
+try { connMode = CONN_MODES.includes(localStorage.getItem('connMode')) ? localStorage.getItem('connMode') : 'auto'; } catch { /* sin almacenamiento */ }
+const db = initializeFirestore(app,
+  connMode === 'memoria' ? { localCache: memoryLocalCache() }
+    : connMode === 'longpoll' ? { localCache: persistentLocalCache(), experimentalForceLongPolling: true }
+      : { localCache: persistentLocalCache() });
+const T_START = performance.now();
 const storage = getStorage(app);
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt: 'select_account' });
@@ -77,7 +88,16 @@ $('#env').innerHTML =
   `Dirección: ${location.origin}${location.pathname}<br>` +
   `Instalada (pantalla de inicio): <b>${isStandalone() ? 'sí' : 'no'}</b><br>` +
   `Navegador: ${navigator.userAgent}`;
-log(`—— Inicio. Instalada: ${isStandalone() ? 'sí' : 'no'}. Firebase 13.4.0. ——`);
+log(`—— Inicio. Instalada: ${isStandalone() ? 'sí' : 'no'}. Firebase 13.4.0. Conexión: ${connMode}. ——`);
+
+// Mide una consulta y la apunta en el registro si tarda más de 1 segundo.
+async function timed(label, promise) {
+  const t0 = performance.now();
+  const result = await promise;
+  const ms = Math.round(performance.now() - t0);
+  if (ms > 1000) log(`Lenta: ${label} tardó ${ms} ms (a los ${Math.round((t0 - T_START) / 1000)} s de abrir)`, 'bad');
+  return result;
+}
 
 // ---------- 1. Entrar ----------
 
@@ -161,7 +181,7 @@ function showRole() {
 
 async function checkRole() {
   try {
-    const snap = await getDoc(doc(db, 'members', user.email.toLowerCase()));
+    const snap = await timed('papel', getDoc(doc(db, 'members', user.email.toLowerCase())));
     countReads(1);
     role = snap.exists() ? snap.data().role : null;
     log(role ? `Papel: ${role}` : 'Sin acceso: este correo no está invitado', role ? 'ok' : 'bad');
@@ -230,20 +250,27 @@ $('#btn-create').onclick = async () => {
   } catch (e) { fail('Crear ficha', e); }
 };
 
-$('#btn-read').onclick = readAll;
+$('#btn-read').onclick = () => readAll();
 
-async function readAll() {
+// Evita dos lecturas a la vez (duplicaban los pines del mapa).
+let readRunning = null;
+function readAll() {
+  if (!readRunning) readRunning = doReadAll().finally(() => { readRunning = null; });
+  return readRunning;
+}
+
+async function doReadAll() {
   const t0 = performance.now();
   try {
-    const rs = await getDocs(collection(db, 'restaurants'));
+    const rs = await timed('restaurantes', getDocs(collection(db, 'restaurants')));
     countReads(rs.size);
-    const users = await getDocs(collection(db, 'users'));
+    const users = await timed('nombres', getDocs(collection(db, 'users')));
     countReads(users.size);
     const names = {};
     users.forEach((d) => { names[d.id] = d.data().displayName; });
     restaurantsCache = [];
     for (const r of rs.docs) {
-      const ratings = await getDocs(collection(r.ref, 'ratings'));
+      const ratings = await timed('opiniones de ' + r.data().name, getDocs(collection(r.ref, 'ratings')));
       countReads(ratings.size);
       const list = ratings.docs.map((d) => ({ uid: d.id, ...d.data() }));
       const globals = list.map((x) => x.global).filter((x) => x != null);
@@ -399,3 +426,12 @@ $('#btn-copy').onclick = async () => {
   } catch (e) { fail('Copiar registro', e); }
 };
 $('#btn-clear').onclick = () => { $('#log').textContent = ''; safeSet('testLog', ''); };
+
+// ---------- 7. Conexión ----------
+
+$('#conn').value = connMode;
+$('#btn-conn').onclick = () => {
+  safeSet('connMode', $('#conn').value);
+  log(`Cambio de conexión a «${$('#conn').value}». Cierra la app del todo y vuelve a abrirla.`);
+  $('#conn-msg').hidden = false;
+};

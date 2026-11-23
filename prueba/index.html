@@ -107,6 +107,20 @@
   </section>
 
   <section>
+    <h2>7. Conexión</h2>
+    <p class="meta">Para medir la lentitud al abrir. Se aplica al cerrar la app del todo y volver a abrirla.</p>
+    <div class="row" style="margin-top:8px">
+      <select id="conn" style="font:inherit;padding:8px;border-radius:10px">
+        <option value="auto">auto (caché, conexión normal)</option>
+        <option value="longpoll">longpoll (caché, long polling)</option>
+        <option value="memoria">memoria (sin caché)</option>
+      </select>
+      <button id="btn-conn">Guardar</button>
+    </div>
+    <p id="conn-msg" class="meta" hidden>Guardado. Cierra la app del todo y vuelve a abrirla.</p>
+  </section>
+
+  <section>
     <h2>Registro</h2>
     <div class="row">
       <button id="btn-copy">Copiar registro</button>
