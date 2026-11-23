@@ -31,6 +31,10 @@ App personal para puntuar y reseñar los restaurantes visitados.
 | Ámbito | También restaurantes de fuera de Mallorca. La localidad es texto libre y el campo sugiere las ya usadas, para evitar variantes del mismo sitio. |
 | Técnica | HTML, CSS y JavaScript sin framework ni paso de compilación. |
 | Orden de construcción | El de la sección 6. |
+| Nombre | «Puntuam a taula». Bajo el icono del iPhone, «Puntuam». Proyecto de Firebase `puntuam-a-taula`. Decidido el 23 de noviembre de 2026. |
+| Cuenta de administración | Una cuenta de Google aparte, solo para las consolas de Firebase y Google Cloud y la facturación. En la app, el propietario entra con su cuenta personal. Su cuenta personal se añade como segunda propietaria del proyecto para no perder el acceso. |
+| Plan y control de gasto | Plan Blaze con alerta de presupuesto de 5 € (solo avisa). Los límites de gasto de Google Cloud no cubren los servicios que usamos (ver sección 9). |
+| Seguridad | La de la sección 9. Nadie sin permiso puede leer, escribir ni subir fotos. |
 
 ### Opciones descartadas
 
@@ -43,7 +47,37 @@ App personal para puntuar y reseñar los restaurantes visitados.
 
 ## 3. Pendiente de confirmar con el propietario
 
-Nada. Los cuatro puntos que quedaban abiertos (compartir, orden de construcción, técnica y restaurantes de fuera de Mallorca) los confirmó el propietario el 23 de noviembre de 2026 y están recogidos en la sección 2.
+Los cuatro puntos que quedaban abiertos el 23 de noviembre (compartir, orden de construcción, técnica y restaurantes de fuera de Mallorca) los confirmó el propietario y están en la sección 2.
+
+### Cuaderno común con puntuaciones de varias personas
+
+Planteado por el propietario el 23 de noviembre de 2026. Cambia la idea de partida: en lugar de un cuaderno propio que otros miran, todos los invitados puntúan y todos ven las puntuaciones de los demás. Hay que aprobarlo antes del paso 2. Mientras tanto, las secciones 4 y 5 describen el diseño anterior.
+
+Idea:
+
+- Cada restaurante tiene una parte común (nombre, localidad, posición, tipos de cocina, precio) y una puntuación por persona (seis notas, plato estrella, reseña, fecha de visita y fotos).
+- Un selector común a mapa, lista y filtros decide quién cuenta en la media: todos, solo yo o personas elegidas. El pin, el color, el orden y el filtro de nota usan esa media.
+- La ficha muestra la media y, debajo, la puntuación de cada persona con su nombre.
+- Cada persona solo puede escribir su propia puntuación. Las medias se calculan en el dispositivo.
+
+Ya decidido:
+
+| Tema | Decisión |
+|---|---|
+| Quién entra | Solo invitados. Grupo privado. |
+| Altas y datos comunes | Solo una lista de editores. El resto del grupo solo añade su puntuación. |
+| Roseta | Dos líneas: la media de las personas seleccionadas y la del propio usuario. |
+
+Falta:
+
+- Redactar el modelo de datos, los permisos y los cambios de pantallas.
+- Diseñar las piezas nuevas de UI (selector de personas, puntuaciones por persona en la ficha, roseta con dos líneas) y enseñarlas al propietario antes de portarlas.
+- Solicitudes de acceso: propuesta de Claude, sin aprobar. Un invitado pide permiso para ver o para editar y el propietario lo aprueba o rechaza en la pantalla de accesos, con aviso dentro de la app (sin correo).
+- Tamaño de las fotos: sigue la propuesta de la sección 5, sin acordar.
+
+### Copias de seguridad
+
+No se activaron al crear Firestore (23 de noviembre de 2026). Se decide en el paso 5: copias programadas de Firestore (verificar antes su precio), qué hacer con las fotos de Storage, que esas copias no cubren, o si basta con la exportación desde la app.
 
 ## 4. Pantallas y comportamiento
 
@@ -183,8 +217,92 @@ Fuentes:
 - https://firebase.google.com/docs/storage/faqs-storage-changes-announced-sept-2024
 - https://docs.github.com/en/enterprise-cloud@latest/pages/getting-started-with-github-pages/what-is-github-pages
 
+### Condiciones de Google Maps Platform para el EEE
+
+Comprobado el 23 de noviembre de 2026. Al activar Maps JavaScript API la consola exige aceptar las condiciones del Espacio Económico Europeo.
+
+- Se aplican desde el 8 de julio de 2025 a los proyectos con cuenta de facturación en el EEE, como este (España). No hay alternativa si se quiere usar Google Maps.
+- Maps JavaScript API no tiene cambios técnicos. Según la FAQ, los precios no cambian. No se ha confirmado si cambian los cupos gratuitos.
+- Se eliminan tres restricciones, entre ellas «no usar con mapas que no sean de Google». Esto contradice el motivo por el que se descartó OpenStreetMap (sección 2): revisarlo antes del paso 6.
+- **Places en el EEE:** salvo latitud, longitud e identificador del sitio, el contenido de Places no se puede mostrar sobre ningún mapa, tampoco el de Google. El componente Place Autocomplete del Places UI Kit queda fuera de esta restricción. Afecta al diseño del paso 6, no a los anteriores.
+- No se ha encontrado en las páginas del EEE la regla de almacenamiento (solo el identificador del sitio de forma indefinida). Volver a comprobarla en el paso 6.
+
+Fuentes:
+
+- https://developers.google.com/maps/comms/eea/faq
+- https://developers.google.com/maps/comms/eea/places
+
 ## 8. Riesgos a probar pronto
 
 - Login con Google dentro de una PWA instalada en iPhone.
 - Restricción de la clave del mapa por dominio sin romper el desarrollo en local.
 - Consulta sin cobertura.
+
+## 9. Seguridad y protección frente a abusos
+
+Acordado el 23 de noviembre de 2026. El objetivo es que nadie de fuera del grupo pueda leer datos, escribirlos, subir fotos ni generar gasto. Las reglas se aplican en los servidores de Firebase, así que no se pueden saltar tocando el código de la app, que es público.
+
+### Fotos (Storage)
+
+- Solo pueden subir fotos los usuarios que han entrado con Google y figuran en la lista de personas con permiso para puntuar. Un usuario sin cuenta o que no esté en la lista recibe un error.
+- Cada persona sube solo a su propia carpeta: `restaurants/{idRestaurante}/{idUsuario}/`. No puede escribir en la de otro.
+- Solo se aceptan imágenes (tipo `image/*`) y con un tamaño máximo por archivo. Propuesta: 3 MB. La app comprime antes de subir, así que una foto normal queda muy por debajo.
+- Borrar una foto: su autor o el propietario.
+- Ver fotos: solo los miembros del grupo.
+- Las reglas de Storage consultan la lista de permisos que está en Firestore. Comprobar en el paso 2 que esta consulta funciona y cuánto cuesta en lecturas.
+
+### Datos (Firestore)
+
+- Todo cerrado por defecto: la base de datos se crea en modo de producción.
+- Leer: solo miembros del grupo.
+- Crear y editar la parte común de un restaurante: solo los editores.
+- Escribir una puntuación: solo su autor y solo la suya.
+- Modificar las listas de permisos: solo el propietario.
+- Se validan los datos: notas de 1 a 10 en pasos de 0,5, precio de 1 a 4 y textos con longitud máxima.
+
+### Mapa (Google Maps)
+
+- Clave limitada a la web de GitHub Pages y a `localhost` para el desarrollo, y solo a Maps JavaScript API.
+- Cuota diaria máxima de cargas de mapa: no se pudo fijar. El 23 de noviembre de 2026 la consola mostraba «Map loads per day» como ilimitado y no ajustable, con la edición desactivada. Sigue igual tras pasar a cuenta completa, así que no era por la prueba. Ninguna cuota de Maps JavaScript API aparece como ajustable. Pendiente: buscar la causa en la documentación de Google.
+- Mientras no haya tope, la protección del mapa es la restricción de la clave y la alerta de presupuesto. Si hubiera abuso: inhabilitar Maps JavaScript API o cambiar la clave.
+
+### Gasto
+
+- Alerta de presupuesto de 5 € al 50, 90 y 100 %, sin contar créditos. Solo avisa: no corta el servicio.
+- Los límites de gasto de Google Cloud (spend caps) no sirven aquí. Comprobado el 23 de noviembre de 2026: solo cubren Gemini API, Vertex AI, Cloud Run y Cloud Run functions. Fuente: https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps
+- La cuenta de facturación se pasó a cuenta completa el 23 de noviembre de 2026, así que la app no se para al acabar la prueba. El crédito restante se sigue usando primero.
+
+### A valorar más adelante
+
+- Firebase App Check, para que solo la propia app pueda llamar a Firebase. No está decidido.
+
+## 10. Datos del proyecto en Firebase y Google Cloud
+
+Creado el 23 de noviembre de 2026. Son identificadores públicos: pueden ir en el repo. Nunca subir aquí contraseñas, claves privadas ni cuentas de servicio.
+
+| Dato | Valor |
+|---|---|
+| Proyecto | Puntuam a taula (`puntuam-a-taula`) |
+| Propietarios | La cuenta personal del propietario y la cuenta de administración |
+| Plan | Blaze. Cuenta de facturación pasada a cuenta completa el 23 de noviembre de 2026; conserva el crédito de la prueba (269,43 €) hasta que se gaste o caduque |
+| Alerta de presupuesto | 5 €, solo avisa |
+| Firestore | Edición Standard, `(default)`, `europe-southwest1` (Madrid), modo de producción, sin copias programadas |
+| Storage | `puntuam-a-taula.firebasestorage.app`, `europe-southwest1`, clase Standard, modo de producción |
+| Authentication | Solo Google. Dominios autorizados: `localhost` e `isidrecc.github.io` |
+
+Configuración web:
+
+```js
+const firebaseConfig = {
+  apiKey: "AIzaSyAuuYMP5wyLNBIWM9p_BHngih1YnwA3kYk",
+  authDomain: "puntuam-a-taula.firebaseapp.com",
+  projectId: "puntuam-a-taula",
+  storageBucket: "puntuam-a-taula.firebasestorage.app",
+  messagingSenderId: "1052734827532",
+  appId: "1:1052734827532:web:0af35c48cc58ab17975229"
+};
+```
+
+La clave `apiKey` de Firebase está restringida a 25 API de Firebase y no incluye Maps JavaScript API (comprobado el 23 de noviembre de 2026).
+
+Clave de Google Maps, «Mapa web Puntuam»: `AIzaSyC1tU3zrYHXj7WsXPDbgbxz5kAdaHh9GP8`. Limitada a los sitios `https://isidrecc.github.io/restaurantes/*`, `http://localhost/*` y `http://localhost:8000/*`, y solo a Maps JavaScript API. Si se renombra el repo, hay que cambiar el primer sitio.

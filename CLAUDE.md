@@ -5,8 +5,10 @@ App web personal para puntuar y reseñar restaurantes: mapa, lista con filtros y
 ## Estado
 
 - La fase de diseño se cerró en una conversación previa (21 a 23 de noviembre de 2026). La app real todavía no existe: este repo contiene solo la especificación y la demo de UI.
-- Siguiente paso: el punto 1 del orden de construcción (`docs/especificacion.md`, sección 6).
-- No queda nada pendiente de confirmar: los supuestos abiertos los aprobó el propietario el 23 de noviembre de 2026.
+- Nombre de la app: «Puntuam a taula».
+- En curso: el punto 1 del orden de construcción (`docs/especificacion.md`, sección 6), la preparación de Firebase y Google Cloud.
+- Pendiente de aprobar antes del paso 2: el cambio a cuaderno común con puntuaciones de varias personas (`docs/especificacion.md`, sección 3).
+- La seguridad está en la sección 9 de la especificación.
 
 ## Qué leer antes de tocar nada
 
