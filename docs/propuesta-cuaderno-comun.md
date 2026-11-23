@@ -18,6 +18,7 @@ Tres papeles. Las listas se guardan por correo, para poder invitar a alguien ant
 | Editor | ✔ | ✔ | ✔ | Solo si no hay opiniones de otros (D2) | |
 | Miembro | ✔ | ✔ | | | |
 
+- Puede haber más de un propietario. Desde el 23 de noviembre de 2026 hay dos (los correos no se anotan aquí porque el repo es público).
 - Desaparece el papel de «solo mira» de la especificación anterior: todo invitado puede puntuar (decisión D1).
 - Cada persona tiene un **nombre visible** corto que elige la primera vez que entra (por defecto, su nombre de pila de Google). Es lo que ven los demás junto a sus notas. Su correo no se muestra a los miembros.
 

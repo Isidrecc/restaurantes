@@ -44,10 +44,14 @@ let restaurantsCache = [];
 function safeGet(k) { try { return localStorage.getItem(k); } catch { return null; } }
 function safeSet(k, v) { try { localStorage.setItem(k, v); } catch { /* sin almacenamiento */ } }
 
+// El registro se guarda en el dispositivo para que sobreviva a cerrar la app.
+$('#log').textContent = safeGet('testLog') || '';
 function log(msg, kind) {
-  const t = new Date().toLocaleTimeString('es-ES');
+  const t = new Date().toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
   const line = `[${t}] ${kind === 'bad' ? '✗ ' : kind === 'ok' ? '✓ ' : ''}${msg}`;
-  $('#log').textContent = line + '\n' + $('#log').textContent;
+  const text = (line + '\n' + $('#log').textContent).split('\n').slice(0, 300).join('\n');
+  $('#log').textContent = text;
+  safeSet('testLog', text);
   (kind === 'bad' ? console.error : console.log)(line);
 }
 function fail(what, e) {
@@ -73,7 +77,7 @@ $('#env').innerHTML =
   `Dirección: ${location.origin}${location.pathname}<br>` +
   `Instalada (pantalla de inicio): <b>${isStandalone() ? 'sí' : 'no'}</b><br>` +
   `Navegador: ${navigator.userAgent}`;
-log(`Inicio. Instalada: ${isStandalone() ? 'sí' : 'no'}. Firebase 13.4.0.`);
+log(`—— Inicio. Instalada: ${isStandalone() ? 'sí' : 'no'}. Firebase 13.4.0. ——`);
 
 // ---------- 1. Entrar ----------
 
@@ -137,6 +141,8 @@ onAuthStateChanged(auth, async (u) => {
     log(`Sesión activa: ${u.email} (uid ${u.uid.slice(0, 6)}…)`, 'ok');
     if (!$('#name').value) $('#name').value = (u.displayName || '').split(' ')[0];
     await checkRole();
+    // Al abrir con sesión y acceso, carga sola los datos para ver si persisten.
+    if (role) await readAll();
   } else {
     role = null;
     showRole();
@@ -392,4 +398,4 @@ $('#btn-copy').onclick = async () => {
     log('Registro copiado', 'ok');
   } catch (e) { fail('Copiar registro', e); }
 };
-$('#btn-clear').onclick = () => { $('#log').textContent = ''; };
+$('#btn-clear').onclick = () => { $('#log').textContent = ''; safeSet('testLog', ''); };
