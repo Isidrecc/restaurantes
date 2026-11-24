@@ -397,7 +397,10 @@ button.card { display: block; width: 100%; }
   display: grid; place-items: center;
 }
 /* Paso 2: precio en cuatro botones grandes y fecha con «Avui» y «Ahir». */
-.price-grid { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+/* Cinco tramos: tres arriba y dos abajo, más anchos. */
+.price-grid { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.price-grid label { grid-column: span 2; }
+.price-grid label:nth-of-type(n + 4) { grid-column: span 3; }
 .price-grid input { position: absolute; opacity: 0; pointer-events: none; }
 .price-grid label {
   min-height: 54px; display: grid; place-items: center; cursor: pointer;

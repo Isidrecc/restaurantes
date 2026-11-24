@@ -92,8 +92,10 @@ function fromDoc(id, d) {
     lat: d.location ? d.location.lat : null,
     lng: d.location ? d.location.lng : null,
     cuisines: Array.from(new Set((d.cuisines || []).map((c) => CUISINE_RENAMES[c] || c))),
-    price: PRICES[(d.price || 2) - 1],
+    price: PRICES[(d.price || 2) - 1] || PRICES[1],
+    // Sin fecha: «Pendent de visitar».
     visitDate: d.visitDate || '',
+    featured: d.featured === true,
     blog: d.blog || '',
     photos: d.photos || [],
     placeId: d.placeId || null,
@@ -111,7 +113,8 @@ function commonFields(r) {
     location: { lat: r.lat, lng: r.lng },
     cuisines: r.cuisines,
     price: PRICES.indexOf(r.price) + 1,
-    visitDate: r.visitDate,
+    visitDate: r.visitDate || null,
+    featured: !!r.featured,
     blog: r.blog,
     // La portada se marca en su foto con cover: true; si no hay ninguna, la portada es la primera.
     photos: r.photos.map((p) => Object.assign({ full: p.full, thumb: p.thumb, caption: p.caption || '' }, p.cover ? { cover: true } : {})),

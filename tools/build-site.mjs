@@ -21,7 +21,7 @@ const BUCKET = 'puntuam-a-taula.firebasestorage.app';
 const DB = 'https://firestore.googleapis.com/v1/projects/puntuam-a-taula/databases/(default)/documents';
 const VERSION = (process.env.GITHUB_SHA || 'local' + Date.now()).slice(0, 12);
 // Igual que PRICES y COLORS de app/config.js (aquí no se puede importar: no es un módulo de Node).
-const PRICES = ['<20 €', '20-50 €', '50-100 €', '>100 €'];
+const PRICES = ['<20 €', '20-40 €', '40-60 €', '60-100 €', '>100 €'];
 const COLORS = ['azul', 'rosa'];
 
 // ---------- Datos de Firestore (API REST) ----------

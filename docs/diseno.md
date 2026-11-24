@@ -31,7 +31,9 @@ La demo (`demo/index.html`) ya no se actualiza. Sirve de referencia para el comp
 
 Desaparecen las reseñas de cada persona.
 
-- **Precio por persona, sin bebida**, en cuatro tramos: menos de 20 €, de 20 a 50 €, de 50 a 100 € y más de 100 €. Se muestran como «<20 €», «20-50 €», «50-100 €» y «>100 €». Se guarda como 1 a 4 (decidido el 24 de noviembre de 2026; sustituye a €, €€, €€€ y €€€€ con la misma numeración).
+- **Precio por persona, sin bebida**, en cinco tramos: «<20 €», «20-40 €», «40-60 €», «60-100 €» y «>100 €». Se guarda como 1 a 5 (pedido por el propietario el 24 de noviembre de 2026). Antes eran cuatro (<20, 20-50, 50-100 y >100, guardados como 1 a 4); se mantienen los códigos, así que los restaurantes guardados con 2 pasan a «20-40 €». Ese día los tres restaurantes reales estaban en 2; solo «Prova Claude (esborrar)» estaba en 3 y pasa de «50-100 €» a «40-60 €».
+- **Pendent de visitar** (24 de noviembre de 2026): restaurante guardado sin fecha de visita (`visitDate` nulo) y sin nota, para apuntar los que se quieren probar. Se ve con «Pendent» en el recuadro de la nota.
+- **Recomanació de l'inici** (24 de noviembre de 2026): marca opcional (`featured`) para el panel «Recomanació per menys de 40 €» de la página de inicio. Solo se puede poner con precio de menos de 40 € (tramos 1 y 2).
 - **Tipos de cocina** de partida: Autor, Japonès, Nikkei, Xinès, Menú degustació, Menú de migdia, Mallorquí, Asiàtic, Italià, Brasa y Arrossos (decidido el 24 de noviembre de 2026). Al final hay un botón «+ Afegeix» para crear otro. Los tipos añadidos no se guardan aparte: salen de los restaurantes que los usan, así que los ven todos y desaparecen si ningún restaurante los usa. Si se escribe uno que ya existe con otras mayúsculas o sin tildes, se marca el existente. Máximo 10 por restaurante. Los nombres antiguos en castellano se muestran en catalán (`CUISINE_RENAMES` en `app/config.js`) y se guardan así al editar.
 - **Localidad**: el pueblo o ciudad de la dirección de Google (sección 5), por ejemplo Caimari o Port de Pollença, no el municipio. No se pide en el alta: solo se escribe a mano si Google no la da. Se sigue viendo en la ficha como etiqueta tocable, sirve de filtro y el buscador de la app busca en ella (confirmado el 24 de noviembre de 2026).
 - **Dirección**: la de Google al elegir el restaurante en el buscador (sección 5). Se ve en la ficha y el buscador de la app busca también en ella.
@@ -50,7 +52,7 @@ De arriba abajo:
    - arriba, el **nombre** y, debajo, el **recuadro con la nota** (la del selector) con su texto (Excel·lent, Molt bo…) y quién ha puntuado al lado;
    - abajo a la izquierda, la **dirección** y **«Visitat el…»**;
    - abajo a la derecha, las **etiquetas tocables** de localidad, tipos de cocina y precio, translúcidas: al tocar una, se abre el mapa con ese filtro puesto **sustituyendo** los filtros que hubiera.
-   Sin fotos, la misma disposición sobre un fondo de color, con el texto oscuro.
+   Sin fotos, la misma disposición sobre un fondo de color, con el texto oscuro. Si está pendiente de visitar, el recuadro dice «Pendent», al lado «Pendent de visitar» y no hay fecha.
 2. (Desde el 24 de noviembre de 2026, el nombre, la dirección, las etiquetas, la fecha y la nota van en la cabecera.)
 3. (La tarjeta de nota que había aquí pasó a la cabecera.)
 4. **Barras por criterio, dos por criterio: tinta y turquesa**, cada una con su valor. En el plato estrella, cada persona con su estrella en su color, el nombre de su plato y su nota.
@@ -60,7 +62,7 @@ De arriba abajo:
 8. **Fotos al final**, cada una con su pie y también la portada. Al tocarla se amplía con el pie debajo. Mientras cargan se ve una rueda y aparecen con un fundido. En la foto ampliada se pasa a la anterior o la siguiente con flechas a los lados, deslizando el dedo o con las teclas de flecha, y debajo se ve «2 / 5» (24 de noviembre de 2026). Al llegar al final vuelve a la primera.
 9. **A Google Maps** (24 de noviembre de 2026, pedido por el propietario): si el sitio se eligió en el buscador de Google (tiene `placeId`), la tarjeta compacta de Google (Places UI Kit, Place Details compacto) con foto y galería, nombre, estrellas con número de reseñas, tipo, precio, si está abierto y su botón «Maps» al perfil. **Pequeña, para que no destaque** (pedido por el propietario el 24 de noviembre de 2026): en horizontal, con la foto pequeña a la izquierda, a todo el ancho de la ficha y sin tarjeta alrededor; con menos ancho, Google quita la foto. Sin `placeId`, o si la tarjeta no carga (por ejemplo, por el tope diario), sale «Obre a Google Maps» (Maps URLs: el sitio de Google o, si no lo hay, el punto del pin).
    - El UI Kit queda fuera de las restricciones del EEE y no hace falta mostrarlo con un mapa. Cada tarjeta creada cuenta una consulta «Places UI Kit Query» (categoría Essentials, 10.000 gratis al mes y después 1 dólar por 1.000; comprobado el 24 de noviembre de 2026). La app guarda cada tarjeta creada y redibujar la ficha no la vuelve a pedir. Por dentro, Google descarga además las fotos de su galería (10 en la prueba). No se ha comprobado qué cuota diaria de Google Cloud cuenta estas tarjetas: probablemente «Query Requests» de Places UI Kit, que tiene un tope de 300.
-10. Acciones: «Comparteix» (todos, también sin entrar); «Mostra al mapa»; «Puntua» o «Edita la meva nota» (quien puntúa), que abre solo su nota; «Edita» (editores), que abre la edición completa (sección 6); «Esborra» (propietario).
+10. Acciones: «Comparteix» (todos, también sin entrar); «Mostra al mapa»; «Puntua» o «Edita la meva nota» (quien puntúa), que abre solo su nota; en un pendiente, en su lugar, «Ja hi hem anat: posa la data i la nota» (editores), que abre la edición con la fecha de hoy y el bloque de la nota; «Edita» (editores), que abre la edición completa (sección 6); «Esborra» (propietario).
 
 Las maquetas del aspecto (24 de noviembre de 2026) incluyeron la ficha; las barras en tinta y turquesa se comprobaron en la app en local, en claro y oscuro.
 
@@ -81,8 +83,9 @@ El alta va en **cuatro pasos**. Arriba, una barra de progreso con cuatro segment
 
 ### Paso 2. Dades
 
-- Tipos de cocina en fichas (sección 2) y precio en cuatro botones grandes, en dos filas de dos.
+- Tipos de cocina en fichas (sección 2) y precio en cinco botones grandes: tres arriba y dos abajo.
 - Fecha de visita con los atajos «Avui» y «Ahir» además del selector de fecha (confirmado el 24 de noviembre de 2026). Por defecto, hoy.
+- Debajo, «Pendent de visitar» (24 de noviembre de 2026): al marcarlo se esconde la fecha y desaparece el paso de la nota, así que el alta queda en tres pasos.
 
 ### Paso 3. La teva nota
 
@@ -111,6 +114,8 @@ Fuentes: https://developers.google.com/maps/documentation/places/web-service/pol
 - **«Edita»** (editores) abre una sola pantalla con los bloques del alta seguidos, sin pasos ni barra de progreso. El bloque de la nota solo lo ve quien puntúa. En el primer bloque aparece también la casilla «Localitat», para poder corregirla: la localidad solo desaparece del alta.
 - **«Puntua» o «Edita la meva nota»** se mantiene en la ficha y abre solo el bloque de la nota (confirmado el 24 de noviembre de 2026).
 - Al guardar la edición, la nota de quien puntúa solo se guarda si la ha cambiado.
+- «Pendent de visitar» solo aparece si nadie ha puntuado el restaurante. Al quitarlo vuelven la fecha (hoy) y el bloque de la nota.
+- **«Recomanació per menys de 40 €»** (bajo el precio, «Pàgina d'inici»): solo al editar y solo con precio «<20 €» o «20-40 €». Con otro precio no se ve y se guarda sin marcar.
 
 ### Común al alta y a la edición
 
@@ -199,7 +204,7 @@ Fuentes: https://developers.google.com/maps/documentation/javascript/cloud-custo
 |---|---|---|
 | `members/{correo}` | `role`: `owner` o `editor` (`viewer` ya no hace falta). `color`: `azul`, `rosa` o ninguno | Propietarios, en la consola |
 | `users/{uid}` | `displayName`, `color` (debe coincidir con el de `members`), `updatedAt` | Cada uno el suyo |
-| `restaurants/{id}` | `name`, `locality`, `address` (opcional), `location`, `cuisines`, `price`, `visitDate`, `blog`, `photos` (lista de `{full, thumb, caption}`, y `cover: true` en la portada si se ha elegido), `placeId`, `source`, `createdBy`, `createdAt`, `updatedBy`, `updatedAt` | Editores |
+| `restaurants/{id}` | `name`, `locality`, `address` (opcional), `location`, `cuisines`, `price` (1 a 5), `visitDate` (`AAAA-MM-DD`, o nulo si está pendiente de visitar), `featured` (opcional, recomendación de la página de inicio), `blog`, `photos` (lista de `{full, thumb, caption}`, y `cover: true` en la portada si se ha elegido), `placeId`, `source`, `createdBy`, `createdAt`, `updatedBy`, `updatedAt` | Editores |
 | `restaurants/{id}/ratings/{uid}` | `scores`, `global`, `dish`, `updatedAt` | Solo su autor, si tiene color |
 | ~~`accessRequests/{uid}`~~ | Retirada el 24 de noviembre de 2026 con la app pública. Las que queden se borran en la consola | Nadie desde la app |
 
@@ -236,3 +241,17 @@ Orden aprobado por el propietario el 24 de noviembre de 2026. Al final de cada p
 Tareas del propietario hechas: publicar las reglas de Firestore que aceptan `address` (comprobado el 24 de noviembre de 2026 al guardar en la app publicada un restaurante con la dirección de Google), poner `color` en los dos documentos de `members`, borrar las fichas de prueba y crear el Map ID con los estilos (sección 8).
 
 Fichas de prueba que el propietario decidió conservar por ahora (24 de noviembre de 2026): «Celler de proves» y «Prova Claude (esborrar)».
+
+### Peticiones del 24 de noviembre de 2026, por partes
+
+Lista del propietario de ese día, ordenada en partes. Al final de cada una se le enseña el resultado.
+
+| Parte | Contenido | Estado |
+|---|---|---|
+| 1 · Ficha y mapa | Cabecera de la ficha según su boceto, tarjeta de Google pequeña y mapa que se abre en Palma (sección 4) | Publicada el 24 de noviembre de 2026 |
+| 2 · Datos | Cinco tramos de precio, «Pendent de visitar» y la marca de recomendación de la página de inicio (secciones 2, 5 y 6). Necesita publicar las reglas de Firestore nuevas | Hecha el 24 de noviembre de 2026 |
+| 3 · Inici | Página de inicio como primera pantalla, con el menú «Inici · Mapa · + · Llista». Paneles «Recomanació per menys de 40 €» (el restaurante marcado, empezando por Bar Vius; sin foto propia, la de Google) y «Millors menús degustació» (tarjetas que llevan a la ficha y «Veure'ls al mapa» con el filtro Menú degustació). Alta de Miceli, Tomeu Caldentey, Boro, Santi Taura y Daica como pendientes de visitar, con el tipo Menú degustació | Pendiente. Falta el tramo de precio de esos cinco |
+| 4 · Comentario con formato | Negrita, cursiva, subrayado y enlaces en el texto largo, con botones | Pendiente. Falta aclarar si «referencias» son enlaces web, enlaces a otras fichas o las dos cosas |
+| 5 · Mapa | Parques, jardines y plazas en verde suave dentro de «Terracota»; sin nombres de autopistas y carreteras, solo los de las calles. El propietario actualiza los dos estilos en Google Cloud | Pendiente |
+
+En espera, sin fecha: fotos intercaladas con el texto en el comentario.

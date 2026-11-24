@@ -12,7 +12,7 @@ export const firebaseConfig = {
 
 export const MAPS_KEY = 'AIzaSyC1tU3zrYHXj7WsXPDbgbxz5kAdaHh9GP8';
 
-// Map ID de Google Maps «Puntuam a taula», con los estilos «Lavanda» (claro) y «Noche» (oscuro)
+// Map ID de Google Maps «Puntuam a taula», con los estilos «Terracota» (claro) y «Terracota nit» (oscuro)
 // asociados en Google Cloud (docs/diseno.md, sección 8). Es un identificador público.
 export const MAP_ID = 'ef2c6b7a22cee90b3aee6ac8';
 
@@ -40,8 +40,11 @@ export const CUISINE_RENAMES = {
 // Nom de cada color per mostrar-lo. «azul» i «rosa» són els noms que guarda l'app (members i users); des del
 // 24 de novembre de 2026 es veuen en tinta i turquesa (docs/diseno.md, secció 7).
 export const COLOR_NAMES = { azul: 'tinta', rosa: 'turquesa' };
-// Precio por persona, sin bebida. Se guarda como 1 a 4.
-export const PRICES = ['<20\u00a0€', '20-50\u00a0€', '50-100\u00a0€', '>100\u00a0€'];
+// Precio por persona, sin bebida. Se guarda como 1 a 5. Cinco tramos desde el 24 de noviembre de 2026; antes eran
+// cuatro (<20, 20-50, 50-100 y >100): los códigos se mantienen y los restaurantes guardados con 2 pasan a 20-40.
+export const PRICES = ['<20 €', '20-40 €', '40-60 €', '60-100 €', '>100 €'];
+// Tramos de la recomendación de la página de inicio («per menys de 40 €»): <20 y 20-40.
+export const CHEAP_PRICES = PRICES.slice(0, 2);
 
 // Colores de quien puntúa. El orden decide quién va primero en barras y leyendas.
 export const COLORS = ['azul', 'rosa'];

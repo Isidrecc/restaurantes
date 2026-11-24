@@ -135,13 +135,20 @@
             <span class="field-label" id="lbl-price">Preu per persona, sense beguda</span>
             <div class="price-grid" role="radiogroup" aria-labelledby="lbl-price" id="f-price"></div>
           </div>
+          <div class="field" id="fld-featured" hidden>
+            <span class="field-label">Pàgina d'inici</span>
+            <div class="chipset"><button class="chip" type="button" id="f-featured" aria-pressed="false">Recomanació per menys de 40&nbsp;€</button></div>
+            <p class="hint">Surt a l'inici com a recomanació.</p>
+          </div>
           <div class="field">
             <label for="f-date">Data de la visita</label>
-            <div class="date-row">
+            <div class="date-row" id="f-date-row">
               <button class="chip" type="button" data-day="0" aria-pressed="false">Avui</button>
               <button class="chip" type="button" data-day="1" aria-pressed="false">Ahir</button>
               <input class="input" id="f-date" type="date">
             </div>
+            <div class="chipset" id="f-pending-row"><button class="chip" type="button" id="f-pending" aria-pressed="false">Pendent de visitar</button></div>
+            <p class="hint" id="f-pending-hint" hidden>Sense data ni nota fins que hi aneu.</p>
           </div>
         </section>
 

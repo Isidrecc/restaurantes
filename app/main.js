@@ -1,5 +1,5 @@
 // Puntuam a taula: interfaz. Porta la demo aprobada (demo/index.html) con los cambios de docs/diseno.md.
-import { CRITERIA, CUISINES, PRICES, COLORS, COLOR_NAMES } from './config.js';
+import { CRITERIA, CUISINES, PRICES, CHEAP_PRICES, COLORS, COLOR_NAMES } from './config.js';
 import * as store from './store.js';
 import { createMainMap, createPickMap, createPlaceSearch, localityAt, placeCard, mapsLink } from './maps.js';
 import { preparePhoto } from './photos.js';
@@ -79,6 +79,10 @@ function de(name) { return (/^h?[aeiouàáèéíïòóúü]/i.test(name) ? 'd’
 function norm(s) { return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
 function placeLine(r, withPrice) { return [r.locality, r.cuisines.join(', '), withPrice ? r.price : ''].filter(Boolean).map(esc).join(' · '); }
 function byId(id) { return restaurants.find((r) => r.id === id); }
+// «Pendent de visitar»: guardado sin fecha de visita.
+function isPending(r) { return !r.visitDate; }
+// Texto de la casilla de nota: la nota, «Sense nota» o, si está pendiente y sin nota, «Pendent».
+function scoreLabel(r, g) { return g == null && isPending(r) ? 'Pendent' : fmt(g); }
 function avg(arr) { return arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null; }
 const STAR = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 16.9 6.6 19.8l1.1-6.1L3.2 9.4l6.1-.8L12 3z"></path></svg>';
 const XICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>';
@@ -173,7 +177,7 @@ function rowHTML(r) {
     return o ? '<span class="pmini p-' + p.color + '">' + esc(p.name) + ' <b>' + fmt(o.global) + '</b></span>' : '';
   }).join('') + '</span>' : '';
   return '<span class="row">' +
-    '<span class="score ' + cls(g) + (g == null ? ' is-empty' : '') + '">' + fmt(g) + '</span>' +
+    '<span class="score ' + cls(g) + (g == null ? ' is-empty' : '') + '">' + scoreLabel(r, g) + '</span>' +
     '<span class="row-main">' +
       '<span class="row-title"><strong class="row-name">' + esc(r.name) + '</strong><span class="price">' + esc(r.price) + '</span></span>' +
       '<span class="meta">' + placeLine(r, false) + '</span>' +
@@ -186,7 +190,7 @@ function renderMarkers(list) {
   if (!mainMap) return;
   mainMap.setMarkers(list.slice().reverse().map((r) => {
     const g = agg(r).g;
-    return { id: r.id, lat: r.lat, lng: r.lng, text: g == null ? '·' : fmt(g), klass: cls(g), title: r.name + ', nota ' + fmt(g), selected: r.id === selectedId };
+    return { id: r.id, lat: r.lat, lng: r.lng, text: g == null ? '·' : fmt(g), klass: cls(g), title: r.name + (g == null && isPending(r) ? ', pendent de visitar' : ', nota ' + fmt(g)), selected: r.id === selectedId };
   }), selectOnMap);
 }
 function renderPreview() {
@@ -394,6 +398,7 @@ function openDetail(id, keepScroll) {
     '<img data-path="' + esc(p.thumb) + '" alt="' + esc(p.caption || 'Foto ' + (i + 1)) + '"></button>' +
     (p.caption ? '<figcaption>' + esc(p.caption) + '</figcaption>' : '') + '</figure>').join('');
   const ci = coverIndex(r.photos);
+  const pending = isPending(r) && !raters.length;
   // Cabecera (boceto del propietario, 24 de noviembre de 2026; docs/diseno.md, sección 4): sobre la portada, arriba
   // el nombre y la nota; abajo, a la izquierda la dirección y la fecha de visita y a la derecha las etiquetas.
   // Sin fotos, lo mismo sobre un fondo de color.
@@ -407,8 +412,10 @@ function openDetail(id, keepScroll) {
         '<div class="hero-top">' +
           '<h2>' + esc(r.name) + '</h2>' +
           '<div class="hero-score-row">' +
-            '<div class="score hero-score ' + cls(g) + (g == null ? ' is-empty' : '') + '">' + fmt(g) + '</div>' +
-            '<div class="hero-word"><strong>' + word(g) + '</strong><span>' + esc(scoreText) + '</span></div>' +
+            '<div class="score hero-score ' + cls(g) + (g == null ? ' is-empty' : '') + '">' + scoreLabel(r, g) + '</div>' +
+            (pending
+              ? '<div class="hero-word"><strong>Pendent de visitar</strong></div>'
+              : '<div class="hero-word"><strong>' + word(g) + '</strong><span>' + esc(scoreText) + '</span></div>') +
           '</div>' +
         '</div>' +
         '<div class="hero-bottom">' +
@@ -433,8 +440,11 @@ function openDetail(id, keepScroll) {
         ? '<div class="card crit">' + legend + critHTML + pscores +
             (missing.length ? '<p class="hint">' + missing.map((p) => esc(p.name)).join(' i ') + ' encara no l’ha puntuat.</p>' : '') +
           '</div>' + rose
-        : '<div class="card"><p class="meta">Encara no l’ha puntuat ningú.</p></div>') +
-      (canRate() ? '<button class="btn btn-primary btn-block" type="button" data-act="rate">' + (mine ? 'Edita la meva nota' : 'Puntua aquest restaurant') + '</button>' : '') +
+        : pending ? '' : '<div class="card"><p class="meta">Encara no l’ha puntuat ningú.</p></div>') +
+      // Pendiente: el botón abre la edición con la fecha de hoy y, si se puntúa, la nota.
+      (pending
+        ? (canEditData() ? '<button class="btn btn-primary btn-block" type="button" data-act="visited">' + (canRate() ? 'Ja hi hem anat: posa la data i la nota' : 'Ja hi hem anat: posa la data') + '</button>' : '')
+        : (canRate() ? '<button class="btn btn-primary btn-block" type="button" data-act="rate">' + (mine ? 'Edita la meva nota' : 'Puntua aquest restaurant') + '</button>' : '')) +
       (r.blog ? '<div class="card"><p class="section-title">Comentari</p><div class="blog">' + blogHTML(r.blog) + '</div></div>' : '') +
       (photos ? '<div class="card"><p class="section-title">Fotos</p><div class="photos">' + photos + '</div></div>' : '') +
       // Google Maps: la tarjeta de Google si el sitio se eligió en su buscador (lleva su propio botón «Maps»);
@@ -767,14 +777,31 @@ function updateDateChips() {
   $$('#grp-datos [data-day]').forEach((b) => b.setAttribute('aria-pressed', v === dayISO(+b.dataset.day) ? 'true' : 'false'));
 }
 
-// Bloques de cada modo, en orden. En el alta son los pasos; si quien da de alta no puntúa, no hay paso de nota.
+// «Pendent de visitar»: sin fecha ni nota (24 de noviembre de 2026). Al marcarlo se esconde la fecha y desaparece
+// el bloque de la nota. Al editar solo se ofrece si nadie lo ha puntuado.
+function setPending(on) {
+  draft.pending = on;
+  $('#f-pending').setAttribute('aria-pressed', on ? 'true' : 'false');
+  $('#f-date-row').hidden = on;
+  $('#f-pending-hint').hidden = !on;
+  if (formMode === 'add') showStep(true);
+  else if (formMode === 'edit') $('#grp-val').hidden = !formBlocks().includes('#grp-val');
+}
+// Recomendación de la página de inicio: solo al editar y solo con precio de menos de 40 €.
+function updateFeaturedField() {
+  const pr = $('#f-price input:checked');
+  $('#fld-featured').hidden = !(formMode === 'edit' && pr && CHEAP_PRICES.includes(pr.value));
+}
+
+// Bloques de cada modo, en orden. En el alta son los pasos; si quien da de alta no puntúa o el restaurante
+// está pendiente de visitar, no hay paso de nota.
 const BLOCKS = ['#grp-ubic', '#grp-datos', '#grp-val', '#grp-res'];
 function formBlocks() {
   if (formMode === 'rate') return ['#grp-val'];
-  return BLOCKS.filter((s) => s !== '#grp-val' || canRate());
+  return BLOCKS.filter((s) => s !== '#grp-val' || (canRate() && !(draft && draft.pending)));
 }
 // Alta: se ve un bloque cada vez, con la barra de progreso, «Enrere» y «Següent» o «Desa el restaurant».
-function showStep() {
+function showStep(keepScroll) {
   const blocks = formBlocks();
   const last = blocks.length - 1;
   BLOCKS.forEach((s) => { $(s).hidden = s !== blocks[formStep]; });
@@ -783,16 +810,19 @@ function showStep() {
   $('#f-back').hidden = formStep === 0;
   $('#f-next').hidden = formStep === last;
   $('#f-save').hidden = formStep !== last;
-  $('#form').scrollTop = 0;
+  if (!keepScroll) $('#form').scrollTop = 0;
 }
-function startForm(mode, r) {
+// visited: viene de «Ja hi hem anat» en la ficha de un pendiente; se abre con la fecha de hoy y la nota.
+function startForm(mode, r, visited) {
   formMode = mode;
   const mine = r && me && r.ratings[me.uid];
   draft = {
     id: r ? r.id : null,
     name: r ? r.name : '', locality: r ? r.locality : '', address: r ? r.address : '', lat: r ? r.lat : null, lng: r ? r.lng : null,
     cuisines: r ? r.cuisines.slice() : [], price: r ? r.price : PRICES[1],
-    visitDate: r ? r.visitDate || todayISO() : todayISO(),
+    visitDate: r && r.visitDate ? r.visitDate : todayISO(),
+    pending: !!r && !r.visitDate && !visited,
+    featured: !!r && r.featured,
     blog: r ? r.blog : '',
     photos: r ? r.photos.map((p) => ({ full: p.full, thumb: p.thumb, caption: p.caption || '', cover: !!p.cover })) : [],
     removed: [],
@@ -832,9 +862,13 @@ function startForm(mode, r) {
   $('#f-cuisine-text').value = '';
   $('#f-date').value = draft.visitDate;
   updateDateChips();
+  // «Pendent de visitar»: en el alta siempre; al editar, si nadie lo ha puntuado.
+  $('#f-pending-row').hidden = mode === 'rate' || (mode === 'edit' && Object.keys(r.ratings).length > 0);
+  $('#f-featured').setAttribute('aria-pressed', draft.featured ? 'true' : 'false');
   $('#f-dish').value = draft.dish || '';
   $('#f-review').value = draft.blog;
   $$('#f-price input').forEach((i) => { i.checked = i.value === draft.price; });
+  updateFeaturedField();
   CRITERIA.forEach((c) => {
     const v = draft.scores[c.k];
     setRate(c.k, v == null ? null : v);
@@ -842,6 +876,7 @@ function startForm(mode, r) {
   ['#err-name', '#err-muni', '#err-loc', '#err-rate'].forEach((s) => { $(s).hidden = true; });
   renderDraftPhotos();
   $('#f-progress-row').hidden = mode !== 'add';
+  if (mode !== 'rate') setPending(draft.pending);
   if (mode === 'add') showStep();
   else {
     $('#f-back').hidden = true;
@@ -857,16 +892,17 @@ function readForm() {
   if (!draft) return;
   draft.name = $('#f-namebox').hidden ? '' : $('#f-name').value.trim();
   draft.cuisines = cuisineList(draft.cuisines).filter((c) => draft.cuisines.includes(c));
-  draft.visitDate = $('#f-date').value || todayISO();
+  draft.visitDate = draft.pending ? '' : $('#f-date').value || todayISO();
   draft.locality = $('#f-locality').value.trim();
   draft.dish = $('#f-dish').value.trim();
   draft.blog = $('#f-review').value.trim();
   const pr = $('#f-price input:checked');
   draft.price = pr ? pr.value : PRICES[1];
+  draft.featured = !$('#fld-featured').hidden && $('#f-featured').getAttribute('aria-pressed') === 'true';
 }
 function ratingKey(scores, dish) { return JSON.stringify([CRITERIA.map((c) => (scores[c.k] == null ? null : scores[c.k])), dish || '']); }
 function snapshot() {
-  return JSON.stringify([draft.name, draft.locality, draft.lat, draft.lng, draft.placeId, draft.cuisines, draft.price, draft.visitDate, draft.blog,
+  return JSON.stringify([draft.name, draft.locality, draft.lat, draft.lng, draft.placeId, draft.cuisines, draft.price, draft.visitDate, draft.featured, draft.blog,
     ratingKey(draft.scores, draft.dish), draft.photos.map((p) => [p.thumb || p.preview, p.caption, !!p.cover])]);
 }
 // Comprueba un bloque y marca lo que falta. Devuelve adónde llevar la vista, o null si está completo.
@@ -996,7 +1032,7 @@ async function saveForm() {
         }
       }
       btn.textContent = 'Desant…';
-      const data = { name: draft.name, locality: draft.locality, address: draft.address, lat: draft.lat, lng: draft.lng, cuisines: draft.cuisines, price: draft.price, visitDate: draft.visitDate, blog: draft.blog, photos, placeId: draft.placeId };
+      const data = { name: draft.name, locality: draft.locality, address: draft.address, lat: draft.lat, lng: draft.lng, cuisines: draft.cuisines, price: draft.price, visitDate: draft.visitDate, featured: draft.featured, blog: draft.blog, photos, placeId: draft.placeId };
       if (formMode === 'add') await store.createRestaurant(id, data, rateOn && hasScore ? rating : null);
       else {
         await store.updateRestaurant(id, data);
@@ -1152,6 +1188,12 @@ function wire() {
     if (act === 'share') shareRestaurant(r);
     if (act === 'edit') { closeDetail(); startForm('edit', r); setView('form'); }
     if (act === 'rate') { closeDetail(); startForm('rate', r); setView('form'); }
+    if (act === 'visited') {
+      closeDetail();
+      startForm('edit', r, true);
+      setView('form');
+      $('#f-date-row').scrollIntoView({ block: 'center' });
+    }
     if (act === 'delete') {
       askConfirm('Vols esborrar aquest restaurant?', 'S’esborrarà la fitxa ' + de(r.name) + ' amb les notes, el comentari i les fotos. No es pot desfer.', async () => {
         try {
@@ -1245,6 +1287,12 @@ function wire() {
     updateDateChips();
   }));
   ['input', 'change'].forEach((t) => $('#f-date').addEventListener(t, updateDateChips));
+  $('#f-pending').addEventListener('click', () => setPending(!draft.pending));
+  $('#f-price').addEventListener('change', updateFeaturedField);
+  $('#f-featured').addEventListener('click', (e) => {
+    const b = e.currentTarget;
+    b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+  });
   wireSliders();
   $('#rates').addEventListener('click', (e) => {
     const b = e.target.closest('.step');
@@ -1444,11 +1492,13 @@ function localPreview() {
   onData({
     people: [{ uid: 'u1', name: 'Isidre', color: 'azul' }, { uid: 'u2', name: 'Cris', color: 'rosa' }],
     restaurants: [
-      { id: 'm1', name: 'Can Exemple', locality: 'Palma', lat: 39.5712, lng: 2.6498, cuisines: ['Mallorquí', 'Arrossos'], price: PRICES[1], address: 'Carrer de Mostra, 1, 07001 Palma, Illes Balears', visitDate: '2026-10-17',
+      { id: 'm1', name: 'Can Exemple', locality: 'Palma', lat: 39.5712, lng: 2.6498, cuisines: ['Mallorquí', 'Arrossos'], price: PRICES[1], featured: true, address: 'Carrer de Mostra, 1, 07001 Palma, Illes Balears', visitDate: '2026-10-17',
         blog: 'Primer paràgraf de mostra.\n\nSegon paràgraf.', photos: [{ full: FOTO, thumb: FOTO, caption: 'Foto de mostra' }, { full: FOTO2, thumb: FOTO2, caption: 'Segona foto' }], placeId: null, ratings: { u1: { scores: sc([8.5, 9, 7, 8, 8.5, 7.5]), dish: 'Arròs brut' }, u2: { scores: sc([9, 9, 8, 8.5, 9, 7]), dish: 'Llom amb col' } } },
       { id: 'm2', name: 'Sa Fonda Fictícia', locality: 'Sóller', lat: 39.7665, lng: 2.7152, cuisines: ['Menú degustació', 'Peix i marisc'], price: PRICES[2], visitDate: '2026-09-05',
         blog: '', photos: [], placeId: null, ratings: { u2: { scores: sc([9.5, 10, 9, 9, 6, 9.5]), dish: 'Gamba roja' } } },
       { id: 'm3', name: 'Bodega Sense Nom', locality: 'Palma', lat: 39.5745, lng: 2.6551, cuisines: ['Autor'], price: PRICES[0], visitDate: '2026-11-07',
+        blog: '', photos: [], placeId: null, ratings: {} },
+      { id: 'm4', name: 'Celler Pendent', locality: 'Palma', lat: 39.5689, lng: 2.6420, cuisines: ['Menú degustació'], price: PRICES[4], visitDate: '',
         blog: '', photos: [], placeId: null, ratings: {} }
     ]
   });

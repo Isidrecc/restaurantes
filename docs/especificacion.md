@@ -105,7 +105,7 @@ Los colores exactos están en los tokens `--s1` a `--s5` de `app/styles.css` (lo
 ### Añadir y editar
 
 - Alta en cuatro pasos (dónde está, datos, nota, texto y fotos) con barra de progreso. Edición en una sola pantalla. Detalle en `docs/diseno.md`, secciones 5 y 6.
-- Datos: nombre (obligatorio), tipos de cocina (selección múltiple), fecha de visita (por defecto hoy, con atajos «Avui» y «Ahir») y precio en cuatro tramos.
+- Datos: nombre (obligatorio), tipos de cocina (selección múltiple), fecha de visita (por defecto hoy, con atajos «Avui» y «Ahir», o «Pendent de visitar», sin fecha ni nota) y precio en cinco tramos.
 - Ubicación: el buscador de Google lleva el mapa al sitio; el pin lo pone el usuario tocando el mapa y se puede arrastrar para afinar. La localidad se saca de Google.
 - Valoración: un deslizador por criterio, con décimas desde el 24 de noviembre de 2026 (`docs/diseno.md`, sección 5). Un criterio sin tocar queda «Sense nota». El plato estrella lleva además el nombre del plato. La nota global y la roseta se actualizan en vivo. Es opcional.
 - Texto largo y fotos con pie. Se pueden añadir varias fotos y quitarlas antes de guardar.
@@ -124,7 +124,7 @@ Detalle en `docs/diseno.md`, sección 4.
 ### Valores usados en la demo
 
 - Tipos de cocina: Mallorquina, Mediterránea, Arroces, Pescado y marisco, Brasa, Tapas, De autor, Italiana, Japonesa, Otra. La lista es ampliable. En la app se sustituyen por los de docs/diseno.md, sección 2, con un botón para añadir más.
-- Precio: €, €€, €€€, €€€€. En la app pasan a ser precio por persona sin bebida: <20 €, 20-50 €, 50-100 € y >100 € (docs/diseno.md, sección 2).
+- Precio: €, €€, €€€, €€€€. En la app pasan a ser precio por persona sin bebida: <20 €, 20-40 €, 40-60 €, 60-100 € y >100 € desde el 24 de noviembre de 2026; antes, cuatro tramos (docs/diseno.md, sección 2).
 - Los restaurantes de la demo son inventados.
 
 ### Qué cambia respecto a la demo
@@ -244,7 +244,7 @@ Acordado el 23 de noviembre de 2026 y cambiado el 24: desde entonces cualquiera 
 - Crear y editar la parte común de un restaurante: solo los editores.
 - Escribir una puntuación: solo su autor y solo la suya.
 - Modificar las listas de permisos: solo el propietario.
-- Se validan los datos: notas de 1 a 10 con una décima (antes del 24 de noviembre de 2026, en pasos de 0,5), precio de 1 a 4 y textos con longitud máxima.
+- Se validan los datos: notas de 1 a 10 con una décima (antes del 24 de noviembre de 2026, en pasos de 0,5), precio de 1 a 5 (antes del 24 de noviembre de 2026, de 1 a 4), fecha de visita con formato de fecha o vacía (pendiente de visitar), marca de recomendación verdadera o falsa y textos con longitud máxima.
 
 ### Mapa (Google Maps)
 
