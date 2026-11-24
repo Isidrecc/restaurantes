@@ -290,8 +290,22 @@ function blogHTML(text) {
 }
 function hydratePhotos(root) {
   $$('img[data-path]', root).forEach((img) => {
-    store.photoURL(img.dataset.path).then((url) => { img.src = url; }).catch(() => { img.alt = 'No s’ha pogut carregar la foto'; });
+    store.photoURL(img.dataset.path).then((url) => { img.src = url; }).catch(() => {
+      img.alt = 'No s’ha pogut carregar la foto';
+      markPhoto(img, false);
+    });
   });
+}
+// Portada: la foto marcada o, si no hay ninguna, la primera (docs/diseno.md, sección 4). -1 si no hay fotos.
+function coverIndex(photos) {
+  if (!photos.length) return -1;
+  const i = photos.findIndex((p) => p.cover);
+  return i >= 0 ? i : 0;
+}
+// Mientras una foto carga se ve una rueda; al llegar, aparece suavemente (styles.css, «Fotos»).
+function markPhoto(img, ok) {
+  const box = img.closest('.thumb, .lightbox');
+  if (box) box.classList.add(ok ? 'is-loaded' : 'is-error');
 }
 function openDetail(id, keepScroll) {
   const r = byId(id);
@@ -325,6 +339,10 @@ function openDetail(id, keepScroll) {
     '<figure class="photo"><button class="thumb" type="button" data-act="photo" data-i="' + i + '" aria-label="Amplia la foto ' + (i + 1) + '">' +
     '<img data-path="' + esc(p.thumb) + '" alt="' + esc(p.caption || 'Foto ' + (i + 1)) + '"></button>' +
     (p.caption ? '<figcaption>' + esc(p.caption) + '</figcaption>' : '') + '</figure>').join('');
+  const ci = coverIndex(r.photos);
+  const cover = ci < 0 ? '' :
+    '<button class="thumb cover" type="button" data-act="photo" data-i="' + ci + '" aria-label="Amplia la portada">' +
+    '<img data-path="' + esc(r.photos[ci].full) + '" alt="' + esc(r.photos[ci].caption || 'Portada') + '"></button>';
   const mine = me && r.ratings[me.uid];
   const actions = (canEditData() ? '<button class="link-btn" type="button" data-act="edit">Edita</button>' : '') +
     (canDelete() ? '<button class="link-btn is-danger" type="button" data-act="delete">Esborra</button>' : '');
@@ -334,6 +352,7 @@ function openDetail(id, keepScroll) {
       '<div class="panel-actions">' + actions + '</div>' +
     '</div>' +
     '<div class="panel-body">' +
+      cover +
       '<div class="d-head">' +
         '<h2>' + esc(r.name) + '</h2>' +
         (r.address ? '<p class="meta d-address">' + esc(r.address) + '</p>' : '') +
@@ -469,7 +488,7 @@ function startForm(mode, r) {
     cuisines: r ? r.cuisines.slice() : [], price: r ? r.price : PRICES[1],
     visitDate: r ? r.visitDate || todayISO() : todayISO(),
     blog: r ? r.blog : '',
-    photos: r ? r.photos.map((p) => ({ full: p.full, thumb: p.thumb, caption: p.caption || '' })) : [],
+    photos: r ? r.photos.map((p) => ({ full: p.full, thumb: p.thumb, caption: p.caption || '', cover: !!p.cover })) : [],
     removed: [],
     placeId: r ? r.placeId : null,
     scores: mine ? Object.assign({}, mine.scores) : {},
@@ -525,11 +544,15 @@ function addCuisine() {
 function renderDraftPhotos() {
   const box = $('#f-thumbs');
   box.hidden = !draft.photos.length;
+  const ci = coverIndex(draft.photos);
   box.innerHTML = draft.photos.map((p, i) =>
     '<div class="photo-edit">' +
       '<div class="thumb">' + (p.preview ? '<img src="' + p.preview + '" alt="Foto ' + (i + 1) + '">' : '<img data-path="' + esc(p.thumb) + '" alt="Foto ' + (i + 1) + '">') +
       '<button class="thumb-x" type="button" data-rmphoto="' + i + '" aria-label="Treu la foto ' + (i + 1) + '">' + XICON + '</button></div>' +
-      '<input class="input" type="text" maxlength="200" placeholder="Peu de foto" aria-label="Peu de la foto ' + (i + 1) + '" data-cap="' + i + '" value="' + esc(p.caption) + '">' +
+      '<div class="photo-edit-side">' +
+        '<input class="input" type="text" maxlength="200" placeholder="Peu de foto" aria-label="Peu de la foto ' + (i + 1) + '" data-cap="' + i + '" value="' + esc(p.caption) + '">' +
+        '<button class="chip cover-btn" type="button" data-cover="' + i + '" aria-pressed="' + (i === ci ? 'true' : 'false') + '">' + STAR + (i === ci ? 'Portada' : 'Fes-la portada') + '</button>' +
+      '</div>' +
     '</div>').join('');
   hydratePhotos(box);
 }
@@ -578,9 +601,9 @@ async function saveForm() {
           btn.textContent = 'Pujant la foto ' + done + ' de ' + fresh + '…';
           const prepared = await preparePhoto(p.file);
           const paths = await store.uploadPhoto(id, prepared.full, prepared.thumb);
-          photos.push({ ...paths, caption: p.caption });
+          photos.push({ ...paths, caption: p.caption, cover: !!p.cover });
         } else {
-          photos.push({ full: p.full, thumb: p.thumb, caption: p.caption });
+          photos.push({ full: p.full, thumb: p.thumb, caption: p.caption, cover: !!p.cover });
         }
       }
       btn.textContent = 'Desant…';
@@ -657,6 +680,9 @@ function askConfirm(title, text, fn) {
 
 // ---------- Eventos ----------
 function wire() {
+  // Las fotos avisan al cargar o al fallar (los eventos de imagen no suben: se escuchan en captura).
+  document.addEventListener('load', (e) => { if (e.target instanceof HTMLImageElement) markPhoto(e.target, true); }, true);
+  document.addEventListener('error', (e) => { if (e.target instanceof HTMLImageElement) markPhoto(e.target, false); }, true);
   $$('.tabs button').forEach((b) => b.addEventListener('click', () => {
     if (b.dataset.view === 'form' && !(view === 'form' && formMode === 'add')) startForm('add', null);
     setView(b.dataset.view);
@@ -737,11 +763,15 @@ function wire() {
     }
     if (act === 'photo') {
       const photo = r.photos[+b.dataset.i];
+      $('#lightbox').classList.remove('is-loaded', 'is-error');
       $('#lightbox-img').removeAttribute('src');
       $('#lightbox-img').alt = photo.caption || 'Foto';
       $('#lightbox-cap').textContent = photo.caption || '';
       $('#lightbox').hidden = false;
-      store.photoURL(photo.full).then((url) => { $('#lightbox-img').src = url; }).catch(() => toast('No s’ha pogut carregar la foto'));
+      store.photoURL(photo.full).then((url) => { $('#lightbox-img').src = url; }).catch(() => {
+        markPhoto($('#lightbox-img'), false);
+        toast('No s’ha pogut carregar la foto');
+      });
     }
     if (act === 'show-on-map') {
       if (!passes(r)) { clearFilters(); toast('Filtres trets per mostrar-lo'); }
@@ -802,6 +832,13 @@ function wire() {
     renderDraftPhotos();
   });
   $('#f-thumbs').addEventListener('click', (e) => {
+    const c = e.target.closest('[data-cover]');
+    if (c) {
+      const i = +c.dataset.cover;
+      draft.photos.forEach((p, j) => { p.cover = j === i; });
+      renderDraftPhotos();
+      return;
+    }
     const b = e.target.closest('[data-rmphoto]');
     if (!b) return;
     const [p] = draft.photos.splice(+b.dataset.rmphoto, 1);

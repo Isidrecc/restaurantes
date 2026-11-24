@@ -132,7 +132,8 @@ function commonFields(r) {
     price: PRICES.indexOf(r.price) + 1,
     visitDate: r.visitDate,
     blog: r.blog,
-    photos: r.photos.map((p) => ({ full: p.full, thumb: p.thumb, caption: p.caption || '' })),
+    // La portada se marca en su foto con cover: true; si no hay ninguna, la portada es la primera.
+    photos: r.photos.map((p) => Object.assign({ full: p.full, thumb: p.thumb, caption: p.caption || '' }, p.cover ? { cover: true } : {})),
     placeId: r.placeId || null,
     source: r.placeId ? 'places' : 'manual'
   };

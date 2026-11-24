@@ -459,6 +459,11 @@ button.card { display: block; width: 100%; }
 .place b { font-weight: 600; }
 .photo-edits { display: flex; flex-direction: column; gap: 10px; }
 .photo-edit { display: grid; grid-template-columns: 88px 1fr; gap: 10px; align-items: center; }
+.photo-edit-side { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.cover-btn { align-self: flex-start; min-height: 30px; gap: 5px; }
+.cover-btn svg { width: 13px; height: 13px; }
+/* Portada de la ficha: a todo el ancho, arriba del todo (docs/diseno.md, sección 4). */
+.thumb.cover { display: block; width: calc(100% + 32px); height: 220px; margin: -16px -16px 0; aspect-ratio: auto; border: 0; border-radius: 0; }
 /* Perfil y acceso */
 .demo-box { padding: 12px; border: 1px dashed var(--line); border-radius: 12px; display: flex; flex-direction: column; gap: 8px; }
 .demo-box .seg-wide button { font-size: 12px; padding: 0 2px; }
@@ -527,6 +532,19 @@ gmp-basic-place-autocomplete { width: 100%; color-scheme: light dark; }
 @media (prefers-reduced-motion: reduce) { .gplace { animation: none; } }
 .photo-edit .thumb img[src=""] { visibility: hidden; }
 
-/* Fotos cargando desde Storage */
+/* Fotos cargando desde Storage: rueda mientras llega y aparición suave al cargar. */
 img[data-path]:not([src]) { visibility: hidden; }
 .thumb { background: var(--surface-2); }
+.thumb::after, .lightbox::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; margin: -13px 0 0 -13px;
+  border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--accent);
+  animation: spin .8s linear infinite; pointer-events: none;
+}
+.lightbox::after { width: 34px; height: 34px; margin: -17px 0 0 -17px; border-color: rgba(255, 255, 255, .25); border-top-color: #fff; }
+.thumb.is-loaded::after, .thumb.is-error::after, .lightbox.is-loaded::after, .lightbox.is-error::after { display: none; }
+.thumb img, .lightbox img { opacity: 0; transition: opacity .35s ease; }
+.thumb.is-loaded img, .lightbox.is-loaded img, .thumb.is-error img { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .thumb img, .lightbox img { transition: none; }
+  .thumb::after, .lightbox::after { animation-duration: 3s; }
+}

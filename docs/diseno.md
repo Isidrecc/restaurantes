@@ -44,14 +44,15 @@ Desaparecen las reseñas de cada persona.
 
 De arriba abajo:
 
-1. Nombre y dirección. **Etiquetas tocables** de localidad, tipos de cocina y precio: al tocar una, se abre el mapa con ese filtro puesto **sustituyendo** los filtros que hubiera. Fecha de visita.
-2. Nota grande (la del selector) con su texto (Excel·lent, Molt bo…).
-3. **Barras por criterio, dos por criterio: azul y rosa**, cada una con su valor. En el plato estrella, cada persona con su estrella en su color, el nombre de su plato y su nota.
-4. **Nota media de cada uno**, en su color.
-5. **Roseta con dos líneas**, azul y rosa, con leyenda.
-6. **Texto largo** del restaurante.
-7. **Fotos al final**, cada una con su pie. Al tocarla se amplía con el pie debajo.
-8. Acciones: «Mostra al mapa»; «Puntua» o «Edita la meva nota» (quien puntúa), que abre solo su nota; «Edita» (editores), que abre la edición completa (sección 6); «Esborra» (propietario).
+1. **Portada**: la foto marcada como portada o, si no hay ninguna, la primera, a todo el ancho y arriba del todo. Mientras carga se ve una rueda; al tocarla se amplía. Si el restaurante no tiene fotos, no hay portada (decidido el 24 de noviembre de 2026).
+2. Nombre y dirección. **Etiquetas tocables** de localidad, tipos de cocina y precio: al tocar una, se abre el mapa con ese filtro puesto **sustituyendo** los filtros que hubiera. Fecha de visita.
+3. Nota grande (la del selector) con su texto (Excel·lent, Molt bo…).
+4. **Barras por criterio, dos por criterio: azul y rosa**, cada una con su valor. En el plato estrella, cada persona con su estrella en su color, el nombre de su plato y su nota.
+5. **Nota media de cada uno**, en su color.
+6. **Roseta con dos líneas**, azul y rosa, con leyenda.
+7. **Texto largo** del restaurante.
+8. **Fotos al final**, cada una con su pie y también la portada. Al tocarla se amplía con el pie debajo. Mientras cargan se ve una rueda y aparecen con un fundido.
+9. Acciones: «Mostra al mapa»; «Puntua» o «Edita la meva nota» (quien puntúa), que abre solo su nota; «Edita» (editores), que abre la edición completa (sección 6); «Esborra» (propietario).
 
 Pendiente: la maqueta de la ficha con el aspecto de la sección 7, y comprobar en la app que las barras y la roseta azul y rosa se leen bien junto al morado.
 
@@ -82,7 +83,7 @@ El alta va en **cuatro pasos**. Arriba, una barra de progreso con cuatro segment
 
 ### Paso 4. Text i fotos
 
-- Texto largo y fotos, cada una con su pie.
+- Texto largo y fotos, cada una con su pie y un botón «Fes-la portada» («Portada» en la que lo es). Solo hay una portada; si no se marca ninguna, lo es la primera.
 
 ### Datos de Google y sus condiciones
 
@@ -158,7 +159,7 @@ Dos colores protagonistas: morado y amarillo mostaza.
 - Hecho el 24 de noviembre de 2026: estilos importados y Map ID «Puntuam a taula» (`ef2c6b7a22cee90b3aee6ac8`, vectorial, sin inclinación ni rotación) con «Lavanda» en claro y «Noche» en oscuro. Está en `app/config.js`.
 - El mapa del formulario usa el mismo estilo, así que tampoco muestra los restaurantes de Google: el sitio elegido en el buscador lo marca el aro (sección 5).
 - Pendiente: la maqueta de la pantalla del mapa con el menú flotante y las tarjetas.
-- Ideas comentadas y no aprobadas: pines con la nota escrita dentro, carrusel de tarjetas sobre el mapa, grupos de pines con la nota media, filtros como fichas flotantes y primera foto como portada de la ficha.
+- Ideas comentadas y no aprobadas: pines con la nota escrita dentro, carrusel de tarjetas sobre el mapa, grupos de pines con la nota media, y filtros como fichas flotantes. La portada de la ficha sí se aprobó el 24 de noviembre de 2026 (sección 4).
 
 Fuentes: https://developers.google.com/maps/documentation/javascript/cloud-customization/setup · https://developers.google.com/maps/documentation/javascript/mapcolorscheme · https://developers.google.com/maps/documentation/javascript/cloud-customization/json · https://developers.google.com/maps/documentation/javascript/cloud-customization/json-reference · https://developers.google.com/maps/documentation/javascript/cloud-customization/map-styles
 
@@ -168,7 +169,7 @@ Fuentes: https://developers.google.com/maps/documentation/javascript/cloud-custo
 |---|---|---|
 | `members/{correo}` | `role`: `owner`, `editor` o `viewer`. `color`: `azul`, `rosa` o ninguno | Propietarios |
 | `users/{uid}` | `displayName`, `color` (debe coincidir con el de `members`), `updatedAt` | Cada uno el suyo |
-| `restaurants/{id}` | `name`, `locality`, `address` (opcional), `location`, `cuisines`, `price`, `visitDate`, `blog`, `photos` (lista de `{full, thumb, caption}`), `placeId`, `source`, `createdBy`, `createdAt`, `updatedBy`, `updatedAt` | Editores |
+| `restaurants/{id}` | `name`, `locality`, `address` (opcional), `location`, `cuisines`, `price`, `visitDate`, `blog`, `photos` (lista de `{full, thumb, caption}`, y `cover: true` en la portada si se ha elegido), `placeId`, `source`, `createdBy`, `createdAt`, `updatedBy`, `updatedAt` | Editores |
 | `restaurants/{id}/ratings/{uid}` | `scores`, `global`, `dish`, `updatedAt` | Solo su autor, si tiene color |
 | `accessRequests/{uid}` | `email`, `displayName`, `status`, `createdAt` | El solicitante la crea; los propietarios la resuelven |
 
