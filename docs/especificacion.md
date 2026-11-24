@@ -226,6 +226,7 @@ Acordado el 23 de noviembre de 2026 y cambiado el 24: desde entonces cualquiera 
 - Queda a la vista de cualquiera que encuentre la dirección (el repo la enlaza): restaurantes, notas, textos, fotos y los nombres visibles de quien puntúa. Los correos (`members`) no.
 - Cada visita gasta lecturas de Firestore (50.000 gratis al día), cargas del mapa (con su tope diario, más abajo) y descargas de fotos de Storage. El coste de esas descargas en `europe-southwest1` no se ha comprobado; con el uso previsto debería ser de céntimos.
 - Sin sesión, nadie puede abusar de la Geocoding API ni del buscador: solo se usan en el alta.
+- Reglas de Firestore y de Storage con lectura pública publicadas en la consola el 24 de noviembre de 2026. Comprobado ese día sin sesión, desde la web publicada: se leen `restaurants` y `users`, `members` responde PERMISSION_DENIED y las fotos se descargan.
 
 ### Fotos (Storage)
 
