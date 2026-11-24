@@ -14,7 +14,7 @@ La demo (`demo/index.html`) ya no se actualiza. Sirve de referencia para el comp
 | Editor | ✔ | Si tiene color | ✔ | | |
 | Cualquiera, sin entrar | ✔ | | | | |
 
-- Puntúan solo dos personas, cada una con su color: **azul** (el propietario) y **rosa** (Cris). El color va en su documento de `members`.
+- Puntúan solo dos personas, cada una con su color: `azul` (el propietario) y `rosa` (Cris). El color va en su documento de `members`. Son nombres internos: desde el 24 de noviembre de 2026 se ven en **tinta** y **turquesa** (sección 7).
 - Puede haber más de un propietario. Hoy hay dos.
 - **La app se ve sin entrar, en solo lectura** (decidido por el propietario el 24 de noviembre de 2026): mapa, lista y fichas, con notas, textos, fotos y los nombres de quien puntúa, pero no los correos. Arriba a la derecha sale «Entra»; entrar con Google solo sirve para añadir, editar y puntuar. Quien entra sin permiso lo ve todo igual y su perfil le dice que no puede editar.
 - Los permisos se dan y se quitan en la consola de Firebase (`docs/accesos.md`); la pantalla de accesos del paso 4 se descartó el 24 de noviembre de 2026. El papel `viewer` y las solicitudes de acceso desaparecen con la app pública.
@@ -49,16 +49,16 @@ De arriba abajo:
 1. **Portada**: la foto marcada como portada o, si no hay ninguna, la primera, a todo el ancho y arriba del todo. Mientras carga se ve una rueda; al tocarla se amplía. Si el restaurante no tiene fotos, no hay portada (decidido el 24 de noviembre de 2026). **El nombre y las etiquetas van encima de la portada**, en blanco sobre un oscurecido que sube desde abajo, con las etiquetas translúcidas (pedido por el propietario el 24 de noviembre de 2026). Tocar fuera de las etiquetas amplía la foto.
 2. Nombre y dirección. **Etiquetas tocables** de localidad, tipos de cocina y precio: al tocar una, se abre el mapa con ese filtro puesto **sustituyendo** los filtros que hubiera. Fecha de visita. Con portada, aquí solo quedan la dirección y la fecha.
 3. Nota grande (la del selector) con su texto (Excel·lent, Molt bo…).
-4. **Barras por criterio, dos por criterio: azul y rosa**, cada una con su valor. En el plato estrella, cada persona con su estrella en su color, el nombre de su plato y su nota.
+4. **Barras por criterio, dos por criterio: tinta y turquesa**, cada una con su valor. En el plato estrella, cada persona con su estrella en su color, el nombre de su plato y su nota.
 5. **Nota media de cada uno**, en su color.
-6. **Roseta con dos líneas**, azul y rosa, con leyenda.
+6. **Roseta con dos líneas**, tinta y turquesa, con leyenda.
 7. **Texto largo** del restaurante.
 8. **Fotos al final**, cada una con su pie y también la portada. Al tocarla se amplía con el pie debajo. Mientras cargan se ve una rueda y aparecen con un fundido. En la foto ampliada se pasa a la anterior o la siguiente con flechas a los lados, deslizando el dedo o con las teclas de flecha, y debajo se ve «2 / 5» (24 de noviembre de 2026). Al llegar al final vuelve a la primera.
 9. **A Google Maps** (24 de noviembre de 2026, pedido por el propietario): si el sitio se eligió en el buscador de Google (tiene `placeId`), la tarjeta compacta de Google (Places UI Kit, Place Details compacto), en vertical, con foto arriba y galería, nombre, estrellas con número de reseñas, tipo, precio, si está abierto y su botón «Maps» al perfil. En horizontal, al ancho del iPhone, Google quitaba la foto. Sin `placeId`, o si la tarjeta no carga (por ejemplo, por el tope diario), sale «Obre a Google Maps» (Maps URLs: el sitio de Google o, si no lo hay, el punto del pin).
    - El UI Kit queda fuera de las restricciones del EEE y no hace falta mostrarlo con un mapa. Cada tarjeta creada cuenta una consulta «Places UI Kit Query» (categoría Essentials, 10.000 gratis al mes y después 1 dólar por 1.000; comprobado el 24 de noviembre de 2026). La app guarda cada tarjeta creada y redibujar la ficha no la vuelve a pedir. Por dentro, Google descarga además las fotos de su galería (10 en la prueba). No se ha comprobado qué cuota diaria de Google Cloud cuenta estas tarjetas: probablemente «Query Requests» de Places UI Kit, que tiene un tope de 300.
 10. Acciones: «Comparteix» (todos, también sin entrar); «Mostra al mapa»; «Puntua» o «Edita la meva nota» (quien puntúa), que abre solo su nota; «Edita» (editores), que abre la edición completa (sección 6); «Esborra» (propietario).
 
-Pendiente: la maqueta de la ficha con el aspecto de la sección 7, y comprobar en la app que las barras y la roseta azul y rosa se leen bien junto al morado.
+Las maquetas del aspecto (24 de noviembre de 2026) incluyeron la ficha; las barras en tinta y turquesa se comprobaron en la app en local, en claro y oscuro.
 
 ## 5. Alta de un restaurante
 
@@ -118,62 +118,71 @@ Decidido el 24 de noviembre de 2026, al aprobar el enfoque de la parte 3g:
 
 ## 7. Aspecto: colores, modo oscuro y menú
 
-Acordado el 24 de noviembre de 2026 con maquetas. Sustituye al aspecto de la demo (paleta náutica).
+Elegido por el propietario el 24 de noviembre de 2026 con maquetas, entre la paleta anterior («Berenjena», morado y amarillo; en el historial de git) y tres propuestas pastel. Pidió quitar el «estilo IA» (letra, botones muy redondos, falta de detalles, colores) e ir cambiando cosas pequeñas.
 
-### Paleta «Berenjena»
+### Paleta «Terracota suau»
 
-Dos colores protagonistas: morado y amarillo mostaza.
+Tonos pastel poco saturados: terracota suave (el color de la icona) y amarillo mantequilla. El acento es pastel y lleva texto oscuro; para textos y enlaces se usa su versión intensa.
 
 | Uso | Claro | Oscuro |
 |---|---|---|
-| Fondo | `#fbf7ff` | `#151020` |
-| Superficies | `#ffffff` | `#211a2e` |
-| Texto | `#2a1a40` | `#efe9f7` |
-| Texto secundario | `#6d6180` | `#a79bb8` |
-| Acento principal (menú, botones) | `#6b3fa0` | `#b48be0` |
-| Texto sobre el acento principal | `#ffffff` | `#170f22` |
-| Acento secundario (botón «+», detalles) | `#ffb81c` | `#ffc444` |
-| Texto sobre el acento secundario | `#2a1a05` | `#2a1a05` |
-| Líneas y pistas de barras | `#e7dcf3` / `#efe8f6` | `#3a2f4a` / `#2f2640` |
-| Azul (propietario) | `#2f6fd0` | `#6ea8ff` |
-| Rosa (Cris) | `#d6457f` | `#ff7fb5` |
+| Fondo | `#faf6f2` | `#18130f` |
+| Superficies | `#fffdfb` / `#f4ede6` | `#211a15` / `#2b231d` |
+| Texto | `#33261f` | `#f2e9e2` |
+| Texto secundario | `#74645a` | `#b5a597` |
+| Líneas y pistas de barras | `#ebe1d7` / `#efe6dd` | `#392f28` / `#332a23` |
+| Acento (botones, «+», fichas marcadas) | `#eec0ab` | `#eec0ab` |
+| Texto sobre el acento | `#46200f` | `#3a170b` |
+| Acento intenso (enlaces, progreso, detalles) | `#a3553a` | `#f0c6b3` |
+| Amarillo mantequilla | `#e9dba8` | `#e9dba8` |
+| Peligro y errores | `#b3393f` | `#f0a0a0` |
 
-- Los colores de nota (`--s1` a `--s5` de `app/styles.css`) no cambian, ni en claro ni en oscuro.
-- Sobre el amarillo, el texto es siempre oscuro, en los dos modos.
-- En oscuro, el fondo es morado muy oscuro, no negro.
-- El acento no puede ser azul medio ni rosa, porque son los colores de quien puntúa.
-- El `theme-color` de `index.html` y del manifiesto pasa a la paleta nueva.
+**Quien puntúa**, colores propios de esta paleta (fuera de los verdes, amarillos, naranjas y rojos de las notas, y con claridad distinta entre los dos). La app los sigue guardando como `azul` y `rosa`; se muestran como «tinta» y «turquesa».
+
+| Persona | Barra, puntos, avatar | Números y nombres (claro / oscuro) | Texto sobre la barra |
+|---|---|---|---|
+| Isidre, tinta (`azul`) | `#8a93b5` / `#a3acd0` | `#343e6a` / `#c6cce6` | `#161c38` |
+| Cris, turquesa (`rosa`) | `#7cc2c0` / `#8fd0ce` | `#23686a` / `#b6e4e2` | `#0d3135` |
+
+**Notas**: los mismos cinco tonos pastel en claro y oscuro, con el número siempre oscuro (`#2b211b`): 9 o más `#a8d8bd`, 8 `#c9e2a0`, 7 `#f3dc94`, 5 y 6 `#f5c19c`, menos de 5 `#f0a9a9`; sin nota, `#e3dad2` (`#c9bdb2` en oscuro). Los colores de nota no se usan como texto.
+
+### Letra, formas y detalles
+
+- Letra del sistema (SF Pro en el iPhone), sin cargar letras de Google. Títulos en seminegrita.
+- Esquinas poco redondas: tarjetas 10 px, botones y campos 8 px, etiquetas 8 px (antes, pastillas), notas 10 y 14 px.
+- Títulos de sección en minúscula y a 15 px («La teva nota», «Fotos»), sin mayúsculas espaciadas.
+- `theme-color` de `index.html` y del manifiesto con las superficies de la paleta.
 
 ### Modo claro y oscuro
 
-- La app sigue siempre el modo del sistema. No hay interruptor manual, así que sobran las reglas `:root[data-theme="light"]` y `:root[data-theme="dark"]` de `app/styles.css`.
+- La app sigue siempre el modo del sistema. No hay interruptor manual.
 
 ### Menú inferior flotante
 
-- Pastilla redondeada, separada de los bordes, con fondo del acento principal, flotando sobre el mapa.
-- En el centro, un botón «+» más grande en el acento secundario para añadir restaurante. A los lados, Mapa y Llista.
+- Pieza clara y redondeada (22 px), con borde fino, separada de los bordes y flotando sobre el mapa. La sección activa en el acento intenso sobre fondo suave.
+- En el centro, un botón «+» más grande, cuadrado redondeado, en el acento con texto oscuro. A los lados, Mapa y Llista.
 
 ## 8. Mapa
 
-- Estilo propio en la nube de Google: **«Lavanda»** para el modo claro y **«Noche»** para el oscuro. Son dos estilos de Google, uno de variante clara y otro oscura, asociados al mismo Map ID: cada Map ID admite uno de cada.
+- Estilo propio en la nube de Google: **«Terracota»** para el modo claro y **«Terracota nit»** para el oscuro, a juego con la paleta (24 de noviembre de 2026; antes, «Lavanda» y «Noche», en el historial de git). Son dos estilos de Google, uno de variante clara y otro oscura, asociados al mismo Map ID: cada Map ID admite uno de cada.
 - El mapa se crea con `colorScheme: FOLLOW_SYSTEM`. Solo se puede fijar al crearlo: si el sistema cambia de modo con la app abierta, el mapa no cambia hasta volver a abrirla. Aceptado.
 - En los dos modos se ocultan los puntos de interés de Google (comercios y restaurantes). Se dejan los nombres de pueblos y del mar.
 
-| Elemento | Lavanda | Noche |
+| Elemento | Terracota | Terracota nit |
 |---|---|---|
-| Mar | `#d9cdf0` | `#17203a` |
-| Tierra | `#f7f2fd` | `#241d30` |
-| Línea de costa | `#c9b6e6` | `#3a2f4a` |
-| Parques y zonas verdes | `#ece2f8` | `#2a2338` |
-| Carreteras principales | `#ffd77a` | `#5a4a2a` |
-| Carreteras secundarias | `#e3d6f3` | `#33293f` |
-| Etiquetas de pueblos | `#6b3fa0` | `#a79bb8` |
-| Etiquetas del mar | `#6b3fa0` | `#6e7fa8` |
+| Mar | `#cfe3e1` | `#142427` |
+| Tierra | `#f8f3ee` | `#221b16` |
+| Cubierta del suelo | `#efe7dc` | `#29211b` |
+| Parques y zonas verdes | `#ebe6d6` | `#29241c` |
+| Carreteras principales | `#f1d9b5` | `#5a4630` |
+| Carreteras secundarias | `#ebe1d6` | `#33291f` |
+| Etiquetas de pueblos | `#7a4a35` | `#b5a597` |
+| Etiquetas del mar | `#3f7a78` | `#6fa5a3` |
 
-- La línea de costa no se ha podido aplicar: al importar, Google rechaza el color de borde en el agua (`strokeColor` en `natural.water`, 24 de noviembre de 2026). La costa queda como el contraste entre mar y tierra.
+- La línea de costa no se puede aplicar: al importar, Google rechaza el color de borde en el agua (`strokeColor` en `natural.water`, 24 de noviembre de 2026). La costa queda como el contraste entre mar y tierra.
 - Coste: usar un Map ID se cobra con el SKU de Dynamic Maps, el mismo de cada carga del mapa; no añade coste aparte. Comprobado el 24 de noviembre de 2026.
-- Los dos estilos están en `docs/mapa/lavanda.json` y `docs/mapa/noche.json`, con los colores de la tabla. Se importan en la consola de Google Cloud desde «Diseños de mapa» → «Crear estilo» → pestaña JSON (comprobado en la documentación el 24 de noviembre de 2026). Si se retocan en la consola, conviene exportarlos y actualizar estos archivos.
-- Hecho el 24 de noviembre de 2026: estilos importados y Map ID «Puntuam a taula» (`ef2c6b7a22cee90b3aee6ac8`, vectorial, sin inclinación ni rotación) con «Lavanda» en claro y «Noche» en oscuro. Está en `app/config.js`.
+- Los dos estilos están en `docs/mapa/terracota.json` y `docs/mapa/terracota-nit.json`, con los colores de la tabla. Se importan en la consola de Google Cloud desde «Diseños de mapa» → «Crear estilo» → pestaña JSON (comprobado en la documentación el 24 de noviembre de 2026) y se asocian al Map ID en lugar de los anteriores. Si se retocan en la consola, conviene exportarlos y actualizar estos archivos.
+- Map ID «Puntuam a taula» (`ef2c6b7a22cee90b3aee6ac8`, vectorial, sin inclinación ni rotación), en `app/config.js`. El 24 de noviembre de 2026 tenía «Lavanda» y «Noche»; cambiarlos por «Terracota» y «Terracota nit» es tarea del propietario, pendiente.
 - El mapa del formulario usa el mismo estilo, así que tampoco muestra los restaurantes de Google: el sitio elegido en el buscador lo marca el aro (sección 5).
 - Pendiente: la maqueta de la pantalla del mapa con el menú flotante y las tarjetas.
 - Ideas comentadas y no aprobadas: pines con la nota escrita dentro, carrusel de tarjetas sobre el mapa, grupos de pines con la nota media, y filtros como fichas flotantes. La portada de la ficha sí se aprobó el 24 de noviembre de 2026 (sección 4).

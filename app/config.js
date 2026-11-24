@@ -37,8 +37,9 @@ export const CUISINE_RENAMES = {
   'Italiano': 'Italià', 'Italiana': 'Italià', 'Arroces': 'Arrossos', 'De autor': 'Autor', 'Mediterránea': 'Mediterrània',
   'Pescado y marisco': 'Peix i marisc', 'Tapas': 'Tapes', 'Otra': 'Altres'
 };
-// Nom de cada color per mostrar-lo.
-export const COLOR_NAMES = { azul: 'blau', rosa: 'rosa' };
+// Nom de cada color per mostrar-lo. «azul» i «rosa» són els noms que guarda l'app (members i users); des del
+// 24 de novembre de 2026 es veuen en tinta i turquesa (docs/diseno.md, secció 7).
+export const COLOR_NAMES = { azul: 'tinta', rosa: 'turquesa' };
 // Precio por persona, sin bebida. Se guarda como 1 a 4.
 export const PRICES = ['<20\u00a0€', '20-50\u00a0€', '50-100\u00a0€', '>100\u00a0€'];
 

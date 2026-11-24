@@ -28,7 +28,7 @@ App personal para puntuar y reseñar los restaurantes visitados.
 | Alojamiento | GitHub Pages desde este repo, que es público. Desde el 24 de noviembre de 2026 lo publica un flujo de GitHub Actions que añade las páginas de compartir de cada ficha (`docs/publicacion.md`). |
 | UI | La estructura de la demo (`demo/index.html`), aprobada por el propietario, con el aspecto, el alta y la edición de `docs/diseno.md` (secciones 5 a 8). |
 | Idioma de la app | Catalán. Ver `docs/diseno.md`. |
-| Compartir | Puntúan dos personas (azul y rosa). La app se ve sin entrar y cada ficha se comparte con un enlace (24 de noviembre de 2026). Ver `docs/diseno.md`, sección 1. |
+| Compartir | Puntúan dos personas (colores tinta y turquesa). La app se ve sin entrar y cada ficha se comparte con un enlace (24 de noviembre de 2026). Ver `docs/diseno.md`, sección 1. |
 | Ámbito | También restaurantes de fuera de Mallorca. La localidad se saca de la dirección de Google. Solo se escribe a mano si Google no la da, y entonces el campo sugiere las ya usadas, para evitar variantes del mismo sitio. |
 | Técnica | HTML, CSS y JavaScript sin framework ni paso de compilación. |
 | Orden de construcción | El de la sección 6. |
@@ -81,7 +81,7 @@ Menú inferior flotante con Mapa y Llista a los lados y un botón «+» central 
 - Los pines que se solapan se agrupan en un círculo con el número. Se separan al acercar.
 - Al tocar un pin aparece una tarjeta resumen con acceso a la ficha. El pin seleccionado queda visible por encima de la tarjeta.
 - Leyenda de colores.
-- Estilo propio «Lavanda» en claro y «Noche» en oscuro, sin los puntos de interés de Google (`docs/diseno.md`, sección 8).
+- Estilo propio «Terracota» en claro y «Terracota nit» en oscuro (antes, «Lavanda» y «Noche»), sin los puntos de interés de Google (`docs/diseno.md`, sección 8).
 
 ### Lista
 
@@ -132,7 +132,7 @@ Detalle en `docs/diseno.md`, sección 4.
 - La base del mapa pasa a ser Google Maps. La demo dibuja un contorno de Mallorca con municipios porque no podía cargar mapas externos.
 - La localidad se saca de la dirección de Google. En la demo es una lista cerrada de municipios de Mallorca que se detecta sola al tocar el mapa.
 - Se añade "usar mi ubicación" al situar el restaurante.
-- El aspecto cambia: paleta «Berenjena», mapa «Lavanda» y «Noche» y menú inferior flotante (`docs/diseno.md`, secciones 7 y 8).
+- El aspecto cambia: paleta «Terracota suau» con letra del sistema, mapa «Terracota» y «Terracota nit» y menú inferior flotante (`docs/diseno.md`, secciones 7 y 8). Antes del 24 de noviembre de 2026, «Berenjena», «Lavanda» y «Noche».
 - El alta va en cuatro pasos y la edición en una sola pantalla.
 - Los textos están en catalán.
 - Los datos y las fotos se guardan de verdad. Las fotos se comprimen antes de subirlas.
@@ -293,7 +293,7 @@ Creado el 23 de noviembre de 2026. Son identificadores públicos: pueden ir en e
 | Firestore | Edición Standard, `(default)`, `europe-southwest1` (Madrid), modo de producción, sin copias programadas |
 | Storage | `puntuam-a-taula.firebasestorage.app`, `europe-southwest1`, clase Standard, modo de producción |
 | Authentication | Solo Google. Dominios autorizados: `localhost` e `isidrecc.github.io` |
-| Map ID | «Puntuam a taula», `ef2c6b7a22cee90b3aee6ac8`, JavaScript vectorial, con los estilos «Lavanda» (claro) y «Noche» (oscuro). Creado el 24 de noviembre de 2026 |
+| Map ID | «Puntuam a taula», `ef2c6b7a22cee90b3aee6ac8`, JavaScript vectorial. Creado el 24 de noviembre de 2026 con los estilos «Lavanda» (claro) y «Noche» (oscuro); pasan a «Terracota» y «Terracota nit» (`docs/mapa/`) |
 
 Configuración web:
 

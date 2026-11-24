@@ -1048,7 +1048,7 @@ function renderProfile() {
   $('#sheet-profile .sheet-foot').classList.toggle('one', !member);
   $('#p-name').value = p ? p.name : (me.displayName || '');
   $('#p-role').innerHTML = member
-    ? 'Paper: <b>' + ROLE_NAMES[me.role] + '</b>' + (me.color ? ' · puntues en <b class="p-' + me.color + '" style="color:var(--pc)">' + COLOR_NAMES[me.color] + '</b>' : '') +
+    ? 'Paper: <b>' + ROLE_NAMES[me.role] + '</b>' + (me.color ? ' · puntues en <b class="p-' + me.color + '" style="color:var(--pc-text)">' + COLOR_NAMES[me.color] + '</b>' : '') +
       '<br><span class="meta">' + esc(me.email) + '</span>'
     : 'Has entrat com a <b>' + esc(me.email) + '</b>. Pots veure-ho tot, però no afegir ni puntuar restaurants: t’hi ha de donar permís un propietari.';
   // Los permisos se dan y se quitan en la consola de Firebase (docs/accesos.md).
