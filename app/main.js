@@ -277,28 +277,68 @@ function homeTasting() {
     return a.r.name.localeCompare(b.r.name, 'ca');
   }).map((x) => x.r);
 }
-// Foto de la tarjeta: la portada propia; si no hay, la de Google (se pone al verse, ver flushHomePhotos);
+// Foto de la noticia: la portada propia; si no hay, la de Google (se pone al verse, ver flushHomePhotos);
 // si tampoco, un recuadro con un plato.
-function homePhoto(r, wide, slot) {
+function homePhoto(r, slot) {
   const ci = coverIndex(r.photos);
   const open = ' data-act="open" data-id="' + esc(r.id) + '"';
-  if (ci >= 0) {
-    const p = r.photos[ci];
-    return '<div class="thumb hcard-photo"' + open + '><img data-path="' + esc(wide ? p.full : p.thumb) + '" alt=""></div>';
-  }
-  if (r.placeId) return '<div class="hcard-google"' + open + ' data-place="' + esc(r.placeId) + '" data-slot="' + slot + '"></div>';
-  return '<div class="hcard-photo hcard-none"' + open + '>' + PLATE + '</div>';
+  if (ci >= 0) return '<div class="thumb news-photo"' + open + '><img data-path="' + esc(r.photos[ci].full) + '" alt=""></div>';
+  if (r.placeId) return '<div class="hcard-google news-photo"' + open + ' data-place="' + esc(r.placeId) + '" data-slot="' + slot + '"></div>';
+  return '<div class="news-photo news-none"' + open + '>' + PLATE + '</div>';
 }
-function homeCard(r, wide, slot) {
+// Entradilla: el principio del comentario, cortado en una palabra.
+function standfirst(text, max) {
+  const first = (text || '').split(/\n\s*\n/)[0].replace(/\s+/g, ' ').trim();
+  if (first.length <= max) return first;
+  return first.slice(0, max).replace(/\s+\S*$/, '') + '…';
+}
+// Quién ha puntuado: «Isidre», «Isidre i Cris».
+function ratersText(r) {
+  return people.filter((pp) => r.ratings[pp.uid]).map((pp) => pp.name).join(' i ');
+}
+// Antetítulo: localidad y cocina (sin la que da nombre a la sección) y precio.
+function kicker(r, skip) {
+  return [r.locality, r.cuisines.filter((c) => c !== skip).join(', '), r.price].filter(Boolean).join(' · ');
+}
+// Firma: la nota con su texto, quién ha puntuado y la fecha; o «Pendent de visitar».
+function byline(r) {
   const g = agg(r).g;
-  const body = wide
-    ? rowHTML(r)
-    : '<span class="row"><span class="score is-small ' + cls(g) + (g == null ? ' is-empty' : '') + '">' + scoreLabel(r, g) + '</span>' +
-      '<span class="row-main"><strong class="hcard-name">' + esc(r.name) + '</strong><span class="meta">' + esc([r.locality, r.price].filter(Boolean).join(' · ')) + '</span></span></span>';
-  return '<article class="hcard' + (wide ? ' is-wide' : '') + '">' + homePhoto(r, wide, slot) +
-    '<button class="hcard-body" type="button" data-act="open" data-id="' + esc(r.id) + '">' + body + '</button></article>';
+  const pending = isPending(r) && g == null;
+  // Pendiente: sin recuadro de nota, ya lo dice el texto.
+  const tile = pending ? '' : '<span class="score is-small ' + cls(g) + (g == null ? ' is-empty' : '') + '">' + fmt(g) + '</span>';
+  const bits = pending
+    ? ['<b>Pendent de visitar</b>']
+    : ['<b>' + esc(word(g)) + '</b>', ratersText(r) ? 'Per ' + esc(ratersText(r)) : '', r.visitDate ? esc(fmtDate(r.visitDate)) : ''].filter(Boolean);
+  return '<span class="byline">' + tile + '<span>' + bits.join(' · ') + '</span></span>';
+}
+// Noticia principal de cada sección: foto, antetítulo, titular, entradilla y firma.
+function leadHTML(r, slot, skip) {
+  const dish = agg(r).list.find((o) => o.dish);
+  const text = standfirst(r.blog, 190) || (dish ? 'Plat estrella: ' + dish.dish + (dish.scores.plato != null ? ' (' + fmt(dish.scores.plato) + ')' : '') + '.' : '');
+  return '<article class="lead">' + homePhoto(r, slot) +
+    '<button class="lead-body" type="button" data-act="open" data-id="' + esc(r.id) + '">' +
+      '<span class="kicker">' + esc(kicker(r, skip)) + '</span>' +
+      '<span class="headline">' + esc(r.name) + '</span>' +
+      (text ? '<span class="standfirst">' + esc(text) + '</span>' : '') +
+      byline(r) +
+    '</button></article>';
+}
+// Breves: solo texto, separados por filetes (sin fotos: tampoco se piden a Google).
+function briefsHTML(list, skip) {
+  if (!list.length) return '';
+  return '<ul class="briefs">' + list.map((r) => {
+    const g = agg(r).g;
+    return '<li><button class="brief" type="button" data-act="open" data-id="' + esc(r.id) + '">' +
+      '<span class="brief-text"><span class="kicker">' + esc(kicker(r, skip)) + '</span>' +
+      '<span class="brief-title">' + esc(r.name) + '</span>' +
+      '<span class="brief-meta">' + (isPending(r) && g == null ? 'Pendent de visitar' : esc(word(g)) + (ratersText(r) ? ' · Per ' + esc(ratersText(r)) : '')) + '</span></span>' +
+      (isPending(r) && g == null ? '' : '<span class="score is-small ' + cls(g) + (g == null ? ' is-empty' : '') + '">' + fmt(g) + '</span>') +
+    '</button></li>';
+  }).join('') + '</ul>';
 }
 // Solo se dibuja con Inici a la vista (o debajo de una ficha); si no, se apunta y se dibuja al volver.
+// Portada de periódico (pedida por el propietario el 24 de noviembre de 2026): fecha del día, secciones con
+// filete y, en cada una, una noticia principal con foto y el resto como breves.
 let homeDirty = true;
 function renderHome() {
   const box = $('#home');
@@ -307,23 +347,25 @@ function renderHome() {
   if (!dataReady) { box.innerHTML = ''; return; }
   const rec = homeRecommended();
   const tasting = homeTasting();
-  let html = '';
+  const today = new Date().toLocaleDateString('ca-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  let html = '<div class="paper-date"><span>' + esc(today) + '</span><span>' + restaurants.length + (restaurants.length === 1 ? ' restaurant' : ' restaurants') + '</span></div>';
+  let any = false;
   if (rec.length || canEditData()) {
-    html += '<section class="home-sec" aria-labelledby="h-rec"><div class="home-head"><h2 class="home-title" id="h-rec">Recomanació per menys de 40 €</h2></div>' +
-      (rec.length
-        ? '<div class="hrow' + (rec.length > 1 ? ' is-many' : '') + '">' + rec.map((r) => homeCard(r, true, 'rec')).join('') + '</div>'
+    any = true;
+    html += '<section class="news-sec" aria-labelledby="h-rec"><div class="news-head"><h2 class="news-label" id="h-rec">Recomanació · menys de 40 €</h2></div>' +
+      (rec.length ? leadHTML(rec[0], 'rec', '') + briefsHTML(rec.slice(1), '')
         : '<p class="hint">Encara no n’hi ha cap. Es marca a «Edita», en un restaurant de menys de 40 €.</p>') +
       '</section>';
   }
   if (tasting.length || canEditData()) {
-    html += '<section class="home-sec" aria-labelledby="h-tast"><div class="home-head"><h2 class="home-title" id="h-tast">Millors menús degustació</h2>' +
+    any = true;
+    html += '<section class="news-sec" aria-labelledby="h-tast"><div class="news-head"><h2 class="news-label" id="h-tast">Millors menús degustació</h2>' +
       (tasting.length ? '<button class="link-btn" type="button" data-act="map-filter" data-g="cuisines" data-v="' + esc(DEGUSTACIO) + '">Veure’ls al mapa</button>' : '') + '</div>' +
-      (tasting.length
-        ? '<div class="hrow">' + tasting.map((r) => homeCard(r, false, 'tast')).join('') + '</div>'
+      (tasting.length ? leadHTML(tasting[0], 'tast', DEGUSTACIO) + briefsHTML(tasting.slice(1), DEGUSTACIO)
         : '<p class="hint">Encara no n’hi ha cap amb el tipus «' + esc(DEGUSTACIO) + '».</p>') +
       '</section>';
   }
-  if (!html) html = '<div class="empty"><p>Encara no hi ha res a destacar.</p></div>';
+  if (!any) html += '<div class="empty"><p>Encara no hi ha res a destacar.</p></div>';
   box.innerHTML = html;
   hydratePhotos(box);
   watchHomePhotos();

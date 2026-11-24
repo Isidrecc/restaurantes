@@ -32,15 +32,16 @@
   --s0: #e3dad2;
   --score-ink: #2b211b;
   --danger: #b3393f;
-  /* Inici: fondo más claro y tarjetas más oscuras que el fondo, para que destaquen (pedido por el propietario
-     el 24 de noviembre de 2026). En oscuro, al revés: tarjetas más claras. Solo en esa pantalla. */
+  /* Inici (portada de periódico): papel blanco, filetes y fondo de las fotos mientras cargan. Solo en esa
+     pantalla (pedido por el propietario el 24 de noviembre de 2026). */
   --home-bg: #ffffff;
-  --home-card: #f3eae2;
-  --home-line: #e5d8cb;
-  --home-ph: #e9ddd2;
+  --home-line: #ddd1c5;
+  --home-ph: #efe6dd;
   --shadow: 0 6px 24px rgba(51, 38, 31, .14);
   --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, system-ui, sans-serif;
   --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, system-ui, sans-serif;
+  /* Titulares de Inici con serifa: New York en el iPhone (ui-serif), Georgia en otros sistemas. */
+  --font-serif: ui-serif, "New York", "Iowan Old Style", Georgia, "Times New Roman", serif;
   --title-weight: 600;
   --r-card: 10px;
   --r-ctl: 8px;
@@ -77,9 +78,8 @@
     --s0: #c9bdb2;
     --danger: #f0a0a0;
     --home-bg: #18130f;
-    --home-card: #31281f;
     --home-line: #45392f;
-    --home-ph: #3b3027;
+    --home-ph: #2b231d;
     --shadow: 0 6px 24px rgba(0, 0, 0, .5);
     color-scheme: dark;
   }
@@ -704,48 +704,46 @@ img[data-path]:not([src]) { visibility: hidden; }
   .thumb::after, .lightbox::after { animation-duration: 3s; }
 }
 
-/* Inici (docs/diseno.md, sección 4b): paneles con tarjetas que se deslizan en horizontal. La foto de Google va
-   en su propio recuadro, sin nada encima, y el texto de la app debajo (condiciones de atribución de Google). */
-#view-home { overflow-y: auto; -webkit-overflow-scrolling: touch; }
-.home { display: flex; flex-direction: column; gap: 24px; padding: 16px 16px var(--menu-space); }
-.home-sec { display: flex; flex-direction: column; gap: 10px; }
-.home-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.home-title { font: var(--title-weight) 17px/1.25 var(--font-display); }
-.home-head .link-btn { flex: none; }
-.hrow {
-  display: flex; gap: 12px; align-items: stretch;
-  margin: 0 -16px; padding: 2px 16px 6px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 16px;
-  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+/* Inici (docs/diseno.md, sección 4b): portada de periódico, pedida por el propietario el 24 de noviembre de 2026.
+   Fecha del día entre filetes; secciones con filete grueso y nombre en versalitas; en cada una, una noticia
+   principal (foto, antetítulo, titular con serifa, entradilla y firma) y el resto como breves de solo texto.
+   Sin tarjetas: papel blanco en claro y el fondo de siempre en oscuro. La foto de Google va en su propio
+   recuadro, sin nada encima, con su atribución debajo como crédito (condiciones de atribución de Google). */
+#view-home { overflow-y: auto; -webkit-overflow-scrolling: touch; background: var(--home-bg); }
+.home { display: flex; flex-direction: column; padding: 0 16px var(--menu-space); }
+.paper-date {
+  display: flex; justify-content: space-between; gap: 12px; padding: 9px 0 8px;
+  border-bottom: 1px solid var(--home-line);
+  font: 600 11px/1.3 var(--font-body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
 }
-.hrow::-webkit-scrollbar { display: none; }
-.hcard {
-  flex: none; width: 224px; scroll-snap-align: start;
-  display: flex; flex-direction: column;
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); overflow: hidden;
-}
-.hcard.is-wide { width: 100%; }
-.hrow.is-many .hcard.is-wide { width: calc(100% - 28px); }
-/* En una fila, las tarjetas miden lo mismo: la foto crece y el texto queda abajo. */
-.hcard-photo, .hcard-google { flex: 1 0 auto; cursor: pointer; }
-.thumb.hcard-photo { aspect-ratio: 4 / 3; border: 0; border-radius: 0; }
-.hcard.is-wide .thumb.hcard-photo { aspect-ratio: 16 / 10; }
-.hcard-none { aspect-ratio: 4 / 3; display: grid; place-items: center; background: var(--surface-2); color: var(--muted); }
-.hcard.is-wide .hcard-none { aspect-ratio: 16 / 10; }
-/* Recuadro de Google: separado del texto con una línea; mientras carga, el sitio de la foto. */
-.hcard-google { position: relative; border-bottom: 1px solid var(--line); }
-.hcard-google:not([data-state="loaded"]) { aspect-ratio: 4 / 3; display: grid; place-items: center; background: var(--surface-2); color: var(--muted); }
-.hcard.is-wide .hcard-google:not([data-state="loaded"]) { aspect-ratio: 16 / 10; }
+.paper-date span:first-child::first-letter { text-transform: uppercase; }
+.news-sec { margin-top: 18px; padding-top: 8px; border-top: 3px solid var(--ink); }
+.news-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.news-head .link-btn { flex: none; padding-right: 0; }
+.news-label { font: 800 12px/1.3 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--ink); }
+.news-sec > .hint { margin-top: 10px; }
+.lead { margin-top: 12px; display: flex; flex-direction: column; }
+.lead-body, .brief { display: flex; width: 100%; padding: 0; border: 0; background: transparent; text-align: left; color: inherit; }
+.lead-body { flex-direction: column; gap: 6px; padding-top: 10px; }
+.kicker { font: 700 11px/1.35 var(--font-body); letter-spacing: .07em; text-transform: uppercase; color: var(--accent-strong); }
+.headline { font: 700 28px/1.1 var(--font-serif); letter-spacing: -.01em; overflow-wrap: anywhere; }
+.standfirst { font: 400 16px/1.45 var(--font-serif); color: var(--ink); }
+.byline { display: flex; align-items: center; gap: 10px; margin-top: 4px; font-size: 13px; color: var(--muted); }
+.byline b { color: var(--ink); font-weight: 600; }
+/* Foto de la noticia: esquinas rectas, como en papel. */
+.news-photo { cursor: pointer; }
+.thumb.news-photo { aspect-ratio: 3 / 2; border: 0; border-radius: 0; }
+.news-none { aspect-ratio: 3 / 2; display: grid; place-items: center; background: var(--home-ph); color: var(--muted); }
+/* Recuadro de Google: mientras carga, el sitio de la foto; cargado, foto y crédito «Google Maps» debajo. */
+.hcard-google { position: relative; }
+.hcard-google:not([data-state="loaded"]) { aspect-ratio: 3 / 2; display: grid; place-items: center; background: var(--home-ph); color: var(--muted); }
 .hcard-google:not([data-state="loaded"]) > :not(svg) { position: absolute; opacity: 0; pointer-events: none; }
-.hcard-google > :not(svg) { width: 100%; border: 0; border-radius: 0; }
-.hcard-body { flex: none; display: block; width: 100%; padding: 10px 12px 12px; border: 0; background: transparent; text-align: left; color: inherit; }
-.hcard-name { font: var(--title-weight) 15px/1.25 var(--font-display); overflow-wrap: anywhere; }
+.hcard-google > :not(svg) { width: 100%; border: 0; border-radius: 0; --gmp-mat-color-surface: var(--home-bg); background: var(--home-bg); }
+/* Breves: solo texto, con filetes finos entre ellos. */
+.briefs { list-style: none; margin: 16px 0 0; padding: 0; border-top: 1px solid var(--home-line); }
+.brief { align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--home-line); }
+.brief-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.brief-title { font: 700 19px/1.2 var(--font-serif); overflow-wrap: anywhere; }
+.brief-meta { font-size: 13px; color: var(--muted); }
 .score.is-small { width: 44px; height: 44px; font-size: 17px; }
 .score.is-small.is-empty { font-size: 10px; padding: 2px; }
-/* Colores propios de Inici (variables --home-*). El recuadro de Google toma el fondo de la tarjeta con su
-   propiedad --gmp-mat-color-surface (comprobada en la documentación de Google el 24 de noviembre de 2026);
-   la línea de debajo lo sigue separando del texto de la app. */
-#view-home { background: var(--home-bg); }
-.home .hcard { background: var(--home-card); border-color: var(--home-line); }
-.home .hcard-none, .home .hcard-google:not([data-state="loaded"]) { background: var(--home-ph); }
-.home .hcard-google { border-bottom-color: var(--home-line); }
-.home .hcard-google > :not(svg) { --gmp-mat-color-surface: var(--home-card); background: var(--home-card); }
