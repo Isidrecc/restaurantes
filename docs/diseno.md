@@ -250,7 +250,7 @@ Orden aprobado por el propietario el 24 de noviembre de 2026. Al final de cada p
 
 Tareas del propietario hechas: publicar las reglas de Firestore que aceptan `address` (comprobado el 24 de noviembre de 2026 al guardar en la app publicada un restaurante con la dirección de Google), poner `color` en los dos documentos de `members`, borrar las fichas de prueba y crear el Map ID con los estilos (sección 8).
 
-Fichas de prueba que el propietario decidió conservar por ahora (24 de noviembre de 2026): «Celler de proves» y «Prova Claude (esborrar)».
+Fichas de prueba que el propietario decidió conservar por ahora (24 de noviembre de 2026): «Celler de proves» y «Prova Claude (esborrar)». Esa misma noche ya solo quedaba la segunda.
 
 ### Peticiones del 24 de noviembre de 2026, por partes
 
@@ -260,7 +260,7 @@ Lista del propietario de ese día, ordenada en partes. Al final de cada una se l
 |---|---|---|
 | 1 · Ficha y mapa | Cabecera de la ficha según su boceto, tarjeta de Google pequeña y mapa que se abre en Palma (sección 4) | Publicada el 24 de noviembre de 2026 |
 | 2 · Datos | Cinco tramos de precio, «Pendent de visitar» y la marca de recomendación de la página de inicio (secciones 2, 5 y 6). Reglas de Firestore nuevas publicadas por el propietario | Publicada el 24 de noviembre de 2026. Comprobada al guardar Bar Vius como recomendado |
-| 3 · Inici | Página de inicio como primera pantalla, con el menú «Inici · Mapa · + · Llista». Paneles «Recomanació per menys de 40 €» (el restaurante marcado, empezando por Bar Vius; sin foto propia, la de Google) y «Millors menús degustació» (tarjetas que llevan a la ficha y «Veure'ls al mapa» con el filtro Menú degustació) (sección 4b). Alta de Miceli, Tomeu Caldentey, Boro, Santi Taura y Daica como pendientes de visitar, con el tipo Menú degustació y precio «>100 €» mientras el propietario no diga otro | Pantalla publicada el 24 de noviembre de 2026. Falta dar de alta los cinco restaurantes |
+| 3 · Inici | Página de inicio como primera pantalla, con el menú «Inici · Mapa · + · Llista». Paneles «Recomanació per menys de 40 €» (el restaurante marcado, empezando por Bar Vius; sin foto propia, la de Google) y «Millors menús degustació» (tarjetas que llevan a la ficha y «Veure'ls al mapa» con el filtro Menú degustació) (sección 4b). Alta de Miceli, Tomeu Caldentey, Boro, Santi Taura y Daica como pendientes de visitar, con el tipo Menú degustació y precio «>100 €» mientras el propietario no diga otro | Hecha el 24 de noviembre de 2026. Los cinco los dio de alta Claude en la app publicada con la sesión del propietario, eligiéndolos en el buscador de Google («Boro» es VORO, el único que sale en Mallorca) |
 | 4 · Comentario con formato | Negrita, cursiva, subrayado y enlaces en el texto largo, con botones | Pendiente. Falta aclarar si «referencias» son enlaces web, enlaces a otras fichas o las dos cosas |
 | 5 · Mapa | Parques, jardines y plazas en verde suave dentro de «Terracota»; sin nombres de autopistas y carreteras, solo los de las calles. El propietario actualiza los dos estilos en Google Cloud | Pendiente |
 
