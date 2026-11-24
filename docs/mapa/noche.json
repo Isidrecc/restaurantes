@@ -8,7 +8,7 @@
     { "id": "pointOfInterest.recreation.park", "geometry": { "fillColor": "#2a2338" } },
     {
       "id": "natural.water",
-      "geometry": { "fillColor": "#17203a", "strokeColor": "#3a2f4a" },
+      "geometry": { "fillColor": "#17203a" },
       "label": { "textFillColor": "#6e7fa8", "textStrokeColor": "#17203a" }
     },
     { "id": "infrastructure.roadNetwork.road.highway", "geometry": { "fillColor": "#5a4a2a" } },

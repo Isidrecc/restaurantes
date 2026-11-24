@@ -152,6 +152,7 @@ Dos colores protagonistas: morado y amarillo mostaza.
 | Etiquetas de pueblos | `#6b3fa0` | `#a79bb8` |
 | Etiquetas del mar | `#6b3fa0` | `#6e7fa8` |
 
+- La línea de costa no se ha podido aplicar: al importar, Google rechaza el color de borde en el agua (`strokeColor` en `natural.water`, 24 de noviembre de 2026). La costa queda como el contraste entre mar y tierra.
 - Coste: usar un Map ID se cobra con el SKU de Dynamic Maps, el mismo de cada carga del mapa; no añade coste aparte. Comprobado el 24 de noviembre de 2026.
 - Los dos estilos están en `docs/mapa/lavanda.json` y `docs/mapa/noche.json`, con los colores de la tabla. Se importan en la consola de Google Cloud desde «Diseños de mapa» → «Crear estilo» → pestaña JSON (comprobado en la documentación el 24 de noviembre de 2026). Si se retocan en la consola, conviene exportarlos y actualizar estos archivos.
 - Tarea del propietario: importar los dos estilos, crear el Map ID y asociarle los dos, guiado paso a paso. Mientras tanto se usa `DEMO_MAP_ID`, que muestra los puntos de interés de Google.
