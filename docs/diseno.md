@@ -4,6 +4,8 @@ Acordado con el propietario el 23 de noviembre de 2026, al aprobar la demo y ant
 
 Los cambios se aplican directamente en la app real del paso 3: la demo no se vuelve a actualizar. El propietario quiere ajustar detalles visuales después de ver la app terminada.
 
+**Idioma:** la app está solo en catalán (decidido el 24 de noviembre de 2026), también los criterios, los tipos de cocina, las fechas y Google Maps. Los textos en castellano de la demo ya no son la referencia. La documentación sigue en castellano.
+
 ## 1. Quién hace qué
 
 | Papel | Ve todo | Puntúa | Da de alta, edita datos, texto y fotos | Borra restaurantes | Gestiona accesos |
@@ -28,7 +30,7 @@ Los cambios se aplican directamente en la app real del paso 3: la demo no se vue
 Desaparecen las reseñas de cada persona.
 
 - **Precio por persona, sin bebida**, en cuatro tramos: menos de 20 €, de 20 a 50 €, de 50 a 100 € y más de 100 €. Se muestran como «<20 €», «20-50 €», «50-100 €» y «>100 €». Se guarda como 1 a 4 (decidido el 24 de noviembre de 2026; sustituye a €, €€, €€€ y €€€€ con la misma numeración).
-- **Tipos de cocina** de partida: Autor, Japonés, Nikkei, Chino, Menú degustación, Menú mediodía, Mallorquín, Asiático, Italiano, Brasa y Arroces (decidido el 24 de noviembre de 2026). Al final hay un botón «+ Añadir» para crear otro. Los tipos añadidos no se guardan aparte: salen de los restaurantes que los usan, así que los ven todos y desaparecen si ningún restaurante los usa. Si se escribe uno que ya existe con otras mayúsculas o sin tildes, se marca el existente. Máximo 10 por restaurante.
+- **Tipos de cocina** de partida: Autor, Japonès, Nikkei, Xinès, Menú degustació, Menú de migdia, Mallorquí, Asiàtic, Italià, Brasa y Arrossos (decidido el 24 de noviembre de 2026). Al final hay un botón «+ Afegeix» para crear otro. Los tipos añadidos no se guardan aparte: salen de los restaurantes que los usan, así que los ven todos y desaparecen si ningún restaurante los usa. Si se escribe uno que ya existe con otras mayúsculas o sin tildes, se marca el existente. Máximo 10 por restaurante. Los nombres antiguos en castellano se muestran en catalán (`CUISINE_RENAMES` en `app/config.js`) y se guardan así al editar.
 - **Dirección**: la de Google al elegir el restaurante en el buscador (sección 5). Se ve en la ficha y el buscador de la app busca también en ella y en la localidad.
 
 ## 3. Nota que se ve

@@ -1,8 +1,8 @@
 {
   "name": "Puntuam a taula",
   "short_name": "Puntuam",
-  "description": "Cuaderno de restaurantes de Isidre y Cris.",
-  "lang": "es",
+  "description": "Quadern de restaurants d’Isidre i Cris.",
+  "lang": "ca",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

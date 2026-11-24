@@ -10,7 +10,7 @@ import {
 import {
   getStorage, ref, uploadBytes, getDownloadURL, deleteObject
 } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-storage.js';
-import { firebaseConfig, CRITERIA, PRICES, COLORS } from './config.js';
+import { firebaseConfig, CRITERIA, PRICES, COLORS, CUISINE_RENAMES } from './config.js';
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -82,7 +82,7 @@ export function watchAll(onChange, onError) {
   };
   const unsubs = [
     onSnapshot(collection(db, 'users'), (snap) => {
-      users = snap.docs.map((d) => ({ uid: d.id, name: d.data().displayName || 'Sin nombre', color: d.data().color || null }));
+      users = snap.docs.map((d) => ({ uid: d.id, name: d.data().displayName || 'Sense nom', color: d.data().color || null }));
       ready.users = true; emit();
     }, onError),
     onSnapshot(collection(db, 'restaurants'), (snap) => {
@@ -110,7 +110,7 @@ function fromDoc(id, d) {
     address: d.address || '',
     lat: d.location ? d.location.lat : null,
     lng: d.location ? d.location.lng : null,
-    cuisines: d.cuisines || [],
+    cuisines: Array.from(new Set((d.cuisines || []).map((c) => CUISINE_RENAMES[c] || c))),
     price: PRICES[(d.price || 2) - 1],
     visitDate: d.visitDate || '',
     blog: d.blog || '',

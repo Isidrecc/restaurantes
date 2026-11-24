@@ -18,16 +18,25 @@ export const MAP_ID = 'DEMO_MAP_ID';
 export const FIREBASE_VERSION = '13.4.0';
 
 export const CRITERIA = [
-  { k: 'producto', label: 'Calidad del producto', short: 'Producto' },
-  { k: 'plato', label: 'Plato estrella', short: 'Plato estrella' },
-  { k: 'tecnica', label: 'Técnica y creatividad', short: 'Técnica' },
-  { k: 'servicio', label: 'Servicio', short: 'Servicio' },
-  { k: 'precio', label: 'Calidad/precio', short: 'Calidad/precio' },
-  { k: 'ambiente', label: 'Ambiente', short: 'Ambiente' }
+  { k: 'producto', label: 'Qualitat del producte', short: 'Producte' },
+  { k: 'plato', label: 'Plat estrella', short: 'Plat estrella' },
+  { k: 'tecnica', label: 'Tècnica i creativitat', short: 'Tècnica' },
+  { k: 'servicio', label: 'Servei', short: 'Servei' },
+  { k: 'precio', label: 'Qualitat/preu', short: 'Qualitat/preu' },
+  { k: 'ambiente', label: 'Ambient', short: 'Ambient' }
 ];
 
 // Tipos de cocina de partida. Los que se añadan desde el formulario salen de los restaurantes guardados.
-export const CUISINES = ['Autor', 'Japonés', 'Nikkei', 'Chino', 'Menú degustación', 'Menú mediodía', 'Mallorquín', 'Asiático', 'Italiano', 'Brasa', 'Arroces'];
+export const CUISINES = ['Autor', 'Japonès', 'Nikkei', 'Xinès', 'Menú degustació', 'Menú de migdia', 'Mallorquí', 'Asiàtic', 'Italià', 'Brasa', 'Arrossos'];
+// Noms antics en castellà: es mostren i es tornen a desar amb el nom en català.
+export const CUISINE_RENAMES = {
+  'Japonés': 'Japonès', 'Japonesa': 'Japonès', 'Chino': 'Xinès', 'Menú degustación': 'Menú degustació',
+  'Menú mediodía': 'Menú de migdia', 'Mallorquín': 'Mallorquí', 'Mallorquina': 'Mallorquí', 'Asiático': 'Asiàtic',
+  'Italiano': 'Italià', 'Italiana': 'Italià', 'Arroces': 'Arrossos', 'De autor': 'Autor', 'Mediterránea': 'Mediterrània',
+  'Pescado y marisco': 'Peix i marisc', 'Tapas': 'Tapes', 'Otra': 'Altres'
+};
+// Nom de cada color per mostrar-lo.
+export const COLOR_NAMES = { azul: 'blau', rosa: 'rosa' };
 // Precio por persona, sin bebida. Se guarda como 1 a 4.
 export const PRICES = ['<20\u00a0€', '20-50\u00a0€', '50-100\u00a0€', '>100\u00a0€'];
 

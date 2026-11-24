@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="es">
+<html lang="ca">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Puntuam a taula</title>
-<meta name="description" content="Cuaderno de restaurantes de Isidre y Cris.">
+<meta name="description" content="Quadern de restaurants d’Isidre i Cris.">
 <meta name="theme-color" content="#17456b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -25,21 +25,21 @@
     <div class="brand">
       <h1 class="brand-name">Puntuam a taula</h1>
     </div>
-    <button class="avatar" id="btn-profile" type="button" aria-label="Tu perfil"><span id="avatar-ini"></span></button>
+    <button class="avatar" id="btn-profile" type="button" aria-label="El teu perfil"><span id="avatar-ini"></span></button>
   </header>
 
   <div class="tools" id="tools">
     <label class="search" for="q">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
-      <input id="q" type="search" placeholder="Buscar" autocomplete="off" enterkeyhint="search">
+      <input id="q" type="search" placeholder="Cerca" autocomplete="off" enterkeyhint="search">
     </label>
-    <button class="btn" id="btn-who" type="button" aria-label="Nota de: Todos">
+    <button class="btn" id="btn-who" type="button" aria-label="Nota: Mitjana">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"></circle><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"></path><circle cx="17" cy="9" r="2.5"></circle><path d="M16 14.2c2.4-.2 4.1 1.4 4.6 4.3"></path></svg>
-      <span id="who-label">Media</span>
+      <span id="who-label">Mitjana</span>
     </button>
     <button class="btn" id="btn-filters" type="button">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>
-      Filtros
+      Filtres
       <span class="badge" id="filter-count" hidden></span>
     </button>
   </div>
@@ -49,141 +49,141 @@
     <section class="view is-active" id="view-map" aria-label="Mapa">
       <div id="map"></div>
       <div class="map-chip" id="map-count"></div>
-      <div class="legend" id="legend" aria-label="Color de los pines según la nota global">
-        <span class="s5"><i></i>9 o más</span>
+      <div class="legend" id="legend" aria-label="Color dels pins segons la nota global">
+        <span class="s5"><i></i>9 o més</span>
         <span class="s4"><i></i>8</span>
         <span class="s3"><i></i>7</span>
-        <span class="s2"><i></i>5 y 6</span>
-        <span class="s1"><i></i>menos de 5</span>
+        <span class="s2"><i></i>5 i 6</span>
+        <span class="s1"><i></i>menys de 5</span>
       </div>
       <div class="preview" id="preview" hidden></div>
     </section>
 
-    <section class="view" id="view-list" aria-label="Lista">
+    <section class="view" id="view-list" aria-label="Llista">
       <div class="list-head">
         <span class="meta" id="list-count"></span>
-        <div class="seg" role="group" aria-label="Ordenar por">
+        <div class="seg" role="group" aria-label="Ordena per">
           <button type="button" data-sort="nota" aria-pressed="true">Nota</button>
-          <button type="button" data-sort="fecha" aria-pressed="false">Fecha</button>
-          <button type="button" data-sort="nombre" aria-pressed="false">Nombre</button>
+          <button type="button" data-sort="fecha" aria-pressed="false">Data</button>
+          <button type="button" data-sort="nombre" aria-pressed="false">Nom</button>
         </div>
       </div>
       <div class="list" id="list"></div>
     </section>
 
-    <section class="view" id="view-form" aria-label="Añadir restaurante">
+    <section class="view" id="view-form" aria-label="Afegeix un restaurant">
       <form class="form" id="form" novalidate>
-        <h2 class="form-title" id="form-title">Añadir restaurante</h2>
+        <h2 class="form-title" id="form-title">Afegeix un restaurant</h2>
 
-        <section class="group" id="grp-ubic" aria-label="Restaurante">
-          <h3 class="group-title">Restaurante</h3>
+        <section class="group" id="grp-ubic" aria-label="Restaurant">
+          <h3 class="group-title">Restaurant</h3>
           <div class="field">
-            <span class="field-label">Buscar en Google Maps</span>
+            <span class="field-label">Cerca a Google Maps</span>
             <div class="gsearch" id="f-gsearch"></div>
-            <p class="hint">Escribe el nombre y elígelo de la lista. El mapa lo marcará.</p>
+            <p class="hint">Escriu el nom i tria’l de la llista. El mapa el marcarà.</p>
           </div>
           <div class="field">
-            <div id="pick-map" aria-label="Mapa para situar el restaurante"></div>
-            <p class="hint" id="pick-status">Busca el restaurante o toca el mapa para situarlo.</p>
-            <div class="loc-actions"><button class="btn" type="button" id="f-geo">Usar mi ubicación</button></div>
-            <p class="error" id="err-loc" hidden>Toca el mapa para marcar dónde está.</p>
+            <div id="pick-map" aria-label="Mapa per situar el restaurant"></div>
+            <p class="hint" id="pick-status">Cerca el restaurant o toca el mapa per situar-lo.</p>
+            <div class="loc-actions"><button class="btn" type="button" id="f-geo">Usa la meva ubicació</button></div>
+            <p class="error" id="err-loc" hidden>Toca el mapa per marcar on és.</p>
           </div>
           <div class="field">
-            <label for="f-name">Nombre</label>
+            <label for="f-name">Nom</label>
             <input class="input" id="f-name" type="text" autocomplete="off" maxlength="80">
-            <p class="hint" id="name-hint" hidden>Copiado de Google Maps. Puedes cambiarlo.</p>
-            <p class="error" id="err-name" hidden>Escribe el nombre del restaurante.</p>
+            <p class="hint" id="name-hint" hidden>Copiat de Google Maps. El pots canviar.</p>
+            <p class="error" id="err-name" hidden>Escriu el nom del restaurant.</p>
           </div>
           <div class="field">
-            <label for="f-locality">Localidad</label>
+            <label for="f-locality">Localitat</label>
             <input class="input" id="f-locality" type="text" maxlength="60" autocomplete="off" list="localities">
             <datalist id="localities"></datalist>
-            <p class="hint" id="locality-hint" hidden>Sacada de la dirección de Google Maps. Puedes cambiarla.</p>
+            <p class="hint" id="locality-hint" hidden>Treta de l’adreça de Google Maps. La pots canviar.</p>
             <p class="hint" id="f-address" hidden></p>
-            <p class="error" id="err-muni" hidden>Escribe la localidad.</p>
+            <p class="error" id="err-muni" hidden>Escriu la localitat.</p>
           </div>
         </section>
 
-        <section class="group" id="grp-datos" aria-label="Datos">
-          <h3 class="group-title">Datos</h3>
+        <section class="group" id="grp-datos" aria-label="Dades">
+          <h3 class="group-title">Dades</h3>
           <div class="field">
-            <span class="field-label" id="lbl-cuisines">Tipos de cocina</span>
+            <span class="field-label" id="lbl-cuisines">Tipus de cuina</span>
             <div class="chipset" id="f-cuisines" role="group" aria-labelledby="lbl-cuisines"></div>
             <div class="add-row" id="f-cuisine-new" hidden>
-              <input class="input" id="f-cuisine-text" type="text" maxlength="30" placeholder="Nuevo tipo de cocina" aria-label="Nuevo tipo de cocina" autocomplete="off" enterkeyhint="done">
-              <button class="btn" type="button" id="f-cuisine-ok">Añadir</button>
+              <input class="input" id="f-cuisine-text" type="text" maxlength="30" placeholder="Nou tipus de cuina" aria-label="Nou tipus de cuina" autocomplete="off" enterkeyhint="done">
+              <button class="btn" type="button" id="f-cuisine-ok">Afegeix</button>
             </div>
-            <p class="hint">Puedes marcar varios.</p>
+            <p class="hint">Pots marcar-ne diversos.</p>
           </div>
           <div class="field">
-            <label for="f-date">Fecha de visita</label>
+            <label for="f-date">Data de la visita</label>
             <input class="input" id="f-date" type="date">
           </div>
           <div class="field">
-            <span class="field-label" id="lbl-price">Precio por persona, sin bebida</span>
+            <span class="field-label" id="lbl-price">Preu per persona, sense beguda</span>
             <div class="seg seg-wide" role="radiogroup" aria-labelledby="lbl-price" id="f-price"></div>
           </div>
         </section>
 
-        <section class="group" id="grp-val" aria-label="Tu nota">
-          <h3 class="group-title">Tu nota</h3>
-          <p class="hint" id="val-hint">Opcional. Puedes puntuarlo ahora o más tarde desde la ficha.</p>
+        <section class="group" id="grp-val" aria-label="La teva nota">
+          <h3 class="group-title">La teva nota</h3>
+          <p class="hint" id="val-hint">Opcional. El pots puntuar ara o més tard des de la fitxa.</p>
           <div id="rates"></div>
           <div class="global-row">
-            <span>Nota global (media)</span>
-            <div class="score" id="f-global">Sin nota</div>
+            <span>Nota global (mitjana)</span>
+            <div class="score" id="f-global">Sense nota</div>
           </div>
-          <p class="error" id="err-rate" hidden>Puntúa al menos un criterio.</p>
+          <p class="error" id="err-rate" hidden>Puntua almenys un criteri.</p>
         </section>
 
-        <section class="group" id="grp-res" aria-label="Comentario y fotos">
-          <h3 class="group-title">Comentario y fotos</h3>
+        <section class="group" id="grp-res" aria-label="Comentari i fotos">
+          <h3 class="group-title">Comentari i fotos</h3>
           <div class="field">
-            <label for="f-review">Comentario</label>
-            <textarea id="f-review" class="blog-input" placeholder="Cuéntalo como en un blog: qué pedisteis, cómo fue, si volveríais. Deja una línea en blanco entre párrafos."></textarea>
+            <label for="f-review">Comentari</label>
+            <textarea id="f-review" class="blog-input" placeholder="Explica-ho com en un blog: què vau demanar, com va anar, si hi tornaríeu. Deixa una línia en blanc entre paràgrafs."></textarea>
           </div>
           <div class="field">
             <span class="field-label">Fotos</span>
             <div class="photo-edits" id="f-thumbs" hidden></div>
             <span class="btn file-btn">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="3"></rect><circle cx="12" cy="13" r="3.5"></circle><path d="M8 6l1.5-2h5L16 6"></path></svg>
-              Añadir fotos
-              <input id="f-photos" type="file" accept="image/*" multiple aria-label="Añadir fotos">
+              Afegeix fotos
+              <input id="f-photos" type="file" accept="image/*" multiple aria-label="Afegeix fotos">
             </span>
           </div>
         </section>
 
         <div class="form-actions">
-          <button class="btn" type="button" id="f-cancel">Cancelar</button>
-          <button class="btn btn-primary" type="submit" id="f-save">Guardar restaurante</button>
+          <button class="btn" type="button" id="f-cancel">Cancel·la</button>
+          <button class="btn btn-primary" type="submit" id="f-save">Desa el restaurant</button>
         </div>
       </form>
     </section>
   </main>
 
-  <nav class="tabs" id="tabs" aria-label="Secciones">
+  <nav class="tabs" id="tabs" aria-label="Seccions">
     <button type="button" data-view="map" aria-current="page">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"></path><path d="M9 4v14M15 6v14"></path></svg>
       Mapa
     </button>
     <button type="button" data-view="list">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"></path><circle cx="4" cy="6" r="1"></circle><circle cx="4" cy="12" r="1"></circle><circle cx="4" cy="18" r="1"></circle></svg>
-      Lista
+      Llista
     </button>
     <button type="button" data-view="form" id="tab-add">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v8M8 12h8"></path></svg>
-      Añadir
+      Afegeix
     </button>
   </nav>
 
-  <section class="panel" id="detail" hidden aria-label="Ficha del restaurante"></section>
+  <section class="panel" id="detail" hidden aria-label="Fitxa del restaurant"></section>
 
   <div class="sheet" id="sheet-filters" hidden>
-    <button class="sheet-backdrop" type="button" data-close aria-label="Cerrar filtros"></button>
+    <button class="sheet-backdrop" type="button" data-close aria-label="Tanca els filtres"></button>
     <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="flt-title">
       <div class="sheet-head">
-        <h2 id="flt-title">Filtros</h2>
-        <button class="icon-btn" type="button" data-close aria-label="Cerrar">
+        <h2 id="flt-title">Filtres</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Tanca">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
         </button>
       </div>
@@ -195,123 +195,123 @@
           </div>
           <div class="range-row">
             <input id="flt-min" type="range" min="0" max="10" step="0.5" value="0" aria-label="Nota mínima">
-            <output id="flt-min-out" for="flt-min">Cualquiera</output>
+            <output id="flt-min-out" for="flt-min">Qualsevol</output>
           </div>
         </div>
-        <div class="field"><span class="field-label">Tipo de cocina</span><div class="chipset" id="flt-cuisines"></div></div>
-        <div class="field"><span class="field-label">Localidad</span><div class="chipset" id="flt-munis"></div></div>
-        <div class="field"><span class="field-label">Precio por persona</span><div class="chipset" id="flt-prices"></div></div>
+        <div class="field"><span class="field-label">Tipus de cuina</span><div class="chipset" id="flt-cuisines"></div></div>
+        <div class="field"><span class="field-label">Localitat</span><div class="chipset" id="flt-munis"></div></div>
+        <div class="field"><span class="field-label">Preu per persona</span><div class="chipset" id="flt-prices"></div></div>
       </div>
       <div class="sheet-foot">
-        <button class="btn" type="button" id="flt-clear">Quitar filtros</button>
-        <button class="btn btn-primary" type="button" id="flt-apply" data-close>Ver restaurantes</button>
+        <button class="btn" type="button" id="flt-clear">Treu els filtres</button>
+        <button class="btn btn-primary" type="button" id="flt-apply" data-close>Mostra els restaurants</button>
       </div>
     </div>
   </div>
 
   <div class="sheet" id="sheet-confirm" hidden>
-    <button class="sheet-backdrop" type="button" data-close aria-label="Cancelar"></button>
+    <button class="sheet-backdrop" type="button" data-close aria-label="Cancel·la"></button>
     <div class="sheet-panel" role="alertdialog" aria-modal="true" aria-labelledby="cf-title">
-      <div class="sheet-head"><h2 id="cf-title">¿Borrar este restaurante?</h2></div>
+      <div class="sheet-head"><h2 id="cf-title">Vols esborrar aquest restaurant?</h2></div>
       <div class="sheet-body"><p id="cf-text" class="meta"></p></div>
       <div class="sheet-foot">
-        <button class="btn" type="button" data-close>Cancelar</button>
-        <button class="btn btn-danger" type="button" id="cf-ok">Borrar</button>
+        <button class="btn" type="button" data-close>Cancel·la</button>
+        <button class="btn btn-danger" type="button" id="cf-ok">Esborra</button>
       </div>
     </div>
   </div>
 
   <div class="sheet" id="sheet-who" hidden>
-    <button class="sheet-backdrop" type="button" data-close aria-label="Cerrar"></button>
+    <button class="sheet-backdrop" type="button" data-close aria-label="Tanca"></button>
     <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="who-title">
       <div class="sheet-head">
         <h2 id="who-title">Nota de</h2>
-        <button class="icon-btn" type="button" data-close aria-label="Cerrar">
+        <button class="icon-btn" type="button" data-close aria-label="Tanca">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
         </button>
       </div>
       <div class="sheet-body">
-        <p class="meta">Elige qué nota ves en el mapa, en la lista y en los filtros. Se guarda en este dispositivo.</p>
+        <p class="meta">Tria quina nota veus al mapa, a la llista i als filtres. Es desa en aquest dispositiu.</p>
         <div class="seg who-quick" id="who-opts" role="group" aria-label="Nota"></div>
       </div>
       <div class="sheet-foot one">
-        <button class="btn btn-primary" type="button" id="who-apply" data-close>Ver restaurantes</button>
+        <button class="btn btn-primary" type="button" id="who-apply" data-close>Mostra els restaurants</button>
       </div>
     </div>
   </div>
 
   <div class="sheet" id="sheet-profile" hidden>
-    <button class="sheet-backdrop" type="button" data-close aria-label="Cerrar"></button>
+    <button class="sheet-backdrop" type="button" data-close aria-label="Tanca"></button>
     <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="prof-title">
       <div class="sheet-head">
-        <h2 id="prof-title">Tu perfil</h2>
-        <button class="icon-btn" type="button" data-close aria-label="Cerrar">
+        <h2 id="prof-title">El teu perfil</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Tanca">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
         </button>
       </div>
       <div class="sheet-body">
         <div class="field">
-          <label for="p-name">Nombre visible</label>
+          <label for="p-name">Nom visible</label>
           <input class="input" id="p-name" type="text" maxlength="30" autocomplete="off">
-          <p class="hint">Es lo que ven los demás junto a tus notas. Tu correo no se muestra.</p>
+          <p class="hint">És el que veuen els altres al costat de les teves notes. El teu correu no es mostra.</p>
         </div>
         <p id="p-role"></p>
         <div id="p-extra"></div>
       </div>
       <div class="sheet-foot">
-        <button class="btn" type="button" id="p-logout">Cerrar sesión</button>
-        <button class="btn btn-primary" type="button" id="p-save">Guardar</button>
+        <button class="btn" type="button" id="p-logout">Tanca la sessió</button>
+        <button class="btn btn-primary" type="button" id="p-save">Desa</button>
       </div>
     </div>
   </div>
 
-  <section class="screen" id="noaccess" hidden aria-label="Sin acceso">
+  <section class="screen" id="noaccess" hidden aria-label="Sense accés">
     <div class="screen-body">
       <p class="brand-name">Puntuam a taula</p>
-      <h2>No tienes acceso</h2>
-      <p>Has entrado como <b id="na-email"></b>, pero este correo no está invitado. Puntuam a taula es el cuaderno de restaurantes de Isidre y Cris, solo para invitados.</p>
-      <button class="btn btn-primary btn-block" type="button" id="na-request">Solicitar acceso</button>
-      <p class="meta" id="na-status" hidden>Solicitud enviada. Cuando te den acceso, vuelve a abrir la app.</p>
-      <button class="btn btn-block" type="button" id="na-other">Entrar con otra cuenta</button>
+      <h2>No hi tens accés</h2>
+      <p>Has entrat com a <b id="na-email"></b>, però aquest correu no està convidat. Puntuam a taula és el quadern de restaurants d’Isidre i Cris, només per a convidats.</p>
+      <button class="btn btn-primary btn-block" type="button" id="na-request">Demana accés</button>
+      <p class="meta" id="na-status" hidden>Sol·licitud enviada. Quan et donin accés, torna a obrir l’app.</p>
+      <button class="btn btn-block" type="button" id="na-other">Entra amb un altre compte</button>
     </div>
   </section>
 
-  <section class="screen" id="login" hidden aria-label="Entrar">
+  <section class="screen" id="login" hidden aria-label="Entra">
     <div class="screen-body">
       <p class="brand-name">Puntuam a taula</p>
-      <h2>El cuaderno de restaurantes de Isidre y Cris</h2>
-      <p class="meta">Entra con tu cuenta de Google. Si es la primera vez en este dispositivo, Google te pedirá el correo y la contraseña.</p>
-      <button class="btn btn-primary btn-block google-btn" type="button" id="btn-login">Entrar con Google</button>
+      <h2>El quadern de restaurants d’Isidre i Cris</h2>
+      <p class="meta">Entra amb el teu compte de Google. Si és la primera vegada en aquest dispositiu, Google et demanarà el correu i la contrasenya.</p>
+      <button class="btn btn-primary btn-block google-btn" type="button" id="btn-login">Entra amb Google</button>
       <p class="error" id="login-error" hidden></p>
     </div>
   </section>
 
-  <section class="screen" id="loading" aria-label="Cargando">
+  <section class="screen" id="loading" aria-label="Carregant">
     <div class="screen-body">
       <p class="brand-name" style="align-self:center">Puntuam a taula</p>
-      <div class="spinner" role="status" aria-label="Cargando"></div>
+      <div class="spinner" role="status" aria-label="Carregant"></div>
     </div>
   </section>
 
   <div class="sheet" id="sheet-name" hidden>
     <div class="sheet-backdrop"></div>
     <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="name-title">
-      <div class="sheet-head"><h2 id="name-title">¿Cómo te llamamos?</h2></div>
+      <div class="sheet-head"><h2 id="name-title">Com et diem?</h2></div>
       <div class="sheet-body">
         <div class="field">
-          <label for="n-name">Nombre visible</label>
+          <label for="n-name">Nom visible</label>
           <input class="input" id="n-name" type="text" maxlength="30" autocomplete="given-name">
-          <p class="hint">Es lo que verán los demás. Lo puedes cambiar en tu perfil.</p>
+          <p class="hint">És el que veuran els altres. El pots canviar al teu perfil.</p>
         </div>
       </div>
-      <div class="sheet-foot one"><button class="btn btn-primary" type="button" id="n-save">Continuar</button></div>
+      <div class="sheet-foot one"><button class="btn btn-primary" type="button" id="n-save">Continua</button></div>
     </div>
   </div>
 
   <div class="lightbox" id="lightbox" hidden>
     <img id="lightbox-img" alt="">
     <p class="lightbox-cap" id="lightbox-cap"></p>
-    <button class="icon-btn" type="button" id="lightbox-close" aria-label="Cerrar foto">
+    <button class="icon-btn" type="button" id="lightbox-close" aria-label="Tanca la foto">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
     </button>
   </div>

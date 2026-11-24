@@ -9,12 +9,12 @@ function bootstrap() {
   if (window.google && window.google.maps && window.google.maps.importLibrary) return Promise.resolve();
   return new Promise((resolve, reject) => {
     window.__gmReady = resolve;
-    window.gm_authFailure = () => console.error('Google Maps rechazó la clave');
+    window.gm_authFailure = () => console.error('Google Maps ha rebutjat la clau');
     const s = document.createElement('script');
-    const params = new URLSearchParams({ key: MAPS_KEY, v: 'weekly', language: 'es', region: 'ES', loading: 'async', callback: '__gmReady' });
+    const params = new URLSearchParams({ key: MAPS_KEY, v: 'weekly', language: 'ca', region: 'ES', loading: 'async', callback: '__gmReady' });
     s.src = 'https://maps.googleapis.com/maps/api/js?' + params.toString();
     s.async = true;
-    s.onerror = () => reject(new Error('No se ha podido cargar Google Maps'));
+    s.onerror = () => reject(new Error('No s’ha pogut carregar Google Maps'));
     document.head.appendChild(s);
   });
 }
@@ -25,7 +25,7 @@ function loadClusterer() {
     const s = document.createElement('script');
     s.src = 'https://unpkg.com/@googlemaps/markerclusterer@2.6.2/dist/index.min.js';
     s.onload = resolve;
-    s.onerror = () => reject(new Error('No se ha podido cargar la agrupación de pines'));
+    s.onerror = () => reject(new Error('No s’ha pogut carregar l’agrupació de pins'));
     document.head.appendChild(s);
   });
 }
@@ -124,7 +124,7 @@ export async function createPickMap(el, { onPick }) {
 
   function setPin(lat, lng) {
     if (!marker) {
-      marker = new AdvancedMarkerElement({ map, position: { lat, lng }, content: pinElement('', 'pin-new'), gmpDraggable: true, title: 'Ubicación del restaurante' });
+      marker = new AdvancedMarkerElement({ map, position: { lat, lng }, content: pinElement('', 'pin-new'), gmpDraggable: true, title: 'Ubicació del restaurant' });
       marker.addListener('dragend', () => {
         const p = marker.position;
         onPick(typeof p.lat === 'function' ? p.lat() : p.lat, typeof p.lng === 'function' ? p.lng() : p.lng);
@@ -190,7 +190,7 @@ function localityOf(components) {
 export async function attachPlaceSearch(container, { getBias, onPlace, onError }) {
   await loadMaps();
   const { BasicPlaceAutocompleteElement, Place } = await google.maps.importLibrary('places');
-  const el = new BasicPlaceAutocompleteElement({ requestedLanguage: 'es', placeholder: 'Nombre del restaurante' });
+  const el = new BasicPlaceAutocompleteElement({ requestedLanguage: 'ca', placeholder: 'Nom del restaurant' });
   container.innerHTML = '';
   container.appendChild(el);
   el.addEventListener('gmp-select', async (event) => {

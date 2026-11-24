@@ -10,7 +10,7 @@ function loadImage(file) {
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('No se ha podido leer la imagen')); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('No s’ha pogut llegir la imatge')); };
     img.src = url;
   });
 }
@@ -22,7 +22,7 @@ function toJpeg(img, maxSide, quality) {
   c.height = Math.round(img.naturalHeight * scale);
   c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
   return new Promise((resolve, reject) =>
-    c.toBlob((b) => (b ? resolve(b) : reject(new Error('No se ha podido comprimir la imagen'))), 'image/jpeg', quality));
+    c.toBlob((b) => (b ? resolve(b) : reject(new Error('No s’ha pogut comprimir la imatge'))), 'image/jpeg', quality));
 }
 
 export async function preparePhoto(file) {
