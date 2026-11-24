@@ -46,5 +46,5 @@ export const PRICES = ['<20\u00a0€', '20-50\u00a0€', '50-100\u00a0€', '>10
 // Colores de quien puntúa. El orden decide quién va primero en barras y leyendas.
 export const COLORS = ['azul', 'rosa'];
 
-// Centro y zoom por defecto: Mallorca.
-export const HOME = { center: { lat: 39.62, lng: 2.98 }, zoom: 9 };
+// Centro y zoom por defecto: Palma (pedido por el propietario el 24 de noviembre de 2026; antes, toda Mallorca).
+export const HOME = { center: { lat: 39.5715, lng: 2.6505 }, zoom: 13 };

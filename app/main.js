@@ -394,17 +394,30 @@ function openDetail(id, keepScroll) {
     '<img data-path="' + esc(p.thumb) + '" alt="' + esc(p.caption || 'Foto ' + (i + 1)) + '"></button>' +
     (p.caption ? '<figcaption>' + esc(p.caption) + '</figcaption>' : '') + '</figure>').join('');
   const ci = coverIndex(r.photos);
-  // Con portada, el nombre y las etiquetas van encima de la foto (docs/diseno.md, sección 4); sin fotos, debajo.
-  const title = '<h2>' + esc(r.name) + '</h2>';
+  // Cabecera (boceto del propietario, 24 de noviembre de 2026; docs/diseno.md, sección 4): sobre la portada, arriba
+  // el nombre y la nota; abajo, a la izquierda la dirección y la fecha de visita y a la derecha las etiquetas.
+  // Sin fotos, lo mismo sobre un fondo de color.
   const tags = '<div class="tags">' + (r.locality ? tagBtn('munis', r.locality) : '') + r.cuisines.map((c) => tagBtn('cuisines', c)).join('') + tagBtn('prices', r.price) + '</div>';
-  const cover = ci < 0 ? '' :
-    '<div class="cover-wrap">' +
-      '<button class="thumb cover" type="button" data-act="photo" data-i="' + ci + '" aria-label="Amplia la portada">' +
-      '<img data-path="' + esc(r.photos[ci].full) + '" alt="' + esc(r.photos[ci].caption || 'Portada') + '"></button>' +
-      '<div class="cover-text">' + title + tags + '</div>' +
+  const hero =
+    '<div class="hero' + (ci < 0 ? ' no-photo' : '') + '">' +
+      (ci < 0 ? '' :
+        '<button class="thumb cover" type="button" data-act="photo" data-i="' + ci + '" aria-label="Amplia la portada">' +
+        '<img data-path="' + esc(r.photos[ci].full) + '" alt="' + esc(r.photos[ci].caption || 'Portada') + '"></button>') +
+      '<div class="hero-text">' +
+        '<div class="hero-top">' +
+          '<h2>' + esc(r.name) + '</h2>' +
+          '<div class="hero-score-row">' +
+            '<div class="score hero-score ' + cls(g) + (g == null ? ' is-empty' : '') + '">' + fmt(g) + '</div>' +
+            '<div class="hero-word"><strong>' + word(g) + '</strong><span>' + esc(scoreText) + '</span></div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="hero-bottom">' +
+          '<div class="hero-info">' + (r.address ? '<span>' + esc(r.address) + '</span>' : '') +
+            (r.visitDate ? '<span>Visitat el ' + esc(fmtDate(r.visitDate)) + '</span>' : '') + '</div>' +
+          tags +
+        '</div>' +
+      '</div>' +
     '</div>';
-  const headInfo = (r.address ? '<p class="meta d-address">' + esc(r.address) + '</p>' : '') +
-    (r.visitDate ? '<p class="meta">Visitat el ' + esc(fmtDate(r.visitDate)) + '</p>' : '');
   const mine = me && r.ratings[me.uid];
   const actions = '<button class="link-btn" type="button" data-act="share">Comparteix</button>' +
     (canEditData() ? '<button class="link-btn" type="button" data-act="edit">Edita</button>' : '') +
@@ -415,15 +428,7 @@ function openDetail(id, keepScroll) {
       '<div class="panel-actions">' + actions + '</div>' +
     '</div>' +
     '<div class="panel-body">' +
-      cover +
-      (cover
-        ? (headInfo ? '<div class="d-head">' + headInfo + '</div>' : '')
-        : '<div class="d-head">' + title + (r.address ? '<p class="meta d-address">' + esc(r.address) + '</p>' : '') + tags +
-            (r.visitDate ? '<p class="meta">Visitat el ' + esc(fmtDate(r.visitDate)) + '</p>' : '') + '</div>') +
-      '<div class="card d-score">' +
-        '<div class="score is-big ' + cls(g) + (g == null ? ' is-empty' : '') + '">' + fmt(g) + '</div>' +
-        '<div class="d-score-text"><strong>' + word(g) + '</strong><span class="meta">' + esc(scoreText) + '</span></div>' +
-      '</div>' +
+      hero +
       (raters.length
         ? '<div class="card crit">' + legend + critHTML + pscores +
             (missing.length ? '<p class="hint">' + missing.map((p) => esc(p.name)).join(' i ') + ' encara no l’ha puntuat.</p>' : '') +
@@ -434,7 +439,7 @@ function openDetail(id, keepScroll) {
       (photos ? '<div class="card"><p class="section-title">Fotos</p><div class="photos">' + photos + '</div></div>' : '') +
       // Google Maps: la tarjeta de Google si el sitio se eligió en su buscador (lleva su propio botón «Maps»);
       // si no la hay o no carga, el enlace.
-      '<div class="card gmaps"><p class="section-title">A Google Maps</p>' +
+      '<div class="gmaps"><p class="section-title">A Google Maps</p>' +
         (r.placeId ? '<div class="gmaps-card" id="gmaps-card"></div>' : '') +
         '<a class="btn btn-block" id="gmaps-link" href="' + esc(mapsLink(r)) + '" target="_blank" rel="noopener"' + (r.placeId ? ' hidden' : '') + '>Obre a Google Maps</a></div>' +
       '<button class="btn btn-block" type="button" data-act="show-on-map">Mostra al mapa</button>' +

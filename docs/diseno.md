@@ -46,15 +46,19 @@ Desaparecen las reseñas de cada persona.
 
 De arriba abajo:
 
-1. **Portada**: la foto marcada como portada o, si no hay ninguna, la primera, a todo el ancho y arriba del todo. Mientras carga se ve una rueda; al tocarla se amplía. Si el restaurante no tiene fotos, no hay portada (decidido el 24 de noviembre de 2026). **El nombre y las etiquetas van encima de la portada**, en blanco sobre un oscurecido que sube desde abajo, con las etiquetas translúcidas (pedido por el propietario el 24 de noviembre de 2026). Tocar fuera de las etiquetas amplía la foto.
-2. Nombre y dirección. **Etiquetas tocables** de localidad, tipos de cocina y precio: al tocar una, se abre el mapa con ese filtro puesto **sustituyendo** los filtros que hubiera. Fecha de visita. Con portada, aquí solo quedan la dirección y la fecha.
-3. Nota grande (la del selector) con su texto (Excel·lent, Molt bo…).
+1. **Cabecera sobre la portada** (boceto del propietario, 24 de noviembre de 2026): la foto marcada como portada o, si no hay ninguna, la primera, a todo el ancho y arriba del todo; mientras carga se ve una rueda y al tocarla se amplía. Encima, en blanco sobre un oscurecido arriba y abajo:
+   - arriba, el **nombre** y, debajo, el **recuadro con la nota** (la del selector) con su texto (Excel·lent, Molt bo…) y quién ha puntuado al lado;
+   - abajo a la izquierda, la **dirección** y **«Visitat el…»**;
+   - abajo a la derecha, las **etiquetas tocables** de localidad, tipos de cocina y precio, translúcidas: al tocar una, se abre el mapa con ese filtro puesto **sustituyendo** los filtros que hubiera.
+   Sin fotos, la misma disposición sobre un fondo de color, con el texto oscuro.
+2. (Desde el 24 de noviembre de 2026, el nombre, la dirección, las etiquetas, la fecha y la nota van en la cabecera.)
+3. (La tarjeta de nota que había aquí pasó a la cabecera.)
 4. **Barras por criterio, dos por criterio: tinta y turquesa**, cada una con su valor. En el plato estrella, cada persona con su estrella en su color, el nombre de su plato y su nota.
 5. **Nota media de cada uno**, en su color.
 6. **Roseta con dos líneas**, tinta y turquesa, con leyenda.
 7. **Texto largo** del restaurante.
 8. **Fotos al final**, cada una con su pie y también la portada. Al tocarla se amplía con el pie debajo. Mientras cargan se ve una rueda y aparecen con un fundido. En la foto ampliada se pasa a la anterior o la siguiente con flechas a los lados, deslizando el dedo o con las teclas de flecha, y debajo se ve «2 / 5» (24 de noviembre de 2026). Al llegar al final vuelve a la primera.
-9. **A Google Maps** (24 de noviembre de 2026, pedido por el propietario): si el sitio se eligió en el buscador de Google (tiene `placeId`), la tarjeta compacta de Google (Places UI Kit, Place Details compacto), en vertical, con foto arriba y galería, nombre, estrellas con número de reseñas, tipo, precio, si está abierto y su botón «Maps» al perfil. En horizontal, al ancho del iPhone, Google quitaba la foto. Sin `placeId`, o si la tarjeta no carga (por ejemplo, por el tope diario), sale «Obre a Google Maps» (Maps URLs: el sitio de Google o, si no lo hay, el punto del pin).
+9. **A Google Maps** (24 de noviembre de 2026, pedido por el propietario): si el sitio se eligió en el buscador de Google (tiene `placeId`), la tarjeta compacta de Google (Places UI Kit, Place Details compacto) con foto y galería, nombre, estrellas con número de reseñas, tipo, precio, si está abierto y su botón «Maps» al perfil. **Pequeña, para que no destaque** (pedido por el propietario el 24 de noviembre de 2026): en horizontal, con la foto pequeña a la izquierda, a todo el ancho de la ficha y sin tarjeta alrededor; con menos ancho, Google quita la foto. Sin `placeId`, o si la tarjeta no carga (por ejemplo, por el tope diario), sale «Obre a Google Maps» (Maps URLs: el sitio de Google o, si no lo hay, el punto del pin).
    - El UI Kit queda fuera de las restricciones del EEE y no hace falta mostrarlo con un mapa. Cada tarjeta creada cuenta una consulta «Places UI Kit Query» (categoría Essentials, 10.000 gratis al mes y después 1 dólar por 1.000; comprobado el 24 de noviembre de 2026). La app guarda cada tarjeta creada y redibujar la ficha no la vuelve a pedir. Por dentro, Google descarga además las fotos de su galería (10 en la prueba). No se ha comprobado qué cuota diaria de Google Cloud cuenta estas tarjetas: probablemente «Query Requests» de Places UI Kit, que tiene un tope de 300.
 10. Acciones: «Comparteix» (todos, también sin entrar); «Mostra al mapa»; «Puntua» o «Edita la meva nota» (quien puntúa), que abre solo su nota; «Edita» (editores), que abre la edición completa (sección 6); «Esborra» (propietario).
 
