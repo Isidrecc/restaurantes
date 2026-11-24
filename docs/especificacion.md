@@ -108,7 +108,7 @@ Los colores exactos están en los tokens `--s1` a `--s5` de `app/styles.css` (lo
 - Datos: nombre (obligatorio), tipos de cocina (selección múltiple), fecha de visita (por defecto hoy, con atajos «Avui» y «Ahir», o «Pendent de visitar», sin fecha ni nota) y precio en cinco tramos.
 - Ubicación: el buscador de Google lleva el mapa al sitio; el pin lo pone el usuario tocando el mapa y se puede arrastrar para afinar. La localidad se saca de Google.
 - Valoración: un deslizador por criterio, con décimas desde el 24 de noviembre de 2026 (`docs/diseno.md`, sección 5). Un criterio sin tocar queda «Sense nota». El plato estrella lleva además el nombre del plato. La nota global y la roseta se actualizan en vivo. Es opcional.
-- Texto largo y fotos con pie. Se pueden añadir varias fotos y quitarlas antes de guardar.
+- Texto largo y fotos con pie. Se pueden añadir varias fotos y quitarlas antes de guardar. El texto admite negrita, cursiva, subrayado y enlaces a otras webs, con botones (`docs/diseno.md`, sección 5, paso 4).
 
 ### Ficha
 
@@ -118,7 +118,7 @@ Detalle en `docs/diseno.md`, sección 4.
 - Nota global grande con su texto.
 - Las seis notas, con una barra por persona que puntúa.
 - **Roseta:** rejilla hexagonal con un hexágono interior en el 5 y radios a los vértices. Una línea por persona que puntúa, en su color. Nombres de los criterios en negrita en los vértices. Sin números dentro del gráfico: las notas exactas están en las barras de encima. Orden desde arriba y en sentido horario: producto, plato estrella, técnica, servicio, calidad/precio, ambiente.
-- Texto largo, y fotos con pie que se amplían al tocarlas.
+- Texto largo con su formato, y fotos con pie que se amplían al tocarlas.
 - Acciones: ver en el mapa, puntuar, editar y borrar con confirmación.
 
 ### Valores usados en la demo

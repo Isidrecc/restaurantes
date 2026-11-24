@@ -3,6 +3,7 @@ import { CRITERIA, CUISINES, PRICES, CHEAP_PRICES, COLORS, COLOR_NAMES } from '.
 import * as store from './store.js';
 import { createMainMap, createPickMap, createPlaceSearch, localityAt, placeCard, placePhoto, mapsLink } from './maps.js';
 import { preparePhoto } from './photos.js';
+import { MARKS, blogHTML, paragraphs, plainText, toggleMark, cleanURL, insertLink } from './text.js';
 
 // ---------- Estado ----------
 let me = null;            // { uid, email, role, color }
@@ -286,9 +287,9 @@ function homePhoto(r, slot) {
   if (r.placeId) return '<div class="hcard-google news-photo"' + open + ' data-place="' + esc(r.placeId) + '" data-slot="' + slot + '"></div>';
   return '<div class="news-photo news-none"' + open + '>' + PLATE + '</div>';
 }
-// Entradilla: el principio del comentario, cortado en una palabra.
+// Entradilla: el principio del comentario, sin las marcas de formato y cortado en una palabra.
 function standfirst(text, max) {
-  const first = (text || '').split(/\n\s*\n/)[0].replace(/\s+/g, ' ').trim();
+  const first = plainText(paragraphs(text)[0] || '').replace(/\s+/g, ' ').trim();
   if (first.length <= max) return first;
   return first.slice(0, max).replace(/\s+\S*$/, '') + '…';
 }
@@ -459,9 +460,6 @@ function chartSVG(list, compact) {
 // ---------- Ficha ----------
 function tagBtn(group, value) {
   return '<button class="chip ftag" type="button" data-act="tag" data-g="' + group + '" data-v="' + esc(value) + '" aria-label="Mostra al mapa: ' + esc(value) + '">' + esc(value) + '</button>';
-}
-function blogHTML(text) {
-  return text.split(/\n\s*\n/).map((p) => '<p>' + esc(p.trim()).replace(/\n/g, '<br>') + '</p>').join('');
 }
 // Dirección de una foto. Las del modo de muestra van dentro de la página (data:); las reales, en Storage.
 function photoSrc(path) {
@@ -947,6 +945,36 @@ function updateFeaturedField() {
   const pr = $('#f-price input:checked');
   $('#fld-featured').hidden = !(formMode === 'edit' && pr && CHEAP_PRICES.includes(pr.value));
 }
+// Formato del texto (docs/diseno.md, sección 5, paso 4): los botones ponen o quitan las marcas de app/text.js.
+let linkSel = null; // lo seleccionado en el texto al abrir el campo del enlace
+function applyEdit(res) {
+  const ta = $('#f-review');
+  ta.value = res.value;
+  ta.focus();
+  ta.setSelectionRange(res.start, res.end);
+}
+function formatText(kind) {
+  const ta = $('#f-review');
+  applyEdit(toggleMark(ta.value, ta.selectionStart, ta.selectionEnd, MARKS[kind]));
+}
+function showLinkRow(on) {
+  $('#f-link-row').hidden = !on;
+  $('#f-link-btn').setAttribute('aria-expanded', on ? 'true' : 'false');
+  $('#err-link').hidden = true;
+  if (!on) return;
+  const ta = $('#f-review');
+  linkSel = [ta.selectionStart, ta.selectionEnd];
+  $('#f-link-url').value = '';
+  $('#f-link-url').focus();
+}
+function addLink() {
+  const url = cleanURL($('#f-link-url').value);
+  if (!url) { $('#err-link').hidden = false; $('#f-link-url').focus(); return; }
+  const ta = $('#f-review');
+  const sel = linkSel || [ta.value.length, ta.value.length];
+  showLinkRow(false);
+  applyEdit(insertLink(ta.value, sel[0], sel[1], url));
+}
 
 // Bloques de cada modo, en orden. En el alta son los pasos; si quien da de alta no puntúa o el restaurante
 // está pendiente de visitar, no hay paso de nota.
@@ -1022,6 +1050,7 @@ function startForm(mode, r, visited) {
   $('#f-featured').setAttribute('aria-pressed', draft.featured ? 'true' : 'false');
   $('#f-dish').value = draft.dish || '';
   $('#f-review').value = draft.blog;
+  showLinkRow(false);
   $$('#f-price input').forEach((i) => { i.checked = i.value === draft.price; });
   updateFeaturedField();
   CRITERIA.forEach((c) => {
@@ -1474,6 +1503,20 @@ function wire() {
     if (i >= 0) draft.cuisines.splice(i, 1); else draft.cuisines.push(b.dataset.c);
     b.setAttribute('aria-pressed', i >= 0 ? 'false' : 'true');
   });
+  // Formato del texto. Los botones no se llevan el foco: no se cierra el teclado ni se pierde la selección.
+  $('#f-fmt').addEventListener('mousedown', (e) => { if (e.target.closest('button')) e.preventDefault(); });
+  $('#f-fmt').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-fmt]');
+    if (!b) return;
+    if (b.dataset.fmt === 'link') showLinkRow($('#f-link-row').hidden);
+    else formatText(b.dataset.fmt);
+  });
+  $('#f-link-ok').addEventListener('click', addLink);
+  $('#f-link-url').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); addLink(); }
+    if (e.key === 'Escape') { e.preventDefault(); showLinkRow(false); $('#f-review').focus(); }
+  });
+  $('#f-link-url').addEventListener('input', () => { $('#err-link').hidden = true; });
   $('#f-cuisine-ok').addEventListener('click', addCuisine);
   $('#f-cuisine-text').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') { e.preventDefault(); addCuisine(); }
@@ -1657,7 +1700,7 @@ function localPreview() {
     people: [{ uid: 'u1', name: 'Isidre', color: 'azul' }, { uid: 'u2', name: 'Cris', color: 'rosa' }],
     restaurants: [
       { id: 'm1', name: 'Can Exemple', locality: 'Palma', lat: 39.5712, lng: 2.6498, cuisines: ['Mallorquí', 'Arrossos'], price: PRICES[1], featured: true, address: 'Carrer de Mostra, 1, 07001 Palma, Illes Balears', visitDate: '2026-10-17',
-        blog: 'Primer paràgraf de mostra.\n\nSegon paràgraf.', photos: sense ? [] : [{ full: FOTO, thumb: FOTO, caption: 'Foto de mostra' }, { full: FOTO2, thumb: FOTO2, caption: 'Segona foto' }], placeId: gplace, ratings: { u1: { scores: sc([8.5, 9, 7, 8, 8.5, 7.5]), dish: 'Arròs brut' }, u2: { scores: sc([9, 9, 8, 8.5, 9, 7]), dish: 'Llom amb col' } } },
+        blog: 'Primer paràgraf de mostra, amb **negreta**, *cursiva*, __subratllat__ i un [enllaç a una altra web](https://www.example.com/).\n\nSegon paràgraf.', photos: sense ? [] : [{ full: FOTO, thumb: FOTO, caption: 'Foto de mostra' }, { full: FOTO2, thumb: FOTO2, caption: 'Segona foto' }], placeId: gplace, ratings: { u1: { scores: sc([8.5, 9, 7, 8, 8.5, 7.5]), dish: 'Arròs brut' }, u2: { scores: sc([9, 9, 8, 8.5, 9, 7]), dish: 'Llom amb col' } } },
       { id: 'm2', name: 'Sa Fonda Fictícia', locality: 'Sóller', lat: 39.7665, lng: 2.7152, cuisines: ['Menú degustació', 'Peix i marisc'], price: PRICES[2], visitDate: '2026-09-05',
         blog: '', photos: [], placeId: gplace, ratings: { u2: { scores: sc([9.5, 10, 9, 9, 6, 9.5]), dish: 'Gamba roja' } } },
       { id: 'm3', name: 'Bodega Sense Nom', locality: 'Palma', lat: 39.5745, lng: 2.6551, cuisines: ['Autor'], price: PRICES[0], visitDate: '2026-11-07',

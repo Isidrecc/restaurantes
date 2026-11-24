@@ -176,7 +176,23 @@
           <h3 class="group-title">Text i fotos</h3>
           <div class="field">
             <label for="f-review">Text</label>
+            <div class="fmt-bar" id="f-fmt" role="toolbar" aria-label="Format del text" aria-controls="f-review">
+              <button class="fmt-btn" type="button" data-fmt="bold" aria-label="Negreta"><b>B</b></button>
+              <button class="fmt-btn" type="button" data-fmt="italic" aria-label="Cursiva"><i>I</i></button>
+              <button class="fmt-btn" type="button" data-fmt="underline" aria-label="Subratllat"><u>U</u></button>
+              <button class="fmt-btn" type="button" data-fmt="link" id="f-link-btn" aria-label="Enllaç" aria-expanded="false" aria-controls="f-link-row">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"></path><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"></path></svg>
+              </button>
+            </div>
+            <div id="f-link-row" hidden>
+              <div class="add-row">
+                <input class="input" id="f-link-url" type="url" inputmode="url" placeholder="https://…" aria-label="Adreça de l’enllaç" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done">
+                <button class="btn" type="button" id="f-link-ok">Afegeix</button>
+              </div>
+              <p class="error" id="err-link" hidden>Escriu una adreça web, com ara guide.michelin.com.</p>
+            </div>
             <textarea id="f-review" class="blog-input" placeholder="Explica-ho com en un blog: què vau demanar, com va anar, si hi tornaríeu. Deixa una línia en blanc entre paràgrafs."></textarea>
+            <p class="hint">Selecciona un tros i toca un botó per donar-li format. L’enllaç es posa al tros seleccionat.</p>
           </div>
           <div class="field">
             <span class="field-label">Fotos</span>

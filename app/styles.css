@@ -551,6 +551,10 @@ button.card { display: block; width: 100%; }
 .blog { margin-top: 8px; }
 .blog p { margin: 0 0 12px; max-width: 65ch; line-height: 1.6; }
 .blog p:last-child { margin-bottom: 0; }
+/* Formato del comentario (app/text.js): enlaces en el color de acento y subrayados; se abren aparte. */
+.blog strong { font-weight: 700; }
+.blog u, .blog a { text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.blog a { color: var(--accent-strong); text-decoration-line: underline; overflow-wrap: anywhere; }
 .photos { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
 .photo { margin: 0; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .photo .thumb { width: 100%; }
@@ -570,6 +574,19 @@ button.card { display: block; width: 100%; }
 .lb-next { right: 8px; }
 /* Formulario */
 .field textarea.blog-input { min-height: 220px; }
+/* Botones de formato del texto: negreta, cursiva, subratllat y enllaç. */
+.fmt-bar { display: flex; gap: 6px; }
+.fmt-btn {
+  display: grid; place-items: center; width: 44px; height: 36px; border-radius: var(--r-ctl);
+  background: var(--surface); border: 1px solid var(--line); font-size: 16px; line-height: 1;
+}
+.fmt-btn b { font-weight: 800; }
+.fmt-btn i { font-family: var(--font-serif); font-size: 18px; }
+.fmt-btn u { text-underline-offset: 2px; }
+.fmt-btn[aria-expanded="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+#f-link-row { display: flex; flex-direction: column; gap: 6px; }
+#f-link-row[hidden] { display: none; }
+#f-link-row .add-row { margin-top: 0; }
 .search-in-form { height: 44px; }
 .places { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 .place { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding: 10px 12px; border: 0; border-top: 1px solid var(--line); background: var(--surface); text-align: left; }
