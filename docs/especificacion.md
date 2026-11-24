@@ -242,7 +242,7 @@ Acordado el 23 de noviembre de 2026. El objetivo es que nadie de fuera del grupo
 
 ### Mapa (Google Maps)
 
-- Clave limitada a la web de GitHub Pages y a `localhost` para el desarrollo, y solo a Maps JavaScript API, Places UI Kit y Places API (New).
+- Clave limitada a la web de GitHub Pages y a `localhost` para el desarrollo, y solo a Maps JavaScript API, Places UI Kit, Places API (New) y Geocoding API (esta última, desde el 24 de noviembre de 2026, para la localidad del pin; `docs/diseno.md`, sección 5).
 - La clave es pública por necesidad: el navegador la necesita para cargar el mapa, así que está en la página publicada y no se puede ocultar. La restricción por web frena a quien la copie en su página, pero no a quien falsee el origen desde un programa propio. Lo que limita el gasto son los topes diarios.
 - **Topes diarios**, puestos el 24 de noviembre de 2026 en Google Cloud (Google Maps Platform → Cuotas). Están calculados para quedar dentro de los cupos gratuitos mensuales aunque alguien abusara de la clave:
 
@@ -254,6 +254,10 @@ Acordado el 23 de noviembre de 2026. El objetivo es que nadie de fuera del grupo
 | Places API (New) | Las demás (búsquedas por texto y cercanas, fotos, reseñas) | 0 |
 | Places UI Kit | Query Requests | 300 |
 | Places UI Kit | Session Requests y Advanced Query Requests | 100 |
+| Geocoding API | v3 requests per day | 300 |
+| Geocoding API | Todas las v4 (por día, por minuto y por minuto y usuario) | 0 |
+
+- Geocoding API, puesta el 24 de noviembre de 2026: el geocodificador del mapa de Google gasta la cuota **v3**. Comprobado ese día desde la web publicada con todas las v4 a 0: la consulta funcionó. Las v3 por minuto se dejan con sus valores de origen.
 
 - Las cuotas por minuto de lo que usa la app se dejan con sus valores de origen: a 0 bloquean el buscador. Las de funciones que no se usan están a 0.
 - Al llegar a un tope, Google rechaza las peticiones siguientes sin cobrarlas. El contador se comprueba con cada petición y se reinicia a medianoche de California, hacia las 9:00 en Mallorca. Se notaría en que el buscador o el mapa dejan de responder ese día; la lista y las fichas siguen funcionando.
@@ -300,4 +304,4 @@ const firebaseConfig = {
 
 La clave `apiKey` de Firebase está restringida a 25 API de Firebase y no incluye Maps JavaScript API (comprobado el 23 de noviembre de 2026).
 
-Clave de Google Maps, «Mapa web Puntuam»: `AIzaSyC1tU3zrYHXj7WsXPDbgbxz5kAdaHh9GP8`. Limitada a los sitios `https://isidrecc.github.io/restaurantes/*`, `http://localhost/*` y `http://localhost:8000/*`, y solo a Maps JavaScript API, Places UI Kit y Places API (New). Si se renombra el repo, hay que cambiar el primer sitio.
+Clave de Google Maps, «Mapa web Puntuam»: `AIzaSyC1tU3zrYHXj7WsXPDbgbxz5kAdaHh9GP8`. Limitada a los sitios `https://isidrecc.github.io/restaurantes/*`, `http://localhost/*` y `http://localhost:8000/*`, y solo a Maps JavaScript API, Places UI Kit, Places API (New) y Geocoding API (añadida el 24 de noviembre de 2026). Si se renombra el repo, hay que cambiar el primer sitio.
