@@ -1,6 +1,6 @@
 # Cuaderno de restaurantes: especificación
 
-Documento de traspaso. Recoge lo acordado entre el propietario y Claude entre el 21 y el 23 de noviembre de 2026. Lo que no aparece aquí no está decidido.
+Documento de traspaso. Recoge lo acordado entre el propietario y Claude entre el 21 y el 23 de noviembre de 2026, con las partes que han cambiado después ya actualizadas. Lo decidido más tarde está en `docs/diseno.md`, que manda sobre este documento. Lo que no aparece en ninguno de los dos no está decidido.
 
 ## 1. Qué es
 
@@ -22,13 +22,14 @@ App personal para puntuar y reseñar los restaurantes visitados.
 | Fichas | Una por restaurante, no una por visita. |
 | Tipos de cocina | Varios por restaurante. |
 | Roseta | En la ficha, debajo de las puntuaciones. Estilo de las cartas de jugadores de fútbol (ver sección 4). |
-| Alta | Manual en la primera versión. Buscador de Google Places en un paso posterior. El propietario dijo que el buscador no es crítico ahora. |
-| Mapa | Google Maps. |
+| Alta | En cuatro pasos, empezando por el buscador de Google para situar el restaurante. Ver `docs/diseno.md`, sección 5. |
+| Mapa | Google Maps, con estilo propio en claro y oscuro. Ver `docs/diseno.md`, sección 8. |
 | Datos y fotos | Firebase: Auth con cuentas de Google, Firestore y Storage. |
 | Alojamiento | GitHub Pages desde este repo, que es público. |
-| UI | La de la demo (`demo/index.html`), aprobada por el propietario. |
+| UI | La estructura de la demo (`demo/index.html`), aprobada por el propietario, con el aspecto, el alta y la edición de `docs/diseno.md` (secciones 5 a 8). |
+| Idioma de la app | Catalán. Ver `docs/diseno.md`. |
 | Compartir | Puntúan dos personas (azul y rosa); el resto de invitados solo mira. Ver `docs/diseno.md`. |
-| Ámbito | También restaurantes de fuera de Mallorca. La localidad es texto libre y el campo sugiere las ya usadas, para evitar variantes del mismo sitio. |
+| Ámbito | También restaurantes de fuera de Mallorca. La localidad se saca de la dirección de Google. Solo se escribe a mano si Google no la da, y entonces el campo sugiere las ya usadas, para evitar variantes del mismo sitio. |
 | Técnica | HTML, CSS y JavaScript sin framework ni paso de compilación. |
 | Orden de construcción | El de la sección 6. |
 | Nombre | «Puntuam a taula». Bajo el icono del iPhone, «Puntuam». Proyecto de Firebase `puntuam-a-taula`. Decidido el 23 de noviembre de 2026. |
@@ -59,15 +60,15 @@ No se activaron al crear Firestore (23 de noviembre de 2026). Se decide en el pa
 
 ## 4. Pantallas y comportamiento
 
-La referencia es la demo. Este apartado resume lo que hay que conservar y lo que cambia.
+La referencia es la demo, salvo el aspecto, el alta y la edición, que están en `docs/diseno.md`. Este apartado resume lo que hay que conservar y lo que cambia.
 
 ### Navegación
 
-Barra inferior con tres secciones: Mapa, Lista y Añadir. La ficha se abre a pantalla completa por encima.
+Menú inferior flotante con Mapa y Llista a los lados y un botón «+» central para añadir (`docs/diseno.md`, sección 7). La ficha se abre a pantalla completa por encima.
 
 ### Filtros (comunes a mapa y lista)
 
-- Búsqueda por nombre, sin distinguir acentos ni mayúsculas.
+- Búsqueda por nombre, localidad y dirección, sin distinguir acentos ni mayúsculas.
 - Nota mínima, aplicable a la nota global o a uno de los seis criterios. En pasos de medio punto.
 - Tipos de cocina: se muestra el restaurante si tiene cualquiera de los marcados.
 - Localidad.
@@ -80,6 +81,7 @@ Barra inferior con tres secciones: Mapa, Lista y Añadir. La ficha se abre a pan
 - Los pines que se solapan se agrupan en un círculo con el número. Se separan al acercar.
 - Al tocar un pin aparece una tarjeta resumen con acceso a la ficha. El pin seleccionado queda visible por encima de la tarjeta.
 - Leyenda de colores.
+- Estilo propio «Lavanda» en claro y «Noche» en oscuro, sin los puntos de interés de Google (`docs/diseno.md`, sección 8).
 
 ### Lista
 
@@ -92,29 +94,32 @@ Se calcula sobre la nota redondeada a un decimal.
 
 | Nota | Texto |
 |---|---|
-| 9 o más | Excelente |
-| De 8 a 8,9 | Muy bueno |
-| De 7 a 7,9 | Bueno |
-| De 5 a 6,9 | Correcto |
-| Menos de 5 | Flojo |
+| 9 o más | Excel·lent |
+| De 8 a 8,9 | Molt bo |
+| De 7 a 7,9 | Bo |
+| De 5 a 6,9 | Correcte |
+| Menos de 5 | Fluix |
 
-Los colores exactos están en los tokens `--s1` a `--s5` de la demo, con variantes para tema claro y oscuro. El color nunca va solo: siempre acompaña a un número.
+Los colores exactos están en los tokens `--s1` a `--s5` de `app/styles.css` (los mismos de la demo), con variantes para modo claro y oscuro. No cambian con la paleta nueva. El color nunca va solo: siempre acompaña a un número.
 
 ### Añadir y editar
 
-- Datos: nombre (obligatorio), tipos de cocina (selección múltiple), fecha de visita (por defecto hoy) y precio en cuatro niveles.
-- Ubicación: localidad y posición marcada tocando el mapa. El pin se puede arrastrar para afinar.
-- Valoración: seis barras deslizantes con botones de medio punto a los lados. Un criterio sin tocar queda "Sin nota". El plato estrella tiene además un campo de texto para el nombre del plato. La nota global se actualiza en vivo.
-- Reseña y fotos. Se pueden añadir varias fotos y quitarlas antes de guardar.
+- Alta en cuatro pasos (dónde está, datos, nota, texto y fotos) con barra de progreso. Edición en una sola pantalla. Detalle en `docs/diseno.md`, secciones 5 y 6.
+- Datos: nombre (obligatorio), tipos de cocina (selección múltiple), fecha de visita (por defecto hoy, con atajos «Avui» y «Ahir») y precio en cuatro tramos.
+- Ubicación: el buscador de Google lleva el mapa al sitio; el pin lo pone el usuario tocando el mapa y se puede arrastrar para afinar. La localidad se saca de Google.
+- Valoración: un deslizador por criterio, en pasos de medio punto. Un criterio sin tocar queda «Sense nota». El plato estrella lleva además el nombre del plato. La nota global y la roseta se actualizan en vivo. Es opcional.
+- Texto largo y fotos con pie. Se pueden añadir varias fotos y quitarlas antes de guardar.
 
 ### Ficha
 
-- Nombre, localidad, tipos de cocina, precio y fecha de visita.
+Detalle en `docs/diseno.md`, sección 4.
+
+- Nombre, dirección, etiquetas de localidad, tipos de cocina y precio, y fecha de visita.
 - Nota global grande con su texto.
-- Las seis notas con barra y valor.
-- **Roseta:** rejilla hexagonal con un hexágono interior en el 5 y radios a los vértices. Una sola línea une las seis notas. La línea toma el color de la nota global. Nombres de los criterios en negrita en los vértices. Sin números dentro del gráfico: las notas exactas están en las barras de encima. Orden desde arriba y en sentido horario: producto, plato estrella, técnica, servicio, calidad/precio, ambiente.
-- Reseña, y fotos que se amplían al tocarlas.
-- Acciones: ver en el mapa, editar y borrar con confirmación.
+- Las seis notas, con una barra por persona que puntúa.
+- **Roseta:** rejilla hexagonal con un hexágono interior en el 5 y radios a los vértices. Una línea por persona que puntúa, en su color. Nombres de los criterios en negrita en los vértices. Sin números dentro del gráfico: las notas exactas están en las barras de encima. Orden desde arriba y en sentido horario: producto, plato estrella, técnica, servicio, calidad/precio, ambiente.
+- Texto largo, y fotos con pie que se amplían al tocarlas.
+- Acciones: ver en el mapa, puntuar, editar y borrar con confirmación.
 
 ### Valores usados en la demo
 
@@ -125,41 +130,21 @@ Los colores exactos están en los tokens `--s1` a `--s5` de la demo, con variant
 ### Qué cambia respecto a la demo
 
 - La base del mapa pasa a ser Google Maps. La demo dibuja un contorno de Mallorca con municipios porque no podía cargar mapas externos.
-- La localidad pasa a ser texto libre, con sugerencia de las localidades ya usadas al escribir. En la demo es una lista cerrada de municipios de Mallorca que se detecta sola al tocar el mapa.
+- La localidad se saca de la dirección de Google. En la demo es una lista cerrada de municipios de Mallorca que se detecta sola al tocar el mapa.
 - Se añade "usar mi ubicación" al situar el restaurante.
+- El aspecto cambia: paleta «Berenjena», mapa «Lavanda» y «Noche» y menú inferior flotante (`docs/diseno.md`, secciones 7 y 8).
+- El alta va en cuatro pasos y la edición en una sola pantalla.
+- Los textos están en catalán.
 - Los datos y las fotos se guardan de verdad. Las fotos se comprimen antes de subirlas.
 - Hay modo de solo lectura para invitados.
 
 ## 5. Modelo de datos
 
-Presentado al propietario en lenguaje llano y sin objeciones. Los nombres de campo son orientativos.
-
-### `restaurants/{id}`
-
-| Campo | Tipo | Notas |
-|---|---|---|
-| `name` | texto | |
-| `locality` | texto | Libre |
-| `location` | `{lat, lng}` | Posición del pin colocado por el usuario |
-| `cuisines` | lista de textos | Uno o varios |
-| `price` | 1 a 4 | 1: <20 €, 2: 20-50 €, 3: 50-100 €, 4: >100 € por persona sin bebida |
-| `visitDate` | `AAAA-MM-DD` | |
-| `scores` | objeto | Claves `producto`, `plato`, `tecnica`, `servicio`, `precio`, `ambiente`. De 1 a 10 en pasos de 0,5, o vacío |
-| `global` | número | Media de los criterios puntuados. Se guarda para ordenar y filtrar |
-| `dish` | texto | Nombre del plato estrella |
-| `review` | texto | |
-| `photos` | lista | Referencias a los archivos en Storage |
-| `placeId` | texto o vacío | Reservado para el buscador de Places |
-| `source` | `manual` o `places` | |
-| `createdBy`, `createdAt`, `updatedBy`, `updatedAt` | | Autoría y fechas |
-
-### Permisos
-
-Un documento de configuración con dos listas de correos: quienes editan (de momento dos personas) y quienes solo miran. Las reglas de seguridad cierran todo lo demás. Solo el propietario modifica las listas.
+El modelo vigente está en `docs/diseno.md`, sección 9: la parte común de cada restaurante en `restaurants`, la nota de cada persona en una subcolección `ratings` y los papeles en `members`. El modelo inicial del 23 de noviembre de 2026 (notas dentro del restaurante y un documento con dos listas de correos) se sustituyó al pasar al diseño de dos personas y queda en el historial de git.
 
 ### Fotos
 
-En Storage, una carpeta por restaurante. Propuesta sin acordar: lado mayor de unos 1600 px y una miniatura para las listas.
+En Storage, una carpeta por restaurante. Lado mayor de 1600 px y una miniatura de 400 px para las listas, en JPEG (sección 8).
 
 ## 6. Orden de construcción
 
@@ -167,10 +152,10 @@ Confirmado por el propietario.
 
 1. **Preparación.** La hace el propietario con guía, unos 20 minutos: proyecto de Google con tarjeta y alerta de presupuesto, Firebase en región europea y clave del mapa restringida al dominio de GitHub Pages. El repo ya está creado.
 2. **Prueba técnica.** Login con Google en el iPhone con la app instalada, guardar y leer una ficha, subir una foto y cargar el mapa. Es el punto con más riesgo y va antes de portar nada.
-3. **Portar la demo.** Misma UI, con datos reales y mapa de Google.
+3. **App real.** La estructura de la demo con datos reales y mapa de Google, con el aspecto, el alta y la edición de `docs/diseno.md`. Partes y estado en `docs/diseno.md`, sección 10.
 4. **Compartir.** Pantalla de accesos (propietarios, editores e invitados que solo miran, con el color de quien puntúa) y solicitudes de acceso (ver `docs/diseno.md`).
 5. **Remate.** Icono e instalación en el iPhone, consulta sin cobertura de lo ya cargado y exportar una copia de seguridad.
-6. **Más adelante.** Buscador de Places.
+6. **Más adelante.** Lo que quede de Places. El buscador para situar el restaurante se adelantó al paso 3 (`docs/diseno.md`, sección 5).
 
 Se enseña el resultado al propietario al final de los pasos 2, 3 y 4.
 
@@ -179,7 +164,7 @@ Se enseña el resultado al propietario al final de los pasos 2, 3 y 4.
 Comprobadas el 23 de noviembre de 2026. Volver a verificarlas antes de apoyarse en ellas.
 
 - **Mapa.** Los datos de Places que se muestren en un mapa tienen que ir sobre un mapa de Google.
-- **Almacenamiento.** De lo que devuelve Places solo se puede guardar de forma indefinida el identificador del sitio. El resto hay que pedirlo de nuevo cuando haga falta. Los datos propios del usuario (notas, reseña, fotos, tipos de cocina) no tienen restricción. El diseño concreto para los restaurantes dados de alta con Places queda para el paso 6.
+- **Almacenamiento.** De lo que devuelve Places solo se puede guardar de forma indefinida el identificador del sitio. El resto hay que pedirlo de nuevo cuando haga falta. Los datos propios del usuario (notas, reseña, fotos, tipos de cocina) no tienen restricción. Lo que la app hace con los datos de Places al dar de alta está en `docs/diseno.md`, sección 5, y se aparta de esta regla por decisión del propietario.
 - **Atribución.** Mostrar datos de Places exige la atribución de Google.
 - **Cupos gratuitos mensuales vistos:** 10.000 cargas de mapa dinámico, 10.000 peticiones por servicio de la categoría Essentials y 5.000 por servicio de la categoría Pro.
 - **Firebase.** Storage exige el plan de pago por uso, que no tiene cuota fija y mantiene cupos gratuitos. Cupos vistos: Firestore con 1 GiB, 50.000 lecturas y 20.000 escrituras al día. Storage con 5 GB gratis en regiones de EE. UU. y del orden de 0,026 $ por GB al mes fuera de ellas.
@@ -202,8 +187,8 @@ Comprobado el 23 de noviembre de 2026. Al activar Maps JavaScript API la consola
 - Se aplican desde el 8 de julio de 2025 a los proyectos con cuenta de facturación en el EEE, como este (España). No hay alternativa si se quiere usar Google Maps.
 - Maps JavaScript API no tiene cambios técnicos. Según la FAQ, los precios no cambian. No se ha confirmado si cambian los cupos gratuitos.
 - Se eliminan tres restricciones, entre ellas «no usar con mapas que no sean de Google». Esto contradice el motivo por el que se descartó OpenStreetMap (sección 2): revisarlo antes del paso 6.
-- **Places en el EEE:** salvo latitud, longitud e identificador del sitio, el contenido de Places no se puede mostrar sobre ningún mapa, tampoco el de Google. El componente Place Autocomplete del Places UI Kit queda fuera de esta restricción. Afecta al diseño del paso 6, no a los anteriores.
-- No se ha encontrado en las páginas del EEE la regla de almacenamiento (solo el identificador del sitio de forma indefinida). Volver a comprobarla en el paso 6.
+- **Places en el EEE:** salvo latitud, longitud e identificador del sitio, el contenido de Places no se puede mostrar sobre ningún mapa, tampoco el de Google. El componente Place Autocomplete del Places UI Kit queda fuera de esta restricción. Afecta al alta (`docs/diseno.md`, sección 5).
+- La regla de almacenamiento no está en las páginas del EEE, sino en la de políticas de Places, comprobada el 24 de noviembre de 2026: el identificador del sitio, de forma indefinida; las coordenadas, 30 días; el resto, nada.
 
 Fuentes:
 
@@ -240,12 +225,11 @@ Acordado el 23 de noviembre de 2026. El objetivo es que nadie de fuera del grupo
 
 ### Fotos (Storage)
 
-- Solo pueden subir fotos los usuarios que han entrado con Google y figuran en la lista de personas con permiso para puntuar. Un usuario sin cuenta o que no esté en la lista recibe un error.
-- Cada persona sube solo a su propia carpeta: `restaurants/{idRestaurante}/{idUsuario}/`. No puede escribir en la de otro.
-- Solo se aceptan imágenes (tipo `image/*`) y con un tamaño máximo por archivo. Propuesta: 3 MB. La app comprime antes de subir, así que una foto normal queda muy por debajo.
-- Borrar una foto: su autor o el propietario.
+- Solo pueden subir fotos los propietarios y editores que han entrado con Google. Un usuario sin cuenta o que no esté en la lista recibe un error.
+- Las fotos van en `restaurants/{idRestaurante}/{archivo}`. Cualquier editor puede subirlas y borrarlas.
+- Solo se aceptan imágenes JPEG, PNG o WebP de menos de 3 MB. La app comprime antes de subir, así que una foto normal queda muy por debajo.
 - Ver fotos: solo los miembros del grupo.
-- Las reglas de Storage consultan la lista de permisos que está en Firestore. Comprobar en el paso 2 que esta consulta funciona y cuánto cuesta en lecturas.
+- Las reglas de Storage consultan los papeles guardados en Firestore. Comprobado en el paso 2 (sección 8).
 
 ### Datos (Firestore)
 

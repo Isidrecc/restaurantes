@@ -4,18 +4,18 @@ App web personal para puntuar y reseñar restaurantes: mapa, lista con filtros y
 
 ## Estado
 
-- La fase de diseño se cerró en una conversación previa (21 a 23 de noviembre de 2026). La app real todavía no existe: este repo contiene solo la especificación y la demo de UI.
+- La fase de diseño inicial se cerró en una conversación previa (21 a 23 de noviembre de 2026). La app real está publicada en GitHub Pages (https://isidrecc.github.io/restaurantes/) desde el 23 de noviembre de 2026.
 - Nombre de la app: «Puntuam a taula».
 - Pasos 1 y 2 terminados el 23 de noviembre de 2026. Resultados de la prueba técnica en `docs/especificacion.md`, sección 8.
-- Diseño vigente en `docs/diseno.md` (23 de noviembre de 2026): solo puntúan dos personas (azul y rosa), los demás invitados miran; texto largo y fotos con pie por restaurante. Sustituye al «cuaderno común». La demo no se actualiza: los cambios van directos a la app real, y el propietario quiere ajustar detalles al verla terminada.
-- Siguiente: paso 3, portar la demo a la app real.
+- Diseño vigente en `docs/diseno.md`: solo puntúan dos personas (azul y rosa), los demás invitados miran; texto largo y fotos con pie por restaurante (23 de noviembre de 2026). Desde el 24 de noviembre, también el aspecto (paleta «Berenjena», mapa «Lavanda» y «Noche», menú flotante), el alta en cuatro pasos, la edición en una pantalla y la app en catalán. La demo no se actualiza.
+- En curso: paso 3. Falta aplicar el alta en pasos, la edición y el aspecto (`docs/diseno.md`, sección 10).
 - La seguridad está en la sección 9 de la especificación.
 
 ## Qué leer antes de tocar nada
 
 1. `docs/especificacion.md`: decisiones tomadas, pendientes de confirmar, pantallas, modelo de datos, orden de construcción y condiciones de Google.
 2. `docs/diseno.md`: diseño vigente, que manda sobre partes de la especificación y de la demo.
-3. `demo/index.html`: prototipo aprobado. Es la referencia de estilo, textos y comportamiento, salvo lo que cambia `docs/diseno.md`. Se abre directamente en un navegador.
+3. `demo/index.html`: prototipo aprobado. Es la referencia de comportamiento, salvo lo que cambia `docs/diseno.md`. Ya no lo es de aspecto ni de textos. Se abre directamente en un navegador.
 
 ## Cómo trabajar con el propietario
 
@@ -30,10 +30,10 @@ App web personal para puntuar y reseñar restaurantes: mapa, lista con filtros y
 ## Reglas del proyecto
 
 - No añadir funciones que no estén en la especificación sin proponerlas antes.
-- La UI no se rediseña: se porta la de la demo. Cualquier cambio visual se consulta.
+- El aspecto es el de `docs/diseno.md` (secciones 4 a 8). Cualquier cambio visual que no esté ahí se consulta.
 - El repo es público. No subir datos de restaurantes, fotos, correos de usuarios ni credenciales privadas.
 - La configuración web de Firebase y la clave de Google Maps sí van en el código, porque son identificadores públicos. Deben estar protegidas: clave limitada al dominio de GitHub Pages y a las API necesarias, y datos cerrados por reglas de seguridad.
-- Textos de la interfaz en español. Decimales con coma (8,5).
+- Textos de la interfaz en catalán. Decimales con coma (8,5).
 - Mensajes de commit en español, con una línea de resumen en imperativo.
 
 ## Técnica (confirmada por el propietario)
