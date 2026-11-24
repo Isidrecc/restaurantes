@@ -124,6 +124,7 @@ h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; }
   font-weight: 600; font-size: 14px; white-space: nowrap;
 }
 .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+a.btn { text-decoration: none; color: inherit; }
 .btn-danger { color: var(--s1); }
 .btn-block { width: 100%; }
 .badge {
@@ -570,7 +571,7 @@ button.card { display: block; width: 100%; }
 }
 /* Ficha: tarjeta de Google del sitio y enlace a Google Maps. */
 .gmaps { display: flex; flex-direction: column; gap: 10px; }
-.gmaps-card { min-height: 110px; border-radius: 10px; overflow: hidden; }
+.gmaps-card { min-height: 120px; border-radius: 12px; overflow: hidden; }
 .gmaps-card:empty { background: var(--surface-2); }
 gmp-place-details-compact { width: 100%; color-scheme: light dark; }
 /* Perfil y acceso. Sin sesión, el botón de arriba a la derecha es «Entra». */

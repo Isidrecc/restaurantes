@@ -230,7 +230,8 @@ export async function placeCard(placeId) {
     await loadMaps();
     await google.maps.importLibrary('places');
     const wrap = document.createElement('div');
-    wrap.innerHTML = '<gmp-place-details-compact orientation="horizontal">' +
+    // Vertical: en horizontal, al ancho de la ficha en el iPhone, Google quita la foto.
+    wrap.innerHTML = '<gmp-place-details-compact orientation="vertical">' +
       '<gmp-place-details-place-request></gmp-place-details-place-request>' +
       '<gmp-place-content-config>' +
         '<gmp-place-media lightbox-preferred></gmp-place-media><gmp-place-rating></gmp-place-rating>' +
