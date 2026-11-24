@@ -53,7 +53,7 @@ De arriba abajo:
 5. **Nota media de cada uno**, en su color.
 6. **Roseta con dos líneas**, azul y rosa, con leyenda.
 7. **Texto largo** del restaurante.
-8. **Fotos al final**, cada una con su pie y también la portada. Al tocarla se amplía con el pie debajo. Mientras cargan se ve una rueda y aparecen con un fundido.
+8. **Fotos al final**, cada una con su pie y también la portada. Al tocarla se amplía con el pie debajo. Mientras cargan se ve una rueda y aparecen con un fundido. En la foto ampliada se pasa a la anterior o la siguiente con flechas a los lados, deslizando el dedo o con las teclas de flecha, y debajo se ve «2 / 5» (24 de noviembre de 2026). Al llegar al final vuelve a la primera.
 9. Acciones: «Comparteix» (todos, también sin entrar); «Mostra al mapa»; «Puntua» o «Edita la meva nota» (quien puntúa), que abre solo su nota; «Edita» (editores), que abre la edición completa (sección 6); «Esborra» (propietario).
 
 Pendiente: la maqueta de la ficha con el aspecto de la sección 7, y comprobar en la app que las barras y la roseta azul y rosa se leen bien junto al morado.

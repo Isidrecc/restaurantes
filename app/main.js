@@ -322,6 +322,40 @@ function coverIndex(photos) {
   const i = photos.findIndex((p) => p.cover);
   return i >= 0 ? i : 0;
 }
+// Foto ampliada: flechas a los lados, deslizar el dedo o las teclas de flecha pasan a la anterior o la
+// siguiente (da la vuelta al llegar al final), con el pie y «2 / 5» debajo.
+let lbPhotos = [];
+let lbIndex = 0;
+let lbToken = 0;
+function openLightbox(photos, i) {
+  lbPhotos = photos;
+  $('#lightbox').hidden = false;
+  showLightboxPhoto(i);
+}
+function showLightboxPhoto(i) {
+  const n = lbPhotos.length;
+  if (!n) return;
+  lbIndex = (i + n) % n;
+  const photo = lbPhotos[lbIndex];
+  const token = ++lbToken;
+  $('#lightbox').classList.remove('is-loaded', 'is-error');
+  $('#lightbox-img').removeAttribute('src');
+  $('#lightbox-img').alt = photo.caption || 'Foto';
+  $('#lightbox-cap').textContent = photo.caption || '';
+  $('#lightbox-count').textContent = n > 1 ? (lbIndex + 1) + ' / ' + n : '';
+  $('#lightbox-prev').hidden = n < 2;
+  $('#lightbox-next').hidden = n < 2;
+  photoSrc(photo.full).then((url) => { if (token === lbToken) $('#lightbox-img').src = url; }).catch(() => {
+    if (token !== lbToken) return;
+    markPhoto($('#lightbox-img'), false);
+    toast('No s’ha pogut carregar la foto');
+  });
+  // Deja preparadas la anterior y la siguiente para que el cambio sea inmediato.
+  if (n > 1) [lbIndex - 1, lbIndex + 1].forEach((j) => {
+    photoSrc(lbPhotos[(j + n) % n].full).then((url) => { new Image().src = url; }).catch(() => {});
+  });
+}
+function closeLightbox() { $('#lightbox').hidden = true; lbToken++; }
 // Mientras una foto carga se ve una rueda; al llegar, aparece suavemente (styles.css, «Fotos»).
 function markPhoto(img, ok) {
   const box = img.closest('.thumb, .lightbox');
@@ -1022,16 +1056,7 @@ function wire() {
       toast('Filtre: ' + b.dataset.v);
     }
     if (act === 'photo') {
-      const photo = r.photos[+b.dataset.i];
-      $('#lightbox').classList.remove('is-loaded', 'is-error');
-      $('#lightbox-img').removeAttribute('src');
-      $('#lightbox-img').alt = photo.caption || 'Foto';
-      $('#lightbox-cap').textContent = photo.caption || '';
-      $('#lightbox').hidden = false;
-      photoSrc(photo.full).then((url) => { $('#lightbox-img').src = url; }).catch(() => {
-        markPhoto($('#lightbox-img'), false);
-        toast('No s’ha pogut carregar la foto');
-      });
+      openLightbox(r.photos, +b.dataset.i);
     }
     if (act === 'show-on-map') {
       if (!passes(r)) { clearFilters(); toast('Filtres trets per mostrar-lo'); }
@@ -1048,8 +1073,24 @@ function wire() {
     $('#sheet-confirm').hidden = true;
     if (fn) fn();
   });
-  $('#lightbox-close').addEventListener('click', () => { $('#lightbox').hidden = true; });
-  $('#lightbox').addEventListener('click', (e) => { if (e.target.id === 'lightbox') $('#lightbox').hidden = true; });
+  $('#lightbox-close').addEventListener('click', closeLightbox);
+  $('#lightbox').addEventListener('click', (e) => { if (e.target.id === 'lightbox') closeLightbox(); });
+  $('#lightbox-prev').addEventListener('click', () => showLightboxPhoto(lbIndex - 1));
+  $('#lightbox-next').addEventListener('click', () => showLightboxPhoto(lbIndex + 1));
+  // Deslizar el dedo en horizontal pasa de foto.
+  let swipe = null;
+  $('#lightbox').addEventListener('touchstart', (e) => {
+    const t = e.touches[0];
+    swipe = e.touches.length === 1 ? { x: t.clientX, y: t.clientY } : null;
+  }, { passive: true });
+  $('#lightbox').addEventListener('touchend', (e) => {
+    if (!swipe || lbPhotos.length < 2) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - swipe.x;
+    const dy = t.clientY - swipe.y;
+    swipe = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) showLightboxPhoto(lbIndex + (dx < 0 ? 1 : -1));
+  }, { passive: true });
 
   // Formulario. Intro en un campo solo cierra el teclado: se guarda con el botón.
   $('#form').addEventListener('submit', (e) => {
@@ -1178,8 +1219,12 @@ function wire() {
   $('#p-logout').addEventListener('click', () => { $('#sheet-profile').hidden = true; store.logOut(); });
 
   document.addEventListener('keydown', (e) => {
+    if (!$('#lightbox').hidden && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+      showLightboxPhoto(lbIndex + (e.key === 'ArrowRight' ? 1 : -1));
+      return;
+    }
     if (e.key !== 'Escape') return;
-    if (!$('#lightbox').hidden) { $('#lightbox').hidden = true; return; }
+    if (!$('#lightbox').hidden) { closeLightbox(); return; }
     const open = $$('.sheet').filter((s) => !s.hidden && s.id !== 'sheet-name')[0];
     if (open) { open.hidden = true; return; }
     if (!$('#detail').hidden) { closeDetail(); return; }
@@ -1271,6 +1316,10 @@ function localPreview() {
     '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9c9a0"/><stop offset="1" stop-color="#8a5a3c"/></linearGradient></defs>' +
     '<rect width="1200" height="800" fill="url(#g)"/><circle cx="420" cy="430" r="250" fill="#f6efe6"/><circle cx="420" cy="430" r="190" fill="#e7d6c1"/>' +
     '<circle cx="380" cy="400" r="70" fill="#c0563b"/><circle cx="470" cy="470" r="55" fill="#7c9a4a"/><circle cx="900" cy="300" r="120" fill="#5b3a2a" opacity=".55"/></svg>');
+  const FOTO2 = 'data:image/svg+xml,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">' +
+    '<rect width="1200" height="800" fill="#2f4a3a"/><rect x="140" y="420" width="920" height="40" rx="20" fill="#c9a77c"/>' +
+    '<circle cx="420" cy="330" r="110" fill="#f2e6d0"/><circle cx="780" cy="330" r="110" fill="#f2e6d0"/><circle cx="420" cy="330" r="60" fill="#d27a3c"/><circle cx="780" cy="330" r="60" fill="#e0b84a"/></svg>');
   // Con ?muestra&visitant se ve como alguien que no ha entrado.
   me = params.has('visitant') ? null : { uid: 'u1', email: 'muestra@localhost', role: 'owner', color: 'azul', displayName: 'Isidre' };
   showScreen(null);
@@ -1279,7 +1328,7 @@ function localPreview() {
     people: [{ uid: 'u1', name: 'Isidre', color: 'azul' }, { uid: 'u2', name: 'Cris', color: 'rosa' }],
     restaurants: [
       { id: 'm1', name: 'Can Exemple', locality: 'Palma', lat: 39.5712, lng: 2.6498, cuisines: ['Mallorquí', 'Arrossos'], price: PRICES[1], address: 'Carrer de Mostra, 1, 07001 Palma, Illes Balears', visitDate: '2026-10-17',
-        blog: 'Primer paràgraf de mostra.\n\nSegon paràgraf.', photos: [{ full: FOTO, thumb: FOTO, caption: 'Foto de mostra' }], placeId: null, ratings: { u1: { scores: sc([8.5, 9, 7, 8, 8.5, 7.5]), dish: 'Arròs brut' }, u2: { scores: sc([9, 9, 8, 8.5, 9, 7]), dish: 'Llom amb col' } } },
+        blog: 'Primer paràgraf de mostra.\n\nSegon paràgraf.', photos: [{ full: FOTO, thumb: FOTO, caption: 'Foto de mostra' }, { full: FOTO2, thumb: FOTO2, caption: 'Segona foto' }], placeId: null, ratings: { u1: { scores: sc([8.5, 9, 7, 8, 8.5, 7.5]), dish: 'Arròs brut' }, u2: { scores: sc([9, 9, 8, 8.5, 9, 7]), dish: 'Llom amb col' } } },
       { id: 'm2', name: 'Sa Fonda Fictícia', locality: 'Sóller', lat: 39.7665, lng: 2.7152, cuisines: ['Menú degustació', 'Peix i marisc'], price: PRICES[2], visitDate: '2026-09-05',
         blog: '', photos: [], placeId: null, ratings: { u2: { scores: sc([9.5, 10, 9, 9, 6, 9.5]), dish: 'Gamba roja' } } },
       { id: 'm3', name: 'Bodega Sense Nom', locality: 'Palma', lat: 39.5745, lng: 2.6551, cuisines: ['Autor'], price: PRICES[0], visitDate: '2026-11-07',
