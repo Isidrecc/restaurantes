@@ -1,7 +1,7 @@
 // Puntuam a taula: interfaz. Porta la demo aprobada (demo/index.html) con los cambios de docs/diseno.md.
 import { CRITERIA, CUISINES, PRICES, COLORS, COLOR_NAMES } from './config.js';
 import * as store from './store.js';
-import { createMainMap, createPickMap, createPlaceSearch, localityAt } from './maps.js';
+import { createMainMap, createPickMap, createPlaceSearch, localityAt, placeCard, mapsLink } from './maps.js';
 import { preparePhoto } from './photos.js';
 
 // ---------- Estado ----------
@@ -432,13 +432,27 @@ function openDetail(id, keepScroll) {
       (canRate() ? '<button class="btn btn-primary btn-block" type="button" data-act="rate">' + (mine ? 'Edita la meva nota' : 'Puntua aquest restaurant') + '</button>' : '') +
       (r.blog ? '<div class="card"><p class="section-title">Comentari</p><div class="blog">' + blogHTML(r.blog) + '</div></div>' : '') +
       (photos ? '<div class="card"><p class="section-title">Fotos</p><div class="photos">' + photos + '</div></div>' : '') +
+      // Google Maps: la tarjeta de Google si el sitio se eligió en su buscador, y siempre el enlace.
+      '<div class="card gmaps"><p class="section-title">A Google Maps</p>' +
+        (r.placeId ? '<div class="gmaps-card" id="gmaps-card"></div>' : '') +
+        '<a class="btn btn-block" href="' + esc(mapsLink(r)) + '" target="_blank" rel="noopener">Obre a Google Maps</a></div>' +
       '<button class="btn btn-block" type="button" data-act="show-on-map">Mostra al mapa</button>' +
     '</div>';
   $('#detail').hidden = false;
   $('#detail .panel-body').scrollTop = prevScroll;
   hydratePhotos($('#detail'));
+  if (r.placeId) showPlaceCard(r.id, r.placeId);
 }
 function closeDetail() { $('#detail').hidden = true; detailId = null; }
+// Pone la tarjeta de Google en la ficha abierta. Si no carga (sin red o tope diario), se quita y queda el enlace.
+function showPlaceCard(rid, placeId) {
+  const box = $('#gmaps-card');
+  placeCard(placeId).then((el) => {
+    if (detailId !== rid || !document.body.contains(box)) return;
+    box.appendChild(el);
+    el.loaded.catch(() => { box.hidden = true; });
+  }).catch(() => { box.hidden = true; });
+}
 // Comparteix: enlace directo a la ficha (?r=id), que se ve sin entrar. En el iPhone abre el menú de compartir.
 async function shareRestaurant(r) {
   const url = location.origin + location.pathname + '?r=' + encodeURIComponent(r.id);

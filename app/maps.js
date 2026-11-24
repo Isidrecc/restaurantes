@@ -218,6 +218,48 @@ export async function createPlaceSearch({ getBias, onPlace, onError }) {
   return el;
 }
 
+// ---------- Tarjeta de Google del sitio ----------
+// Places UI Kit, Place Details compacto: foto (con galería), nombre, estrellas con número de reseñas, tipo,
+// precio, si está abierto y enlace a Google Maps. El UI Kit queda fuera de las restricciones del EEE y cada
+// tarjeta creada cuenta una consulta «Places UI Kit Query» (docs/diseno.md, sección 4). Se guarda cada
+// tarjeta creada: volver a ponerla en la página no la vuelve a pedir (comprobado el 24 de noviembre de 2026).
+const placeCards = new Map();
+export async function placeCard(placeId) {
+  if (placeCards.has(placeId)) return placeCards.get(placeId);
+  const ready = (async () => {
+    await loadMaps();
+    await google.maps.importLibrary('places');
+    const wrap = document.createElement('div');
+    wrap.innerHTML = '<gmp-place-details-compact orientation="horizontal">' +
+      '<gmp-place-details-place-request></gmp-place-details-place-request>' +
+      '<gmp-place-content-config>' +
+        '<gmp-place-media lightbox-preferred></gmp-place-media><gmp-place-rating></gmp-place-rating>' +
+        '<gmp-place-type></gmp-place-type><gmp-place-price></gmp-place-price><gmp-place-open-now-status></gmp-place-open-now-status>' +
+        '<gmp-place-attribution light-scheme-color="gray" dark-scheme-color="white"></gmp-place-attribution>' +
+      '</gmp-place-content-config></gmp-place-details-compact>';
+    const el = wrap.firstElementChild;
+    el.querySelector('gmp-place-details-place-request').setAttribute('place', placeId);
+    // Se resuelve al cargar o falla (por ejemplo, si se ha llegado al tope diario).
+    el.loaded = new Promise((resolve, reject) => {
+      el.addEventListener('gmp-load', resolve, { once: true });
+      el.addEventListener('gmp-error', reject, { once: true });
+    });
+    // Si falla, no se guarda: la próxima vez que se abra la ficha se vuelve a intentar.
+    el.loaded.catch(() => placeCards.delete(placeId));
+    return el;
+  })();
+  placeCards.set(placeId, ready);
+  ready.catch(() => placeCards.delete(placeId));
+  return ready;
+}
+
+// Enlace a Google Maps (Maps URLs, sin clave ni coste): el sitio de Google si lo hay; si no, el punto.
+export function mapsLink(r) {
+  const q = r.placeId ? r.name : r.lat + ',' + r.lng;
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q) +
+    (r.placeId ? '&query_place_id=' + encodeURIComponent(r.placeId) : '');
+}
+
 // ---------- Localidad de un punto (geocodificación inversa) ----------
 // Para el pin puesto a mano: Google devuelve la dirección del punto y se saca el pueblo o ciudad.
 // Necesita la Geocoding API activada en el proyecto y añadida a la clave (docs/diseno.md, sección 5).
