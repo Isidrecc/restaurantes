@@ -513,6 +513,8 @@ button.card { display: block; width: 100%; }
 /* Portada de la ficha: a todo el ancho, arriba del todo (docs/diseno.md, sección 4). */
 .thumb.cover { display: block; width: calc(100% + 32px); height: 220px; margin: -16px -16px 0; aspect-ratio: auto; border: 0; border-radius: 0; }
 /* Perfil y acceso */
+.req-list { margin: 6px 0 0; padding-left: 18px; font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+.req-list li { overflow-wrap: anywhere; }
 .demo-box { padding: 12px; border: 1px dashed var(--line); border-radius: 12px; display: flex; flex-direction: column; gap: 8px; }
 .demo-box .seg-wide button { font-size: 12px; padding: 0 2px; }
 .noaccess { z-index: 2500; justify-content: center; overflow-y: auto; }

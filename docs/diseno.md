@@ -16,7 +16,7 @@ La demo (`demo/index.html`) ya no se actualiza. Sirve de referencia para el comp
 
 - Puntúan solo dos personas, cada una con su color: **azul** (el propietario) y **rosa** (Cris). El color va en su documento de `members`.
 - Puede haber más de un propietario. Hoy hay dos.
-- Solicitudes de acceso: quien no está invitado puede pedir acceso para ver. Lo aprueba un propietario (paso 4). Desaparece «solicitar ser editor».
+- Solicitudes de acceso: quien no está invitado puede pedir acceso para ver. Lo aprueba un propietario en la consola de Firebase, siguiendo `docs/accesos.md`; en la app, los propietarios ven en su perfil los correos pendientes. La pantalla de accesos del paso 4 se descartó el 24 de noviembre de 2026. Desaparece «solicitar ser editor».
 
 ## 2. Qué guarda cada restaurante
 

@@ -59,9 +59,14 @@ export function requestAccess(user) {
   });
 }
 
-export async function countPendingRequests() {
+// Solicitudes de acceso pendientes, de la más antigua a la más nueva. Se resuelven en la consola de Firebase
+// (docs/accesos.md); la app solo las muestra a los propietarios.
+export async function pendingRequests() {
   const snap = await getDocs(query(collection(db, 'accessRequests'), where('status', '==', 'pending')));
-  return snap.size;
+  return snap.docs.map((d) => {
+    const x = d.data();
+    return { email: x.email || '', name: x.displayName || '', at: x.createdAt ? x.createdAt.toMillis() : 0 };
+  }).sort((a, b) => a.at - b.at);
 }
 
 // ---------- Lectura en tiempo real ----------

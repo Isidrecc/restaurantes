@@ -153,11 +153,11 @@ Confirmado por el propietario.
 1. **Preparación.** La hace el propietario con guía, unos 20 minutos: proyecto de Google con tarjeta y alerta de presupuesto, Firebase en región europea y clave del mapa restringida al dominio de GitHub Pages. El repo ya está creado.
 2. **Prueba técnica.** Login con Google en el iPhone con la app instalada, guardar y leer una ficha, subir una foto y cargar el mapa. Es el punto con más riesgo y va antes de portar nada.
 3. **App real.** La estructura de la demo con datos reales y mapa de Google, con el aspecto, el alta y la edición de `docs/diseno.md`. Partes y estado en `docs/diseno.md`, sección 10. Terminado el 24 de noviembre de 2026.
-4. **Compartir.** Pantalla de accesos (propietarios, editores e invitados que solo miran, con el color de quien puntúa) y solicitudes de acceso (ver `docs/diseno.md`).
+4. ~~**Compartir.** Pantalla de accesos (propietarios, editores e invitados que solo miran, con el color de quien puntúa) y solicitudes de acceso.~~ Descartado por el propietario el 24 de noviembre de 2026: los accesos se dan y se quitan en la consola de Firebase (`docs/accesos.md`), y la app solo muestra a los propietarios los correos de las solicitudes pendientes.
 5. **Remate.** Icono e instalación en el iPhone, consulta sin cobertura de lo ya cargado y exportar una copia de seguridad. Además, sacar la clave de Google Maps del repo (propuesto por el propietario el 24 de noviembre de 2026): clave nueva con las mismas restricciones y topes, guardada como secreto de GitHub y puesta en la página al publicar con GitHub Actions; en local, en un archivo que no se sube. Después, borrar la clave antigua para que las del historial dejen de valer y quitarla de la sección 10. La clave seguirá viéndose en la web publicada: lo que se gana es que no esté en GitHub. Decidir entonces qué hacer con la configuración de Firebase, que también está en el repo.
 6. **Más adelante.** Lo que quede de Places. El buscador para situar el restaurante se adelantó al paso 3 (`docs/diseno.md`, sección 5).
 
-Se enseña el resultado al propietario al final de los pasos 2, 3 y 4.
+Se enseña el resultado al propietario al final de los pasos 2, 3 y 5.
 
 ## 7. Condiciones de Google que afectan al diseño
 

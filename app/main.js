@@ -832,10 +832,14 @@ async function renderProfile() {
   $('#p-role').innerHTML = 'Paper: <b>' + ROLE_NAMES[me.role] + '</b>' + (me.color ? ' · puntues en <b class="p-' + me.color + '" style="color:var(--pc)">' + COLOR_NAMES[me.color] + '</b>' : '') +
     '<br><span class="meta">' + esc(me.email) + '</span>';
   $('#p-extra').innerHTML = '';
+  // Los accesos se dan y se quitan en la consola de Firebase (docs/accesos.md). Aquí solo se ve quién lo ha pedido.
   if (me.role === 'owner') {
     try {
-      const n = await store.countPendingRequests();
-      $('#p-extra').innerHTML = '<p class="meta">Sol·licituds d’accés pendents: <b>' + n + '</b>. La pantalla d’accessos arriba al pas 4; mentrestant es gestionen a la consola de Firebase.</p>';
+      const reqs = await store.pendingRequests();
+      $('#p-extra').innerHTML = reqs.length
+        ? '<p class="meta">Sol·licituds d’accés pendents: <b>' + reqs.length + '</b>. Dona’ls accés a la consola de Firebase, a la col·lecció <b>members</b>, i després esborra la sol·licitud.</p>' +
+          '<ul class="req-list">' + reqs.map((r) => '<li><b>' + esc(r.email) + '</b>' + (r.name ? ' · ' + esc(r.name) : '') + '</li>').join('') + '</ul>'
+        : '<p class="meta">Cap sol·licitud d’accés pendent. Els accessos es donen i es treuen a la consola de Firebase, a la col·lecció <b>members</b>.</p>';
     } catch (e) { /* no es crítico */ }
   }
 }
