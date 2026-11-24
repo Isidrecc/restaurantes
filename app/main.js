@@ -1,7 +1,7 @@
 // Puntuam a taula: interfaz. Porta la demo aprobada (demo/index.html) con los cambios de docs/diseno.md.
 import { CRITERIA, CUISINES, PRICES, COLORS, COLOR_NAMES } from './config.js';
 import * as store from './store.js';
-import { createMainMap, createPickMap, createPlaceSearch, searchText } from './maps.js';
+import { createMainMap, createPickMap, createPlaceSearch, localityAt } from './maps.js';
 import { preparePhoto } from './photos.js';
 
 // ---------- Estado ----------
@@ -32,6 +32,9 @@ let searchToken = 0;      // descarta casillas que terminan de crearse cuando ya
 let searchFailed = false; // sin buscador de Google: el nombre se escribe a mano
 let nameBeforeSearch = '';// nombre que había antes de tocar la X para volver a buscar
 let autoLocality = '';    // localidad copiada de Google
+let typedText = '';       // lo escrito en la casilla de Google, reconstruido tecla a tecla
+let geoToken = 0;         // descarta respuestas de localidad de un pin anterior
+let localityManual = false; // la localidad la ha escrito la persona: no se sustituye
 
 // Selector de nota: 'all' (media) o el color de quien puntúa.
 let who = 'all';
@@ -419,6 +422,7 @@ function showNameBox(name) {
 async function showSearch() {
   const token = ++searchToken;
   searchEl = null;
+  typedText = '';
   $('#f-namebox').hidden = true;
   $('#f-address').hidden = true;
   $('#f-gsearch').hidden = false;
@@ -460,12 +464,14 @@ function onPlacePicked(m, p) {
   m.center(p.lat, p.lng, 18);
   draft.address = p.address || '';
   showNameBox(p.name);
-  // La localidad sale de la dirección de Google y en el alta no se muestra; si Google no la da, se pide.
+  // La localidad sale de la dirección de Google y en el alta no se muestra. Si Google no la da, se pide
+  // la del punto al poner el pin (fillLocalityFromPin).
   const input = $('#f-locality');
-  if (p.locality) input.value = p.locality;
+  if (p.locality && !localityManual) input.value = p.locality;
   else if (input.value.trim() === autoLocality) input.value = '';
   autoLocality = p.locality || '';
-  showLocality(formMode !== 'add' || !p.locality);
+  if (formMode !== 'add') showLocality(true);
+  else if (p.locality) showLocality(false);
   $('#err-muni').hidden = true;
   $('#err-loc').hidden = true;
   $('#pick-status').textContent = 'Toca el restaurant marcat per posar-hi el pin.';
@@ -485,23 +491,56 @@ function setDraftLocation(lat, lng) {
   $('#err-loc').hidden = true;
   $('#pick-status').textContent = 'Punt marcat. Pots arrossegar el pin per afinar.';
   // Pin puesto sin elegir ningún resultado: la casilla pasa a campo de nombre con lo que se hubiera escrito.
-  if (!searching()) return;
-  const typed = searchText(searchEl);
-  searchToken++;
-  if (typed) {
-    // Sitio nuevo escrito a mano: sin datos de Google, y la localidad se pide.
-    draft.placeId = null;
-    draft.address = '';
-    if (pickMap) pickMap.hidePlace();
-    if ($('#f-locality').value.trim() === autoLocality) $('#f-locality').value = '';
-    autoLocality = '';
-    showNameBox(typed);
-    showLocality(true);
-  } else {
-    // No se ha escrito nada: se recupera lo que había antes de volver a buscar.
-    showNameBox(nameBeforeSearch);
-    showLocality(formMode !== 'add' || !$('#f-locality').value.trim());
+  if (searching()) {
+    const typed = typedText.replace(/\s+/g, ' ').trim().slice(0, 80);
+    searchToken++;
+    if (typed) {
+      // Sitio nuevo escrito a mano: sin datos de Google.
+      draft.placeId = null;
+      draft.address = '';
+      if (pickMap) pickMap.hidePlace();
+      if ($('#f-locality').value.trim() === autoLocality) $('#f-locality').value = '';
+      autoLocality = '';
+      showNameBox(typed);
+    } else {
+      // No se ha escrito nada: se recupera lo que había antes de volver a buscar.
+      showNameBox(nameBeforeSearch);
+    }
   }
+  fillLocalityFromPin();
+}
+// Alta: la localidad del pin la da Google (geocodificación inversa) si no ha llegado con el sitio elegido
+// en el buscador ni la ha escrito la persona. Si Google no la da, aparece la casilla «Localitat».
+function fillLocalityFromPin() {
+  if (!draft || formMode !== 'add' || localityManual) return;
+  if (draft.placeId && autoLocality) return;
+  const token = ++geoToken;
+  localityAt(draft.lat, draft.lng).then((loc) => {
+    if (token !== geoToken || !draft || localityManual) return;
+    if (loc) {
+      $('#f-locality').value = loc;
+      autoLocality = loc;
+      $('#err-muni').hidden = true;
+      showLocality(false);
+    } else showLocality(true);
+  }).catch((e) => {
+    if (token !== geoToken || !draft) return;
+    console.warn('No s’ha pogut obtenir la localitat del punt', e);
+    showLocality(true);
+  });
+}
+// Reconstruye lo escrito en la casilla de Google a partir de sus eventos de teclado, que sí salen de ella
+// (la casilla no deja leer su texto). Supone que se escribe al final: con el autocorrector, al pegar o al
+// mover el cursor puede no coincidir, y entonces el nombre se corrige a mano.
+function trackSearchTyping(e) {
+  if (e.type === 'compositionend') { typedText += e.data || ''; return; }
+  const t = e.inputType || '';
+  const text = e.data != null ? e.data : (e.dataTransfer ? e.dataTransfer.getData('text/plain') : '');
+  if (t === 'insertText' || t === 'insertFromPaste' || t === 'insertFromDrop') typedText += text || '';
+  else if (t === 'insertReplacementText') typedText = typedText.replace(/\S*$/, text || '');
+  else if (t === 'deleteContentBackward') typedText = Array.from(typedText).slice(0, -1).join('');
+  else if (t === 'deleteWordBackward') typedText = typedText.replace(/\S*\s*$/, '');
+  else if (t.indexOf('delete') === 0) typedText = '';
 }
 function placeDraftOnPickMap(m) {
   if (!m || !draft) return;
@@ -590,6 +629,9 @@ function startForm(mode, r) {
   searchFailed = false;
   nameBeforeSearch = draft.name;
   autoLocality = '';
+  typedText = '';
+  localityManual = false;
+  geoToken++;
   $('#form-title').textContent = mode === 'add' ? 'Afegeix un restaurant' : mode === 'edit' ? 'Edita · ' + r.name : (mine ? 'Edita la meva nota · ' : 'Puntua · ') + r.name;
   $('#f-save').textContent = mode === 'add' ? 'Desa el restaurant' : mode === 'edit' ? 'Desa els canvis' : 'Desa la meva nota';
   const blocks = formBlocks();
@@ -994,7 +1036,13 @@ function wire() {
     showSearch();
   });
   $('#f-name').addEventListener('input', () => { $('#err-name').hidden = true; });
-  $('#f-locality').addEventListener('input', () => { $('#err-muni').hidden = true; });
+  $('#f-locality').addEventListener('input', () => {
+    $('#err-muni').hidden = true;
+    localityManual = !!$('#f-locality').value.trim();
+  });
+  // Los eventos de teclado de la casilla de Google salen de ella aunque su texto no se pueda leer.
+  $('#f-gsearch').addEventListener('beforeinput', trackSearchTyping, true);
+  $('#f-gsearch').addEventListener('compositionend', trackSearchTyping, true);
   $$('#grp-datos [data-day]').forEach((b) => b.addEventListener('click', () => {
     $('#f-date').value = dayISO(+b.dataset.day);
     updateDateChips();

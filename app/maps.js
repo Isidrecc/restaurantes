@@ -181,12 +181,13 @@ export async function createPickMap(el, { onPick }) {
 // aunque las condiciones de Google no permiten guardarlos (docs/diseno.md, sección 5).
 // Las coordenadas solo sirven para llevar el mapa allí; el pin lo pone el usuario.
 
-// Localidad de la dirección: el pueblo o ciudad (no la provincia).
+// Localidad de la dirección: el pueblo o ciudad (no la provincia). Places (New) da longText; Geocoder, long_name.
 function localityOf(components) {
   const order = ['locality', 'postal_town', 'administrative_area_level_4', 'administrative_area_level_3'];
   for (const type of order) {
-    const c = (components || []).find((x) => x.types.includes(type));
-    if (c && c.longText) return c.longText;
+    const c = (components || []).find((x) => (x.types || []).includes(type));
+    const name = c && (c.longText || c.long_name);
+    if (name) return name;
   }
   return '';
 }
@@ -217,14 +218,21 @@ export async function createPlaceSearch({ getBias, onPlace, onError }) {
   return el;
 }
 
-// Lo escrito en la casilla de Google sin elegir ningún resultado. Google no lo documenta: se prueba con
-// la propiedad value y con el campo interno si su shadow DOM está abierto. Si no se puede leer, vacío.
-export function searchText(el) {
-  if (!el) return '';
-  let v = '';
-  try {
-    if (typeof el.value === 'string') v = el.value;
-    else if (el.shadowRoot && el.shadowRoot.querySelector('input')) v = el.shadowRoot.querySelector('input').value;
-  } catch (e) { v = ''; }
-  return String(v || '').replace(/\s+/g, ' ').trim().slice(0, 80);
+// ---------- Localidad de un punto (geocodificación inversa) ----------
+// Para el pin puesto a mano: Google devuelve la dirección del punto y se saca el pueblo o ciudad.
+// Necesita la Geocoding API activada en el proyecto y añadida a la clave (docs/diseno.md, sección 5).
+// Si no está o no hay resultado, devuelve '' y la app pide la localidad.
+let geocoder = null;
+export async function localityAt(lat, lng) {
+  await loadMaps();
+  if (!geocoder) {
+    const { Geocoder } = await google.maps.importLibrary('geocoding');
+    geocoder = new Geocoder();
+  }
+  const { results } = await geocoder.geocode({ location: { lat, lng } });
+  for (const r of results || []) {
+    const name = localityOf(r.address_components);
+    if (name) return name.slice(0, 60);
+  }
+  return '';
 }
