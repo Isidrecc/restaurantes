@@ -197,7 +197,7 @@ Fuentes:
 
 ## 8. Riesgos y resultados de la prueba técnica (paso 2)
 
-Probado el 23 de noviembre de 2026 con la página `prueba/` en un iPhone (iOS 18.7) y en local. Firebase 13.4.0.
+Probado el 23 de noviembre de 2026 con la página `prueba/` en un iPhone (iOS 18.7) y en local. Firebase 13.4.0. La página se borró el 24 de noviembre de 2026 y sigue en el historial de git.
 
 | Riesgo | Resultado |
 |---|---|
@@ -217,7 +217,7 @@ Decisiones que salen de la prueba:
 - Firestore con caché en el dispositivo y long polling forzado.
 - Fotos a 1600 px y miniatura a 400 px, en JPEG. Si el original ya es JPEG y cabe en 1600 px, se sube sin recomprimir. Esto cierra la propuesta de tamaño de la sección 5.
 - Leer las opiniones en paralelo (o con una consulta de grupo de colecciones) en lugar de una tras otra, y evitar dos lecturas a la vez.
-- La carpeta `prueba/` se borra al terminar el paso 3.
+- La carpeta `prueba/` se borra al terminar el paso 3. Hecho el 24 de noviembre de 2026.
 
 ## 9. Seguridad y protección frente a abusos
 

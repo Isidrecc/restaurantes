@@ -208,8 +208,8 @@ Orden aprobado por el propietario el 24 de noviembre de 2026. Al final de cada p
 |---|---|
 | 3e · Colores y menú | Paleta «Berenjena» en claro y oscuro, sin interruptor manual, `theme-color` y menú inferior flotante con el «+» (sección 7). Va primero para comprobar pronto que el azul y el rosa se leen bien junto al morado |
 | 3f · Mapa | Estilo «Lavanda» y «Noche» preparado por Claude, Map ID creado por el propietario con guía, y conexión con `FOLLOW_SYSTEM` (sección 8) |
-| 3g · Alta y edición | Alta en cuatro pasos y edición en una pantalla, que comparten los mismos bloques (secciones 5 y 6). Publicada el 24 de noviembre de 2026, pendiente del visto bueno del propietario en el iPhone |
-| 3h · Cierre | Prueba del propietario en el iPhone y su aprobación, estado al día en `CLAUDE.md` y borrar la carpeta `prueba/` |
+| 3g · Alta y edición | Alta en cuatro pasos y edición en una pantalla, que comparten los mismos bloques (secciones 5 y 6). Publicada el 24 de noviembre de 2026 y aprobada por el propietario tras probarla Claude en la app publicada (alta con Google, nota y edición) |
+| 3h · Cierre | Prueba del propietario en el iPhone y su aprobación, estado al día en `CLAUDE.md` y borrar la carpeta `prueba/`. El 24 de noviembre de 2026: `prueba/` borrada y estado al día; falta la prueba final del propietario en el iPhone |
 
 Tareas del propietario hechas: publicar las reglas de Firestore que aceptan `address` (comprobado el 24 de noviembre de 2026 al guardar en la app publicada un restaurante con la dirección de Google), poner `color` en los dos documentos de `members`, borrar las fichas de prueba y crear el Map ID con los estilos (sección 8).
 

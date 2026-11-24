@@ -4,10 +4,14 @@ App web personal para puntuar y reseñar restaurantes: mapa, lista con filtros y
 
 ## Estado
 
-En diseño. Todavía no hay app: el repo contiene la especificación y la demo de la interfaz.
+Publicada en https://isidrecc.github.io/restaurantes/ con acceso solo por invitación. En construcción: la app básica (paso 3) está hecha; el siguiente paso es la pantalla para compartir el acceso.
 
 ## Contenido
 
+- `index.html` y `app/`: la app. HTML, CSS y JavaScript sin paso de compilación, con Firebase y Google Maps.
+- `firestore.rules` y `storage.rules`: reglas de seguridad de Firebase. Se publican a mano en la consola.
 - `docs/especificacion.md`: decisiones, modelo de datos y orden de construcción.
-- `demo/index.html`: prototipo de la interfaz con datos inventados. Se abre directamente en un navegador.
+- `docs/diseno.md`: diseño vigente, que manda sobre la especificación y la demo.
+- `docs/mapa/`: estilos del mapa para importar en Google Cloud.
+- `demo/index.html`: prototipo de la interfaz con datos inventados. Ya no se actualiza.
 - `CLAUDE.md`: instrucciones de trabajo para Claude Code.
