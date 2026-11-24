@@ -25,7 +25,7 @@ App personal para puntuar y reseñar los restaurantes visitados.
 | Alta | En cuatro pasos, empezando por el buscador de Google para situar el restaurante. Ver `docs/diseno.md`, sección 5. |
 | Mapa | Google Maps, con estilo propio en claro y oscuro. Ver `docs/diseno.md`, sección 8. |
 | Datos y fotos | Firebase: Auth con cuentas de Google, Firestore y Storage. |
-| Alojamiento | GitHub Pages desde este repo, que es público. |
+| Alojamiento | GitHub Pages desde este repo, que es público. Desde el 24 de noviembre de 2026 lo publica un flujo de GitHub Actions que añade las páginas de compartir de cada ficha (`docs/publicacion.md`). |
 | UI | La estructura de la demo (`demo/index.html`), aprobada por el propietario, con el aspecto, el alta y la edición de `docs/diseno.md` (secciones 5 a 8). |
 | Idioma de la app | Catalán. Ver `docs/diseno.md`. |
 | Compartir | Puntúan dos personas (azul y rosa). La app se ve sin entrar y cada ficha se comparte con un enlace (24 de noviembre de 2026). Ver `docs/diseno.md`, sección 1. |
@@ -224,6 +224,7 @@ Decisiones que salen de la prueba:
 Acordado el 23 de noviembre de 2026 y cambiado el 24: desde entonces cualquiera puede **leer** restaurantes, notas, nombres visibles y fotos, porque la app es pública en solo lectura (`docs/diseno.md`, sección 1). El objetivo pasa a ser que nadie sin permiso pueda escribir datos, subir fotos ni ver los correos, y que leer no genere un gasto apreciable. Las reglas se aplican en los servidores de Firebase, así que no se pueden saltar tocando el código de la app, que es público.
 
 - Queda a la vista de cualquiera que encuentre la dirección (el repo la enlaza): restaurantes, notas, textos, fotos y los nombres visibles de quien puntúa. Los correos (`members`) no.
+- El montaje de la web con GitHub Actions lee todos los datos cada 30 minutos: unas 14.400 lecturas al día con 100 restaurantes (`docs/publicacion.md`).
 - Cada visita gasta lecturas de Firestore (50.000 gratis al día), cargas del mapa (con su tope diario, más abajo) y descargas de fotos de Storage. El coste de esas descargas en `europe-southwest1` no se ha comprobado; con el uso previsto debería ser de céntimos.
 - Sin sesión, nadie puede abusar de la Geocoding API ni del buscador: solo se usan en el alta.
 - Reglas de Firestore y de Storage con lectura pública publicadas en la consola el 24 de noviembre de 2026. Comprobado ese día sin sesión, desde la web publicada: se leen `restaurants` y `users`, `members` responde PERMISSION_DENIED y las fotos se descargan.

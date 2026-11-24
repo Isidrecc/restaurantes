@@ -456,9 +456,17 @@ function showPlaceCard(rid, placeId) {
     el.loaded.catch(fail);
   }).catch(fail);
 }
-// Comparteix: enlace directo a la ficha (?r=id), que se ve sin entrar. En el iPhone abre el menú de compartir.
+// Comparteix: enlace a la ficha, que se ve sin entrar. En el iPhone abre el menú de compartir.
+// En la web publicada es la página f/<id>/, con la portada para la vista previa (tools/build-site.mjs), que
+// lleva a la ficha; en local, directamente ?r=id.
+function shareURL(r) {
+  const base = location.origin + location.pathname.replace(/[^/]*$/, '');
+  return location.hostname.endsWith('github.io')
+    ? base + 'f/' + encodeURIComponent(r.id) + '/'
+    : base + '?r=' + encodeURIComponent(r.id);
+}
 async function shareRestaurant(r) {
-  const url = location.origin + location.pathname + '?r=' + encodeURIComponent(r.id);
+  const url = shareURL(r);
   if (navigator.share) {
     try { await navigator.share({ title: r.name + ' · Puntuam a taula', url }); } catch (e) { /* cancel·lat */ }
     return;

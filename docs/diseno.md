@@ -18,7 +18,7 @@ La demo (`demo/index.html`) ya no se actualiza. Sirve de referencia para el comp
 - Puede haber más de un propietario. Hoy hay dos.
 - **La app se ve sin entrar, en solo lectura** (decidido por el propietario el 24 de noviembre de 2026): mapa, lista y fichas, con notas, textos, fotos y los nombres de quien puntúa, pero no los correos. Arriba a la derecha sale «Entra»; entrar con Google solo sirve para añadir, editar y puntuar. Quien entra sin permiso lo ve todo igual y su perfil le dice que no puede editar.
 - Los permisos se dan y se quitan en la consola de Firebase (`docs/accesos.md`); la pantalla de accesos del paso 4 se descartó el 24 de noviembre de 2026. El papel `viewer` y las solicitudes de acceso desaparecen con la app pública.
-- **Compartir**: cada ficha tiene «Comparteix», que en el iPhone abre el menú de compartir con el enlace directo a la ficha (`?r=` y el identificador del restaurante). Sin menú de compartir, el enlace se copia.
+- **Compartir**: cada ficha tiene «Comparteix», que en el iPhone abre el menú de compartir con el enlace a la ficha. Sin menú de compartir, el enlace se copia. En la web publicada el enlace es `f/<id>/`, una página con la portada para la vista previa (WhatsApp y otras apps) que lleva al instante a la ficha (`?r=id`); se monta con GitHub Actions (`docs/publicacion.md`, 24 de noviembre de 2026).
 
 ## 2. Qué guarda cada restaurante
 

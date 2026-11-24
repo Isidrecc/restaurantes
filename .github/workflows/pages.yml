@@ -1,0 +1,45 @@
+# Publica la web en GitHub Pages (docs/publicacion.md): monta la app con su versión y una página por ficha
+# con la portada para las vistas previas al compartir (tools/build-site.mjs).
+# Corre en cada cambio de main, cada 30 minutos (para las fichas nuevas o cambiadas) y a mano desde Actions.
+name: Publica la web
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Una publicación cada vez; la que está en marcha no se cancela.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Monta la web y las páginas de compartir
+        run: node tools/build-site.mjs _site
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
