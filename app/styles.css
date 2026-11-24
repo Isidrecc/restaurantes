@@ -32,6 +32,12 @@
   --s0: #e3dad2;
   --score-ink: #2b211b;
   --danger: #b3393f;
+  /* Inici: fondo más claro y tarjetas más oscuras que el fondo, para que destaquen (pedido por el propietario
+     el 24 de noviembre de 2026). En oscuro, al revés: tarjetas más claras. Solo en esa pantalla. */
+  --home-bg: #ffffff;
+  --home-card: #f3eae2;
+  --home-line: #e5d8cb;
+  --home-ph: #e9ddd2;
   --shadow: 0 6px 24px rgba(51, 38, 31, .14);
   --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, system-ui, sans-serif;
   --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, system-ui, sans-serif;
@@ -70,6 +76,10 @@
     --sea: #142427;
     --s0: #c9bdb2;
     --danger: #f0a0a0;
+    --home-bg: #18130f;
+    --home-card: #31281f;
+    --home-line: #45392f;
+    --home-ph: #3b3027;
     --shadow: 0 6px 24px rgba(0, 0, 0, .5);
     color-scheme: dark;
   }
@@ -731,3 +741,11 @@ img[data-path]:not([src]) { visibility: hidden; }
 .hcard-name { font: var(--title-weight) 15px/1.25 var(--font-display); overflow-wrap: anywhere; }
 .score.is-small { width: 44px; height: 44px; font-size: 17px; }
 .score.is-small.is-empty { font-size: 10px; padding: 2px; }
+/* Colores propios de Inici (variables --home-*). El recuadro de Google toma el fondo de la tarjeta con su
+   propiedad --gmp-mat-color-surface (comprobada en la documentación de Google el 24 de noviembre de 2026);
+   la línea de debajo lo sigue separando del texto de la app. */
+#view-home { background: var(--home-bg); }
+.home .hcard { background: var(--home-card); border-color: var(--home-line); }
+.home .hcard-none, .home .hcard-google:not([data-state="loaded"]) { background: var(--home-ph); }
+.home .hcard-google { border-bottom-color: var(--home-line); }
+.home .hcard-google gmp-place-details-compact { --gmp-mat-color-surface: var(--home-card); background: var(--home-card); }
