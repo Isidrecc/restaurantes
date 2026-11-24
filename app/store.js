@@ -4,8 +4,8 @@ import {
   getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
 } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js';
 import {
-  initializeFirestore, persistentLocalCache, doc, collection, collectionGroup, getDoc, getDocs,
-  setDoc, updateDoc, writeBatch, serverTimestamp, onSnapshot, query, where
+  initializeFirestore, persistentLocalCache, doc, collection, collectionGroup, getDoc,
+  setDoc, updateDoc, writeBatch, serverTimestamp, onSnapshot
 } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js';
 import {
   getStorage, ref, uploadBytes, getDownloadURL, deleteObject
@@ -43,30 +43,6 @@ export async function getProfile(uid) {
 
 export function saveProfile(uid, displayName, color) {
   return setDoc(doc(db, 'users', uid), { displayName, color: color || null, updatedAt: serverTimestamp() });
-}
-
-export async function getAccessRequest(uid) {
-  const snap = await getDoc(doc(db, 'accessRequests', uid));
-  return snap.exists() ? snap.data() : null;
-}
-
-export function requestAccess(user) {
-  return setDoc(doc(db, 'accessRequests', user.uid), {
-    email: user.email.toLowerCase(),
-    displayName: user.displayName || '',
-    status: 'pending',
-    createdAt: serverTimestamp()
-  });
-}
-
-// Solicitudes de acceso pendientes, de la más antigua a la más nueva. Se resuelven en la consola de Firebase
-// (docs/accesos.md); la app solo las muestra a los propietarios.
-export async function pendingRequests() {
-  const snap = await getDocs(query(collection(db, 'accessRequests'), where('status', '==', 'pending')));
-  return snap.docs.map((d) => {
-    const x = d.data();
-    return { email: x.email || '', name: x.displayName || '', at: x.createdAt ? x.createdAt.toMillis() : 0 };
-  }).sort((a, b) => a.at - b.at);
 }
 
 // ---------- Lectura en tiempo real ----------

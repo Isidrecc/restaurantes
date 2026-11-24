@@ -1,8 +1,9 @@
 rules_version = '2';
 
 // Reglas de Firestore de Puntuam a taula (docs/diseno.md).
-// Papeles en members/{correo}: owner (propietario), editor y viewer (invitado que solo mira).
-// Puntúa quien es propietario o editor y tiene color (azul o rosa).
+// Leer restaurantes, notas y nombres visibles: cualquiera, sin entrar (app pública en solo lectura desde el
+// 24 de noviembre de 2026). Escribir: según el papel en members/{correo}: owner (propietario) o editor.
+// Puntúa quien es propietario o editor y tiene color (azul o rosa). El papel viewer ya no hace falta.
 
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -86,9 +87,9 @@ service cloud.firestore {
       allow write: if isOwner();
     }
 
-    // Nombre visible y color (copia del de members, para que los invitados vean quién es quién).
+    // Nombre visible y color (copia del de members, para que se vea quién es quién). Sin correos.
     match /users/{uid} {
-      allow read: if isMember();
+      allow read: if true;
       allow create, update: if isMember() && request.auth.uid == uid
         && request.resource.data.keys().hasOnly(['displayName', 'color', 'updatedAt'])
         && request.resource.data.displayName is string
@@ -100,7 +101,7 @@ service cloud.firestore {
     }
 
     match /restaurants/{rid} {
-      allow read: if isMember();
+      allow read: if true;
       allow create: if isEditor()
         && validRestaurant(request.resource.data)
         && request.resource.data.createdBy == request.auth.uid
@@ -113,7 +114,7 @@ service cloud.firestore {
 
       // Nota de cada persona que puntúa: solo la escribe ella.
       match /ratings/{uid} {
-        allow read: if isMember();
+        allow read: if true;
         allow create, update: if isRater() && request.auth.uid == uid && validRating(request.resource.data);
         allow delete: if (isRater() && request.auth.uid == uid) || isOwner();
       }
@@ -121,20 +122,10 @@ service cloud.firestore {
 
     // Lectura de todas las notas de una vez (consulta de grupo de colecciones).
     match /{path=**}/ratings/{uid} {
-      allow read: if isMember();
+      allow read: if true;
     }
 
-    // Solicitudes de acceso. Las resuelven los propietarios.
-    match /accessRequests/{uid} {
-      allow read: if signedIn() && (request.auth.uid == uid || isOwner());
-      allow create: if signedIn() && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['email', 'displayName', 'status', 'createdAt'])
-        && request.resource.data.email == myEmail()
-        && request.resource.data.displayName is string
-        && request.resource.data.displayName.size() <= 60
-        && request.resource.data.status == 'pending'
-        && request.resource.data.createdAt == request.time;
-      allow update, delete: if isOwner();
-    }
+    // Las solicitudes de acceso (accessRequests) se quitaron al hacer la app pública: sin regla, nadie
+    // las lee ni las escribe desde la app. Las que queden se borran en la consola.
   }
 }

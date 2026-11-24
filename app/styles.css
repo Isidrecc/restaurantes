@@ -529,15 +529,10 @@ button.card { display: block; width: 100%; }
   background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .38);
   -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
 }
-/* Perfil y acceso */
-.req-list { margin: 6px 0 0; padding-left: 18px; font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
-.req-list li { overflow-wrap: anywhere; }
+/* Perfil y acceso. Sin sesión, el botón de arriba a la derecha es «Entra». */
+.btn-enter { height: 34px; padding: 0 14px; color: var(--accent); border-color: var(--accent); }
 .demo-box { padding: 12px; border: 1px dashed var(--line); border-radius: 12px; display: flex; flex-direction: column; gap: 8px; }
 .demo-box .seg-wide button { font-size: 12px; padding: 0 2px; }
-.noaccess { z-index: 2500; justify-content: center; overflow-y: auto; }
-.noaccess-body { padding: 24px; display: flex; flex-direction: column; gap: 14px; max-width: 420px; margin: 0 auto; width: 100%; }
-.noaccess-body h2 { font-size: 26px; font-weight: 700; }
-.noaccess-body .link-btn { align-self: center; }
 
 /* ---------- App real: añadidos sobre la demo ---------- */
 html, body { overscroll-behavior: none; overflow: hidden; }
@@ -563,7 +558,7 @@ body { background: var(--surface); }
 .gpin .pin { position: absolute; left: 0; top: 0; }
 .gcluster { cursor: pointer; }
 
-/* Pantallas completas: cargando, entrar, sin acceso */
+/* Pantalla completa de carga */
 .screen {
   position: absolute; inset: 0; z-index: 2600; background: var(--bg);
   display: flex; flex-direction: column; justify-content: center; overflow-y: auto;
@@ -572,7 +567,6 @@ body { background: var(--surface); }
 .screen-body h2 { font-size: 26px; font-weight: 700; }
 .screen-body .link-btn { align-self: center; }
 .screen .brand-name { font-size: 22px; }
-.google-btn { gap: 10px; }
 .spinner {
   width: 28px; height: 28px; border-radius: 50%; align-self: center;
   border: 3px solid var(--line); border-top-color: var(--accent);

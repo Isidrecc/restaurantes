@@ -1,46 +1,40 @@
-# Cómo dar y quitar acceso
+# Cómo dar y quitar permisos
 
-Los accesos se gestionan en la consola de Firebase. La pantalla de accesos de la app (paso 4) se descartó el 24 de noviembre de 2026: con tan poca gente, la consola basta.
+Desde el 24 de noviembre de 2026 la app se ve sin entrar, en solo lectura. Los permisos solo hacen falta para **añadir, editar y puntuar**, y se gestionan en la consola de Firebase. La pantalla de accesos de la app (paso 4) se descartó ese mismo día: con tan poca gente, la consola basta.
 
 ## Lo que hay que saber
 
-- Cada persona con acceso tiene un documento en la colección `members`. **El ID del documento es su correo de Google en minúsculas.**
+- Cada persona con permiso tiene un documento en la colección `members`. **El ID del documento es su correo de Google en minúsculas.**
 - El documento lleva estos campos, los dos de tipo texto (`string`):
 
 | Campo | Valores | Para qué |
 |---|---|---|
-| `role` | `owner`, `editor` o `viewer` | Propietario, editor o invitado que solo mira (`docs/diseno.md`, sección 1) |
-| `color` | `azul` o `rosa` | Solo quien puntúa. Cada color, una sola persona. Los invitados no llevan este campo |
+| `role` | `owner` o `editor` | Propietario o editor (`docs/diseno.md`, sección 1). El antiguo `viewer` ya no hace falta: para mirar no se necesita entrar |
+| `color` | `azul` o `rosa` | Solo quien puntúa. Cada color, una sola persona |
 
 - **La consola no comprueba nada.** Un correo con mayúsculas, `Editor` en vez de `editor` o un color mal escrito dejan a la persona sin acceso o sin poder puntuar, y la app no dice por qué. Si alguien no puede entrar, lo primero es revisar el documento letra a letra.
 - La lista de quién puntúa no sale de `members`, sale de `users`: cada persona guarda allí su nombre y su color al abrir la app.
 
-## Dar acceso
+## Dar permiso
 
 1. Abre https://console.firebase.google.com y entra en el proyecto **puntuam-a-taula**.
 2. En el menú de la izquierda, **Firestore Database** y la pestaña **Datos**.
 3. Toca la colección **members** y después **Añadir documento**.
 4. En **ID del documento**, escribe el correo en minúsculas.
-5. Añade el campo `role`, tipo `string`, con `viewer`, `editor` u `owner`.
+5. Añade el campo `role`, tipo `string`, con `editor` u `owner`.
 6. Si la persona puntúa, añade el campo `color`, tipo `string`, con `azul` o `rosa`.
-7. **Guardar.** Tendrá acceso la próxima vez que abra la app.
+7. **Guardar.** Podrá editar la próxima vez que abra la app y entre con Google.
 
 Los nombres de los botones pueden cambiar con las versiones de la consola.
 
-## Si lo ha pedido desde la app
-
-Quien entra sin estar invitado puede pedir acceso. La petición queda en la colección `accessRequests`.
-
-1. Los propietarios ven los correos pendientes en la app: botón con su inicial, arriba a la derecha, apartado «Sol·licituds d’accés pendents».
-2. Da acceso como en el apartado anterior, con ese correo.
-3. Después, borra su documento en `accessRequests`. Si no, seguirá saliendo como pendiente.
+Quien entra con Google sin tener permiso lo ve todo igual; su perfil le dice que no puede añadir ni puntuar. Las solicitudes de acceso que había antes (colección `accessRequests`) ya no se usan: si queda alguna, se puede borrar.
 
 ## Cambiar el papel o el color
 
 - Cambia el campo en su documento de `members`.
 - El color también está copiado en `users` y se pone al día solo la próxima vez que la persona abra la app.
 
-## Quitar el acceso
+## Quitar el permiso
 
 1. Borra su documento en `members`.
 2. Si puntuaba, borra también su documento en `users` (búscalo por el campo `displayName`). Si no, seguiría saliendo en las notas y en el selector «Nota de».
@@ -48,5 +42,5 @@ Quien entra sin estar invitado puede pedir acceso. La petición queda en la cole
 
 ## Cuidado
 
-- No borres ni cambies tu propio documento de `members`: te quedarías sin acceso a la app. La consola seguiría funcionando y podrías volver a crearlo.
+- No borres ni cambies tu propio documento de `members`: te quedarías sin poder editar. La consola seguiría funcionando y podrías volver a crearlo.
 - Las reglas de seguridad (`firestore.rules`) también dejan escribir en `members` a los propietarios desde la app, aunque la app no tiene ninguna pantalla que lo haga.

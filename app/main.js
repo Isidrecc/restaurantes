@@ -11,6 +11,7 @@ let restaurants = [];
 let stopWatch = null;
 let dataReady = false;
 let pendingOpen = null;   // ficha que abrir cuando lleguen los datos guardados
+let linkId = null;        // ficha de un enlace compartido (?r=id), que se abre al llegar los datos
 
 const filters = { q: '', min: 0, field: 'global', cuisines: new Set(), munis: new Set(), prices: new Set() };
 let sortBy = 'nota';
@@ -371,7 +372,8 @@ function openDetail(id, keepScroll) {
   const headInfo = (r.address ? '<p class="meta d-address">' + esc(r.address) + '</p>' : '') +
     (r.visitDate ? '<p class="meta">Visitat el ' + esc(fmtDate(r.visitDate)) + '</p>' : '');
   const mine = me && r.ratings[me.uid];
-  const actions = (canEditData() ? '<button class="link-btn" type="button" data-act="edit">Edita</button>' : '') +
+  const actions = '<button class="link-btn" type="button" data-act="share">Comparteix</button>' +
+    (canEditData() ? '<button class="link-btn" type="button" data-act="edit">Edita</button>' : '') +
     (canDelete() ? '<button class="link-btn is-danger" type="button" data-act="delete">Esborra</button>' : '');
   $('#detail').innerHTML =
     '<div class="panel-bar">' +
@@ -403,6 +405,18 @@ function openDetail(id, keepScroll) {
   hydratePhotos($('#detail'));
 }
 function closeDetail() { $('#detail').hidden = true; detailId = null; }
+// Comparteix: enlace directo a la ficha (?r=id), que se ve sin entrar. En el iPhone abre el menú de compartir.
+async function shareRestaurant(r) {
+  const url = location.origin + location.pathname + '?r=' + encodeURIComponent(r.id);
+  if (navigator.share) {
+    try { await navigator.share({ title: r.name + ' · Puntuam a taula', url }); } catch (e) { /* cancel·lat */ }
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    toast('Enllaç copiat');
+  } catch (e) { window.prompt('Copia l’enllaç de la fitxa', url); }
+}
 
 // ---------- Formulario ----------
 // Tres modos con los mismos bloques (docs/diseno.md, secciones 5 y 6): add (alta en pasos, editores),
@@ -878,29 +892,42 @@ function renderWho() {
   $('#who-apply').textContent = 'Mostra ' + (n === 1 ? '1 restaurant' : n + ' restaurants');
 }
 const ROLE_NAMES = { owner: 'Propietari', editor: 'Editor', viewer: 'Convidat (només mira)' };
-async function renderProfile() {
+// Perfil de quien ha entrado. Sin permiso para editar, solo se ve con qué correo y se puede salir.
+function renderProfile() {
+  const member = canEditData();
   const p = person(me.uid);
+  $('#p-name-field').hidden = !member;
+  $('#p-save').hidden = !member;
+  $('#sheet-profile .sheet-foot').classList.toggle('one', !member);
   $('#p-name').value = p ? p.name : (me.displayName || '');
-  $('#p-role').innerHTML = 'Paper: <b>' + ROLE_NAMES[me.role] + '</b>' + (me.color ? ' · puntues en <b class="p-' + me.color + '" style="color:var(--pc)">' + COLOR_NAMES[me.color] + '</b>' : '') +
-    '<br><span class="meta">' + esc(me.email) + '</span>';
-  $('#p-extra').innerHTML = '';
-  // Los accesos se dan y se quitan en la consola de Firebase (docs/accesos.md). Aquí solo se ve quién lo ha pedido.
-  if (me.role === 'owner') {
-    try {
-      const reqs = await store.pendingRequests();
-      $('#p-extra').innerHTML = reqs.length
-        ? '<p class="meta">Sol·licituds d’accés pendents: <b>' + reqs.length + '</b>. Dona’ls accés a la consola de Firebase, a la col·lecció <b>members</b>, i després esborra la sol·licitud.</p>' +
-          '<ul class="req-list">' + reqs.map((r) => '<li><b>' + esc(r.email) + '</b>' + (r.name ? ' · ' + esc(r.name) : '') + '</li>').join('') + '</ul>'
-        : '<p class="meta">Cap sol·licitud d’accés pendent. Els accessos es donen i es treuen a la consola de Firebase, a la col·lecció <b>members</b>.</p>';
-    } catch (e) { /* no es crítico */ }
-  }
+  $('#p-role').innerHTML = member
+    ? 'Paper: <b>' + ROLE_NAMES[me.role] + '</b>' + (me.color ? ' · puntues en <b class="p-' + me.color + '" style="color:var(--pc)">' + COLOR_NAMES[me.color] + '</b>' : '') +
+      '<br><span class="meta">' + esc(me.email) + '</span>'
+    : 'Has entrat com a <b>' + esc(me.email) + '</b>. Pots veure-ho tot, però no afegir ni puntuar restaurants: t’hi ha de donar permís un propietari.';
+  // Los permisos se dan y se quitan en la consola de Firebase (docs/accesos.md).
+  $('#p-extra').innerHTML = me.role === 'owner'
+    ? '<p class="meta">Els permisos per afegir i puntuar es donen i es treuen a la consola de Firebase, a la col·lecció <b>members</b>.</p>' : '';
 }
+// Botón de arriba a la derecha: «Entra» sin sesión; con sesión, la inicial en el color de quien puntúa.
 function applyRole() {
   $('#tab-add').hidden = !canEditData();
   $('#tabs').classList.toggle('is-two', !canEditData());
-  const ini = ((person(me.uid) || {}).name || me.displayName || me.email || '?').charAt(0).toUpperCase();
-  $('#avatar-ini').textContent = ini;
-  $('#btn-profile').className = 'avatar' + (me.color ? ' p-' + me.color : '');
+  const btn = $('#btn-profile');
+  if (!me) {
+    btn.className = 'btn btn-enter';
+    btn.setAttribute('aria-label', 'Entra amb Google per afegir i puntuar');
+    $('#avatar-ini').textContent = 'Entra';
+    return;
+  }
+  btn.setAttribute('aria-label', 'El teu perfil');
+  $('#avatar-ini').textContent = ((person(me.uid) || {}).name || me.displayName || me.email || '?').charAt(0).toUpperCase();
+  btn.className = 'avatar' + (me.color ? ' p-' + me.color : '');
+}
+async function signIn() {
+  try { await store.signIn(); } catch (e) {
+    if (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') return;
+    toast('No s’ha pogut entrar: ' + errText(e));
+  }
 }
 function askConfirm(title, text, fn, okLabel) {
   $('#cf-title').textContent = title;
@@ -970,6 +997,7 @@ function wire() {
     const act = b.dataset.act;
     if (act === 'back') { closeDetail(); return; }
     if (!r) return;
+    if (act === 'share') shareRestaurant(r);
     if (act === 'edit') { closeDetail(); startForm('edit', r); setView('form'); }
     if (act === 'rate') { closeDetail(); startForm('rate', r); setView('form'); }
     if (act === 'delete') {
@@ -1132,7 +1160,11 @@ function wire() {
   });
 
   // Perfil
-  $('#btn-profile').addEventListener('click', () => { renderProfile(); $('#sheet-profile').hidden = false; });
+  $('#btn-profile').addEventListener('click', () => {
+    if (!me) { signIn(); return; }
+    renderProfile();
+    $('#sheet-profile').hidden = false;
+  });
   $('#p-save').addEventListener('click', async () => {
     const name = $('#p-name').value.trim();
     if (!name) { toast('Escriu un nom'); return; }
@@ -1145,24 +1177,6 @@ function wire() {
   });
   $('#p-logout').addEventListener('click', () => { $('#sheet-profile').hidden = true; store.logOut(); });
 
-  // Entrar y sin acceso
-  $('#btn-login').addEventListener('click', async () => {
-    $('#login-error').hidden = true;
-    try { await store.signIn(); } catch (e) {
-      if (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') return;
-      $('#login-error').textContent = 'No s’ha pogut entrar: ' + errText(e);
-      $('#login-error').hidden = false;
-    }
-  });
-  $('#na-request').addEventListener('click', async () => {
-    try {
-      await store.requestAccess(store.currentUser());
-      $('#na-request').hidden = true;
-      $('#na-status').hidden = false;
-    } catch (e) { toast('No s’ha pogut enviar: ' + errText(e)); }
-  });
-  $('#na-other').addEventListener('click', () => store.logOut());
-
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!$('#lightbox').hidden) { $('#lightbox').hidden = true; return; }
@@ -1174,8 +1188,10 @@ function wire() {
 }
 
 // ---------- Arranque y sesión ----------
+// La app se ve sin entrar, en solo lectura (desde el 24 de noviembre de 2026). Entrar con Google solo hace
+// falta para añadir, editar y puntuar, y lo deciden los permisos de members/{correo} (docs/accesos.md).
 function showScreen(id) {
-  ['loading', 'login', 'noaccess'].forEach((s) => { $('#' + s).hidden = s !== id; });
+  ['loading'].forEach((s) => { $('#' + s).hidden = s !== id; });
 }
 function askName(suggestion) {
   return new Promise((resolve) => {
@@ -1198,40 +1214,45 @@ function onData(data) {
   applyRole();
   buildFilterChips();
   render();
-  if (pendingOpen && byId(pendingOpen)) { const id = pendingOpen; pendingOpen = null; openDetail(id); }
+  if (linkId) {
+    // Ficha de un enlace compartido (?r=id).
+    const id = linkId;
+    linkId = null;
+    if (byId(id)) openDetail(id); else toast('Aquest restaurant ja no hi és');
+  } else if (pendingOpen && byId(pendingOpen)) { const id = pendingOpen; pendingOpen = null; openDetail(id); }
   else if (detailId) openDetail(detailId, true);
 }
 async function startSession(user) {
   if (stopWatch) { stopWatch(); stopWatch = null; }
   me = null;
-  closeDetail();
-  if (!user) { showScreen('login'); return; }
-  showScreen('loading');
-  let m;
-  try { m = await store.getMembership(user); } catch (e) {
-    console.error(e);
-    toast('No s’ha pogut comprovar el teu accés: ' + errText(e));
-    m = null;
+  if (user) {
+    let m = null;
+    try { m = await store.getMembership(user); } catch (e) {
+      console.error(e);
+      toast('No s’ha pogut comprovar el teu permís: ' + errText(e));
+    }
+    me = { uid: user.uid, email: user.email, role: m && ROLE_NAMES[m.role] ? m.role : null, color: m ? m.color : null, displayName: '' };
+    // El nombre visible solo lo tienen quienes pueden editar (users/{uid} solo lo escriben ellos).
+    if (canEditData()) {
+      try {
+        const prof = await store.getProfile(user.uid);
+        let name = prof && prof.displayName;
+        if (!name) { showScreen(null); name = await askName((user.displayName || '').split(' ')[0]); }
+        me.displayName = name;
+        if (!prof || prof.displayName !== name || (prof.color || null) !== (m.color || null)) await store.saveProfile(user.uid, name, m.color);
+      } catch (e) { console.error(e); toast('No s’ha pogut desar el teu nom: ' + errText(e)); }
+    }
   }
-  if (!m || !ROLE_NAMES[m.role]) {
-    $('#na-email').textContent = user.email;
-    let req = null;
-    try { req = await store.getAccessRequest(user.uid); } catch (e) { /* sin permiso o sin red */ }
-    $('#na-request').hidden = !!req;
-    $('#na-status').hidden = !req;
-    showScreen('noaccess');
-    return;
-  }
-  me = { uid: user.uid, email: user.email, role: m.role, color: m.color, displayName: '' };
-  try {
-    const prof = await store.getProfile(user.uid);
-    let name = prof && prof.displayName;
-    if (!name) { showScreen(null); name = await askName((user.displayName || '').split(' ')[0]); }
-    me.displayName = name;
-    if (!prof || prof.displayName !== name || (prof.color || null) !== (m.color || null)) await store.saveProfile(user.uid, name, m.color);
-  } catch (e) { console.error(e); toast('No s’ha pogut desar el teu nom: ' + errText(e)); }
+  // Sin permiso para editar no se puede seguir en el formulario.
+  if (view === 'form' && !canEditData()) { draft = null; setView(lastBrowse); }
   showScreen(null);
   applyRole();
+  if (dataReady) {
+    render();
+    if (detailId) openDetail(detailId, true);
+  }
+  // Los datos se vuelven a pedir con cada cambio de sesión: así nadie se queda sin ellos si una lectura
+  // sin entrar se rechazara.
   stopWatch = store.watchAll(onData, (e) => { console.error(e); toast('Error en llegir les dades: ' + errText(e)); });
   if (!mainMap) {
     createMainMap($('#map'), { onMapClick: () => { if (selectedId) { selectedId = null; render(); } } })
@@ -1250,8 +1271,10 @@ function localPreview() {
     '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9c9a0"/><stop offset="1" stop-color="#8a5a3c"/></linearGradient></defs>' +
     '<rect width="1200" height="800" fill="url(#g)"/><circle cx="420" cy="430" r="250" fill="#f6efe6"/><circle cx="420" cy="430" r="190" fill="#e7d6c1"/>' +
     '<circle cx="380" cy="400" r="70" fill="#c0563b"/><circle cx="470" cy="470" r="55" fill="#7c9a4a"/><circle cx="900" cy="300" r="120" fill="#5b3a2a" opacity=".55"/></svg>');
-  me = { uid: 'u1', email: 'muestra@localhost', role: 'owner', color: 'azul', displayName: 'Isidre' };
+  // Con ?muestra&visitant se ve como alguien que no ha entrado.
+  me = params.has('visitant') ? null : { uid: 'u1', email: 'muestra@localhost', role: 'owner', color: 'azul', displayName: 'Isidre' };
   showScreen(null);
+  applyRole();
   onData({
     people: [{ uid: 'u1', name: 'Isidre', color: 'azul' }, { uid: 'u2', name: 'Cris', color: 'rosa' }],
     restaurants: [
@@ -1270,5 +1293,13 @@ function localPreview() {
 
 buildFormStatics();
 wire();
-if (location.hostname === 'localhost' && new URLSearchParams(location.search).has('muestra')) localPreview();
+// Enlace compartido a una ficha: se abre al llegar los datos y se quita de la dirección.
+const params = new URLSearchParams(location.search);
+if (params.get('r')) {
+  linkId = params.get('r');
+  const rest = new URLSearchParams(params);
+  rest.delete('r');
+  history.replaceState(null, '', location.pathname + (rest.toString() ? '?' + rest.toString() : ''));
+}
+if (location.hostname === 'localhost' && params.has('muestra')) localPreview();
 else store.onSession(startSession);

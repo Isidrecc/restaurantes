@@ -12,11 +12,13 @@ La demo (`demo/index.html`) ya no se actualiza. Sirve de referencia para el comp
 |---|---|---|---|---|---|
 | Propietario | ✔ | Si tiene color | ✔ | ✔ | ✔ |
 | Editor | ✔ | Si tiene color | ✔ | | |
-| Invitado (solo mira) | ✔ | | | | |
+| Cualquiera, sin entrar | ✔ | | | | |
 
 - Puntúan solo dos personas, cada una con su color: **azul** (el propietario) y **rosa** (Cris). El color va en su documento de `members`.
 - Puede haber más de un propietario. Hoy hay dos.
-- Solicitudes de acceso: quien no está invitado puede pedir acceso para ver. Lo aprueba un propietario en la consola de Firebase, siguiendo `docs/accesos.md`; en la app, los propietarios ven en su perfil los correos pendientes. La pantalla de accesos del paso 4 se descartó el 24 de noviembre de 2026. Desaparece «solicitar ser editor».
+- **La app se ve sin entrar, en solo lectura** (decidido por el propietario el 24 de noviembre de 2026): mapa, lista y fichas, con notas, textos, fotos y los nombres de quien puntúa, pero no los correos. Arriba a la derecha sale «Entra»; entrar con Google solo sirve para añadir, editar y puntuar. Quien entra sin permiso lo ve todo igual y su perfil le dice que no puede editar.
+- Los permisos se dan y se quitan en la consola de Firebase (`docs/accesos.md`); la pantalla de accesos del paso 4 se descartó el 24 de noviembre de 2026. El papel `viewer` y las solicitudes de acceso desaparecen con la app pública.
+- **Compartir**: cada ficha tiene «Comparteix», que en el iPhone abre el menú de compartir con el enlace directo a la ficha (`?r=` y el identificador del restaurante). Sin menú de compartir, el enlace se copia.
 
 ## 2. Qué guarda cada restaurante
 
@@ -52,7 +54,7 @@ De arriba abajo:
 6. **Roseta con dos líneas**, azul y rosa, con leyenda.
 7. **Texto largo** del restaurante.
 8. **Fotos al final**, cada una con su pie y también la portada. Al tocarla se amplía con el pie debajo. Mientras cargan se ve una rueda y aparecen con un fundido.
-9. Acciones: «Mostra al mapa»; «Puntua» o «Edita la meva nota» (quien puntúa), que abre solo su nota; «Edita» (editores), que abre la edición completa (sección 6); «Esborra» (propietario).
+9. Acciones: «Comparteix» (todos, también sin entrar); «Mostra al mapa»; «Puntua» o «Edita la meva nota» (quien puntúa), que abre solo su nota; «Edita» (editores), que abre la edición completa (sección 6); «Esborra» (propietario).
 
 Pendiente: la maqueta de la ficha con el aspecto de la sección 7, y comprobar en la app que las barras y la roseta azul y rosa se leen bien junto al morado.
 
@@ -179,13 +181,15 @@ Fuentes: https://developers.google.com/maps/documentation/javascript/cloud-custo
 
 | Documento | Contenido | Quién escribe |
 |---|---|---|
-| `members/{correo}` | `role`: `owner`, `editor` o `viewer`. `color`: `azul`, `rosa` o ninguno | Propietarios |
+| `members/{correo}` | `role`: `owner` o `editor` (`viewer` ya no hace falta). `color`: `azul`, `rosa` o ninguno | Propietarios, en la consola |
 | `users/{uid}` | `displayName`, `color` (debe coincidir con el de `members`), `updatedAt` | Cada uno el suyo |
 | `restaurants/{id}` | `name`, `locality`, `address` (opcional), `location`, `cuisines`, `price`, `visitDate`, `blog`, `photos` (lista de `{full, thumb, caption}`, y `cover: true` en la portada si se ha elegido), `placeId`, `source`, `createdBy`, `createdAt`, `updatedBy`, `updatedAt` | Editores |
 | `restaurants/{id}/ratings/{uid}` | `scores`, `global`, `dish`, `updatedAt` | Solo su autor, si tiene color |
-| `accessRequests/{uid}` | `email`, `displayName`, `status`, `createdAt` | El solicitante la crea; los propietarios la resuelven |
+| ~~`accessRequests/{uid}`~~ | Retirada el 24 de noviembre de 2026 con la app pública. Las que queden se borran en la consola | Nadie desde la app |
 
-Fotos en Storage: `restaurants/{id}/{archivo}`. Suben y borran los editores; ven todos los invitados.
+Fotos en Storage: `restaurants/{id}/{archivo}`. Suben y borran los editores; las ve cualquiera.
+
+Lectura: `restaurants`, sus `ratings` y `users` los lee cualquiera, sin entrar; `members`, solo cada uno el suyo y los propietarios.
 
 ## 10. Orden de trabajo
 

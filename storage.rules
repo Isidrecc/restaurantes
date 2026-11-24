@@ -18,11 +18,11 @@ service firebase.storage {
         && firestore.get(memberDoc()).data.role in roles;
     }
     function isEditor() { return hasRole(['owner', 'editor']); }
-    function isMember() { return hasRole(['owner', 'editor', 'viewer']); }
 
-    // Fotos de cada restaurante. Las suben y borran los editores; las ven todos los invitados.
+    // Fotos de cada restaurante. Las suben y borran los editores; las ve cualquiera, sin entrar
+    // (app pública en solo lectura desde el 24 de noviembre de 2026).
     match /restaurants/{rid}/{file} {
-      allow read: if isMember();
+      allow read: if true;
       allow create: if isEditor()
         && request.resource.contentType.matches('image/(jpeg|png|webp)')
         && request.resource.size < 3 * 1024 * 1024;

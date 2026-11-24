@@ -271,7 +271,7 @@
         </button>
       </div>
       <div class="sheet-body">
-        <div class="field">
+        <div class="field" id="p-name-field">
           <label for="p-name">Nom visible</label>
           <input class="input" id="p-name" type="text" maxlength="30" autocomplete="off">
           <p class="hint">És el que veuen els altres al costat de les teves notes. El teu correu no es mostra.</p>
@@ -285,27 +285,6 @@
       </div>
     </div>
   </div>
-
-  <section class="screen" id="noaccess" hidden aria-label="Sense accés">
-    <div class="screen-body">
-      <p class="brand-name">Puntuam a taula</p>
-      <h2>No hi tens accés</h2>
-      <p>Has entrat com a <b id="na-email"></b>, però aquest correu no està convidat. Puntuam a taula és el quadern de restaurants d’Isidre i Cris, només per a convidats.</p>
-      <button class="btn btn-primary btn-block" type="button" id="na-request">Demana accés</button>
-      <p class="meta" id="na-status" hidden>Sol·licitud enviada. Quan et donin accés, torna a obrir l’app.</p>
-      <button class="btn btn-block" type="button" id="na-other">Entra amb un altre compte</button>
-    </div>
-  </section>
-
-  <section class="screen" id="login" hidden aria-label="Entra">
-    <div class="screen-body">
-      <p class="brand-name">Puntuam a taula</p>
-      <h2>El quadern de restaurants d’Isidre i Cris</h2>
-      <p class="meta">Entra amb el teu compte de Google. Si és la primera vegada en aquest dispositiu, Google et demanarà el correu i la contrasenya.</p>
-      <button class="btn btn-primary btn-block google-btn" type="button" id="btn-login">Entra amb Google</button>
-      <p class="error" id="login-error" hidden></p>
-    </div>
-  </section>
 
   <section class="screen" id="loading" aria-label="Carregant">
     <div class="screen-body">

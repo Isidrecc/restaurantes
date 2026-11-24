@@ -7,7 +7,7 @@ Documento de traspaso. Recoge lo acordado entre el propietario y Claude entre el
 App personal para puntuar y reseñar los restaurantes visitados.
 
 - Volumen previsto: como máximo unos 100 restaurantes.
-- Privada. Se comparte con unas pocas personas invitadas.
+- ~~Privada. Se comparte con unas pocas personas invitadas.~~ Desde el 24 de noviembre de 2026, pública en solo lectura: cualquiera la ve sin entrar y las fichas se comparten con un enlace. Añadir, editar y puntuar sigue siendo solo para quien tiene permiso.
 - Uso principal desde el iPhone, también desde ordenador.
 
 ## 2. Decisiones tomadas
@@ -28,7 +28,7 @@ App personal para puntuar y reseñar los restaurantes visitados.
 | Alojamiento | GitHub Pages desde este repo, que es público. |
 | UI | La estructura de la demo (`demo/index.html`), aprobada por el propietario, con el aspecto, el alta y la edición de `docs/diseno.md` (secciones 5 a 8). |
 | Idioma de la app | Catalán. Ver `docs/diseno.md`. |
-| Compartir | Puntúan dos personas (azul y rosa); el resto de invitados solo mira. Ver `docs/diseno.md`. |
+| Compartir | Puntúan dos personas (azul y rosa). La app se ve sin entrar y cada ficha se comparte con un enlace (24 de noviembre de 2026). Ver `docs/diseno.md`, sección 1. |
 | Ámbito | También restaurantes de fuera de Mallorca. La localidad se saca de la dirección de Google. Solo se escribe a mano si Google no la da, y entonces el campo sugiere las ya usadas, para evitar variantes del mismo sitio. |
 | Técnica | HTML, CSS y JavaScript sin framework ni paso de compilación. |
 | Orden de construcción | El de la sección 6. |
@@ -136,7 +136,7 @@ Detalle en `docs/diseno.md`, sección 4.
 - El alta va en cuatro pasos y la edición en una sola pantalla.
 - Los textos están en catalán.
 - Los datos y las fotos se guardan de verdad. Las fotos se comprimen antes de subirlas.
-- Hay modo de solo lectura para invitados.
+- Sin entrar, todo se ve en solo lectura, y cada ficha tiene «Comparteix».
 
 ## 5. Modelo de datos
 
@@ -153,7 +153,7 @@ Confirmado por el propietario.
 1. **Preparación.** La hace el propietario con guía, unos 20 minutos: proyecto de Google con tarjeta y alerta de presupuesto, Firebase en región europea y clave del mapa restringida al dominio de GitHub Pages. El repo ya está creado.
 2. **Prueba técnica.** Login con Google en el iPhone con la app instalada, guardar y leer una ficha, subir una foto y cargar el mapa. Es el punto con más riesgo y va antes de portar nada.
 3. **App real.** La estructura de la demo con datos reales y mapa de Google, con el aspecto, el alta y la edición de `docs/diseno.md`. Partes y estado en `docs/diseno.md`, sección 10. Terminado el 24 de noviembre de 2026.
-4. ~~**Compartir.** Pantalla de accesos (propietarios, editores e invitados que solo miran, con el color de quien puntúa) y solicitudes de acceso.~~ Descartado por el propietario el 24 de noviembre de 2026: los accesos se dan y se quitan en la consola de Firebase (`docs/accesos.md`), y la app solo muestra a los propietarios los correos de las solicitudes pendientes.
+4. ~~**Compartir.** Pantalla de accesos (propietarios, editores e invitados que solo miran, con el color de quien puntúa) y solicitudes de acceso.~~ Descartado por el propietario el 24 de noviembre de 2026: los permisos se dan y se quitan en la consola de Firebase (`docs/accesos.md`). Ese mismo día la app pasó a verse sin entrar y las solicitudes de acceso se quitaron.
 5. **Remate.** Icono e instalación en el iPhone, consulta sin cobertura de lo ya cargado y exportar una copia de seguridad. Además, sacar la clave de Google Maps del repo (propuesto por el propietario el 24 de noviembre de 2026): clave nueva con las mismas restricciones y topes, guardada como secreto de GitHub y puesta en la página al publicar con GitHub Actions; en local, en un archivo que no se sube. Después, borrar la clave antigua para que las del historial dejen de valer y quitarla de la sección 10. La clave seguirá viéndose en la web publicada: lo que se gana es que no esté en GitHub. Decidir entonces qué hacer con la configuración de Firebase, que también está en el repo.
 6. **Más adelante.** Lo que quede de Places. El buscador para situar el restaurante se adelantó al paso 3 (`docs/diseno.md`, sección 5).
 
@@ -221,20 +221,24 @@ Decisiones que salen de la prueba:
 
 ## 9. Seguridad y protección frente a abusos
 
-Acordado el 23 de noviembre de 2026. El objetivo es que nadie de fuera del grupo pueda leer datos, escribirlos, subir fotos ni generar gasto. Las reglas se aplican en los servidores de Firebase, así que no se pueden saltar tocando el código de la app, que es público.
+Acordado el 23 de noviembre de 2026 y cambiado el 24: desde entonces cualquiera puede **leer** restaurantes, notas, nombres visibles y fotos, porque la app es pública en solo lectura (`docs/diseno.md`, sección 1). El objetivo pasa a ser que nadie sin permiso pueda escribir datos, subir fotos ni ver los correos, y que leer no genere un gasto apreciable. Las reglas se aplican en los servidores de Firebase, así que no se pueden saltar tocando el código de la app, que es público.
+
+- Queda a la vista de cualquiera que encuentre la dirección (el repo la enlaza): restaurantes, notas, textos, fotos y los nombres visibles de quien puntúa. Los correos (`members`) no.
+- Cada visita gasta lecturas de Firestore (50.000 gratis al día), cargas del mapa (con su tope diario, más abajo) y descargas de fotos de Storage. El coste de esas descargas en `europe-southwest1` no se ha comprobado; con el uso previsto debería ser de céntimos.
+- Sin sesión, nadie puede abusar de la Geocoding API ni del buscador: solo se usan en el alta.
 
 ### Fotos (Storage)
 
 - Solo pueden subir fotos los propietarios y editores que han entrado con Google. Un usuario sin cuenta o que no esté en la lista recibe un error.
 - Las fotos van en `restaurants/{idRestaurante}/{archivo}`. Cualquier editor puede subirlas y borrarlas.
 - Solo se aceptan imágenes JPEG, PNG o WebP de menos de 3 MB. La app comprime antes de subir, así que una foto normal queda muy por debajo.
-- Ver fotos: solo los miembros del grupo.
+- Ver fotos: cualquiera, sin entrar (desde el 24 de noviembre de 2026).
 - Las reglas de Storage consultan los papeles guardados en Firestore. Comprobado en el paso 2 (sección 8).
 
 ### Datos (Firestore)
 
 - Todo cerrado por defecto: la base de datos se crea en modo de producción.
-- Leer: solo miembros del grupo.
+- Leer restaurantes, notas y nombres visibles: cualquiera, sin entrar (desde el 24 de noviembre de 2026). Leer `members`: cada uno el suyo y los propietarios.
 - Crear y editar la parte común de un restaurante: solo los editores.
 - Escribir una puntuación: solo su autor y solo la suya.
 - Modificar las listas de permisos: solo el propietario.
@@ -272,7 +276,7 @@ Acordado el 23 de noviembre de 2026. El objetivo es que nadie de fuera del grupo
 
 ### A valorar más adelante
 
-- Firebase App Check, para que solo la propia app pueda llamar a Firebase y a Places API (New). Según Google, en apps privadas no hace falta. No está decidido.
+- Firebase App Check, para que solo la propia app pueda llamar a Firebase y a Places API (New). Según Google, en apps privadas no hace falta. Con la app pública (24 de noviembre de 2026) frenaría que alguien leyera los datos en bucle desde un programa propio. No está decidido.
 
 ## 10. Datos del proyecto en Firebase y Google Cloud
 
