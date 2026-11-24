@@ -155,7 +155,7 @@ Dos colores protagonistas: morado y amarillo mostaza.
 - La línea de costa no se ha podido aplicar: al importar, Google rechaza el color de borde en el agua (`strokeColor` en `natural.water`, 24 de noviembre de 2026). La costa queda como el contraste entre mar y tierra.
 - Coste: usar un Map ID se cobra con el SKU de Dynamic Maps, el mismo de cada carga del mapa; no añade coste aparte. Comprobado el 24 de noviembre de 2026.
 - Los dos estilos están en `docs/mapa/lavanda.json` y `docs/mapa/noche.json`, con los colores de la tabla. Se importan en la consola de Google Cloud desde «Diseños de mapa» → «Crear estilo» → pestaña JSON (comprobado en la documentación el 24 de noviembre de 2026). Si se retocan en la consola, conviene exportarlos y actualizar estos archivos.
-- Tarea del propietario: importar los dos estilos, crear el Map ID y asociarle los dos, guiado paso a paso. Mientras tanto se usa `DEMO_MAP_ID`, que muestra los puntos de interés de Google.
+- Hecho el 24 de noviembre de 2026: estilos importados y Map ID «Puntuam a taula» (`ef2c6b7a22cee90b3aee6ac8`, vectorial, sin inclinación ni rotación) con «Lavanda» en claro y «Noche» en oscuro. Está en `app/config.js`.
 - El mapa del formulario usa el mismo estilo, así que tampoco muestra los restaurantes de Google: el sitio elegido en el buscador lo marca el aro (sección 5).
 - Pendiente: la maqueta de la pantalla del mapa con el menú flotante y las tarjetas.
 - Ideas comentadas y no aprobadas: pines con la nota escrita dentro, carrusel de tarjetas sobre el mapa, grupos de pines con la nota media, filtros como fichas flotantes y primera foto como portada de la ficha.
@@ -202,4 +202,4 @@ Orden aprobado por el propietario el 24 de noviembre de 2026. Al final de cada p
 
 Antes de empezar, el propietario publica las reglas de Firestore que aceptan `address`.
 
-Tareas del propietario: publicar las reglas de Firestore que aceptan `address` (pendiente desde el 24 de noviembre; sin ellas, guardar da error) y crear el Map ID con el estilo (sección 8). Hechas: poner `color` en los dos documentos de `members` y borrar las fichas de prueba.
+Tareas del propietario: publicar las reglas de Firestore que aceptan `address` (pendiente desde el 24 de noviembre; sin ellas, guardar da error) Hechas: poner `color` en los dos documentos de `members`, borrar las fichas de prueba y crear el Map ID con los estilos (sección 8).

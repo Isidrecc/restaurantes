@@ -283,6 +283,7 @@ Creado el 23 de noviembre de 2026. Son identificadores públicos: pueden ir en e
 | Firestore | Edición Standard, `(default)`, `europe-southwest1` (Madrid), modo de producción, sin copias programadas |
 | Storage | `puntuam-a-taula.firebasestorage.app`, `europe-southwest1`, clase Standard, modo de producción |
 | Authentication | Solo Google. Dominios autorizados: `localhost` e `isidrecc.github.io` |
+| Map ID | «Puntuam a taula», `ef2c6b7a22cee90b3aee6ac8`, JavaScript vectorial, con los estilos «Lavanda» (claro) y «Noche» (oscuro). Creado el 24 de noviembre de 2026 |
 
 Configuración web:
 

@@ -34,12 +34,15 @@ export function loadMaps() {
   if (!loading) {
     loading = (async () => {
       await bootstrap();
-      const [{ Map }, { AdvancedMarkerElement }] = await Promise.all([
+      const [{ Map }, { AdvancedMarkerElement }, { ColorScheme }] = await Promise.all([
         google.maps.importLibrary('maps'),
-        google.maps.importLibrary('marker')
+        google.maps.importLibrary('marker'),
+        google.maps.importLibrary('core')
       ]);
       await loadClusterer();
-      return { Map, AdvancedMarkerElement };
+      // El mapa sigue el modo claro u oscuro del sistema: «Lavanda» o «Noche». Solo se fija al crearlo.
+      const options = { ...BASE_OPTIONS, colorScheme: ColorScheme.FOLLOW_SYSTEM };
+      return { Map, AdvancedMarkerElement, options };
     })();
     loading.catch(() => { loading = null; });
   }
@@ -67,9 +70,9 @@ function pinElement(text, klass) {
 // ---------- Mapa principal ----------
 
 export async function createMainMap(el, { onMapClick }) {
-  const { Map, AdvancedMarkerElement } = await loadMaps();
+  const { Map, AdvancedMarkerElement, options } = await loadMaps();
   // Botones de zoom a media altura: abajo los taparía el menú flotante.
-  const map = new Map(el, { ...BASE_OPTIONS, zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER } });
+  const map = new Map(el, { ...options, zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER } });
   map.addListener('click', () => onMapClick && onMapClick());
   const markers = new globalThis.Map();
   const clusterer = new window.markerClusterer.MarkerClusterer({
@@ -119,8 +122,8 @@ export async function createMainMap(el, { onMapClick }) {
 // ---------- Mapa para situar el pin ----------
 
 export async function createPickMap(el, { onPick }) {
-  const { Map, AdvancedMarkerElement } = await loadMaps();
-  const map = new Map(el, BASE_OPTIONS);
+  const { Map, AdvancedMarkerElement, options } = await loadMaps();
+  const map = new Map(el, options);
   let marker = null;
 
   function setPin(lat, lng) {

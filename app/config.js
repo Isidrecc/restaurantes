@@ -12,8 +12,9 @@ export const firebaseConfig = {
 
 export const MAPS_KEY = 'AIzaSyC1tU3zrYHXj7WsXPDbgbxz5kAdaHh9GP8';
 
-// Map ID de Google Maps. «DEMO_MAP_ID» solo sirve para probar; se sustituye por el del proyecto.
-export const MAP_ID = 'DEMO_MAP_ID';
+// Map ID de Google Maps «Puntuam a taula», con los estilos «Lavanda» (claro) y «Noche» (oscuro)
+// asociados en Google Cloud (docs/diseno.md, sección 8). Es un identificador público.
+export const MAP_ID = 'ef2c6b7a22cee90b3aee6ac8';
 
 export const FIREBASE_VERSION = '13.4.0';
 
