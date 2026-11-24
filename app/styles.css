@@ -510,8 +510,25 @@ button.card { display: block; width: 100%; }
 .photo-edit-side { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .cover-btn { align-self: flex-start; min-height: 30px; gap: 5px; }
 .cover-btn svg { width: 13px; height: 13px; }
-/* Portada de la ficha: a todo el ancho, arriba del todo (docs/diseno.md, sección 4). */
-.thumb.cover { display: block; width: calc(100% + 32px); height: 220px; margin: -16px -16px 0; aspect-ratio: auto; border: 0; border-radius: 0; }
+/* Portada de la ficha: a todo el ancho, arriba del todo, con el nombre y las etiquetas encima sobre un
+   oscurecido de abajo arriba (docs/diseno.md, sección 4). Los toques fuera de las etiquetas amplían la foto. */
+.cover-wrap { position: relative; margin: -16px -16px 0; }
+.thumb.cover { display: block; width: 100%; height: 260px; margin: 0; aspect-ratio: auto; border: 0; border-radius: 0; }
+.cover-text {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 56px 16px 14px; pointer-events: none; color: #fff;
+  background: linear-gradient(to top, rgba(12, 8, 18, .78), rgba(12, 8, 18, .45) 55%, rgba(12, 8, 18, 0));
+}
+.cover-text h2 {
+  color: #fff; font-size: 27px; font-weight: 700; line-height: 1.15; letter-spacing: -.01em;
+  overflow-wrap: anywhere; text-shadow: 0 1px 3px rgba(0, 0, 0, .35);
+}
+.cover-text .chip.ftag {
+  pointer-events: auto; color: #fff;
+  background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .38);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
 /* Perfil y acceso */
 .req-list { margin: 6px 0 0; padding-left: 18px; font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
 .req-list li { overflow-wrap: anywhere; }

@@ -44,8 +44,8 @@ Desaparecen las reseñas de cada persona.
 
 De arriba abajo:
 
-1. **Portada**: la foto marcada como portada o, si no hay ninguna, la primera, a todo el ancho y arriba del todo. Mientras carga se ve una rueda; al tocarla se amplía. Si el restaurante no tiene fotos, no hay portada (decidido el 24 de noviembre de 2026).
-2. Nombre y dirección. **Etiquetas tocables** de localidad, tipos de cocina y precio: al tocar una, se abre el mapa con ese filtro puesto **sustituyendo** los filtros que hubiera. Fecha de visita.
+1. **Portada**: la foto marcada como portada o, si no hay ninguna, la primera, a todo el ancho y arriba del todo. Mientras carga se ve una rueda; al tocarla se amplía. Si el restaurante no tiene fotos, no hay portada (decidido el 24 de noviembre de 2026). **El nombre y las etiquetas van encima de la portada**, en blanco sobre un oscurecido que sube desde abajo, con las etiquetas translúcidas (pedido por el propietario el 24 de noviembre de 2026). Tocar fuera de las etiquetas amplía la foto.
+2. Nombre y dirección. **Etiquetas tocables** de localidad, tipos de cocina y precio: al tocar una, se abre el mapa con ese filtro puesto **sustituyendo** los filtros que hubiera. Fecha de visita. Con portada, aquí solo quedan la dirección y la fecha.
 3. Nota grande (la del selector) con su texto (Excel·lent, Molt bo…).
 4. **Barras por criterio, dos por criterio: azul y rosa**, cada una con su valor. En el plato estrella, cada persona con su estrella en su color, el nombre de su plato y su nota.
 5. **Nota media de cada uno**, en su color.

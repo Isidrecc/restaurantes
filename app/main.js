@@ -303,9 +303,13 @@ function tagBtn(group, value) {
 function blogHTML(text) {
   return text.split(/\n\s*\n/).map((p) => '<p>' + esc(p.trim()).replace(/\n/g, '<br>') + '</p>').join('');
 }
+// Dirección de una foto. Las del modo de muestra van dentro de la página (data:); las reales, en Storage.
+function photoSrc(path) {
+  return path.indexOf('data:') === 0 ? Promise.resolve(path) : store.photoURL(path);
+}
 function hydratePhotos(root) {
   $$('img[data-path]', root).forEach((img) => {
-    store.photoURL(img.dataset.path).then((url) => { img.src = url; }).catch(() => {
+    photoSrc(img.dataset.path).then((url) => { img.src = url; }).catch(() => {
       img.alt = 'No s’ha pogut carregar la foto';
       markPhoto(img, false);
     });
@@ -355,9 +359,17 @@ function openDetail(id, keepScroll) {
     '<img data-path="' + esc(p.thumb) + '" alt="' + esc(p.caption || 'Foto ' + (i + 1)) + '"></button>' +
     (p.caption ? '<figcaption>' + esc(p.caption) + '</figcaption>' : '') + '</figure>').join('');
   const ci = coverIndex(r.photos);
+  // Con portada, el nombre y las etiquetas van encima de la foto (docs/diseno.md, sección 4); sin fotos, debajo.
+  const title = '<h2>' + esc(r.name) + '</h2>';
+  const tags = '<div class="tags">' + (r.locality ? tagBtn('munis', r.locality) : '') + r.cuisines.map((c) => tagBtn('cuisines', c)).join('') + tagBtn('prices', r.price) + '</div>';
   const cover = ci < 0 ? '' :
-    '<button class="thumb cover" type="button" data-act="photo" data-i="' + ci + '" aria-label="Amplia la portada">' +
-    '<img data-path="' + esc(r.photos[ci].full) + '" alt="' + esc(r.photos[ci].caption || 'Portada') + '"></button>';
+    '<div class="cover-wrap">' +
+      '<button class="thumb cover" type="button" data-act="photo" data-i="' + ci + '" aria-label="Amplia la portada">' +
+      '<img data-path="' + esc(r.photos[ci].full) + '" alt="' + esc(r.photos[ci].caption || 'Portada') + '"></button>' +
+      '<div class="cover-text">' + title + tags + '</div>' +
+    '</div>';
+  const headInfo = (r.address ? '<p class="meta d-address">' + esc(r.address) + '</p>' : '') +
+    (r.visitDate ? '<p class="meta">Visitat el ' + esc(fmtDate(r.visitDate)) + '</p>' : '');
   const mine = me && r.ratings[me.uid];
   const actions = (canEditData() ? '<button class="link-btn" type="button" data-act="edit">Edita</button>' : '') +
     (canDelete() ? '<button class="link-btn is-danger" type="button" data-act="delete">Esborra</button>' : '');
@@ -368,12 +380,10 @@ function openDetail(id, keepScroll) {
     '</div>' +
     '<div class="panel-body">' +
       cover +
-      '<div class="d-head">' +
-        '<h2>' + esc(r.name) + '</h2>' +
-        (r.address ? '<p class="meta d-address">' + esc(r.address) + '</p>' : '') +
-        '<div class="tags">' + (r.locality ? tagBtn('munis', r.locality) : '') + r.cuisines.map((c) => tagBtn('cuisines', c)).join('') + tagBtn('prices', r.price) + '</div>' +
-        (r.visitDate ? '<p class="meta">Visitat el ' + esc(fmtDate(r.visitDate)) + '</p>' : '') +
-      '</div>' +
+      (cover
+        ? (headInfo ? '<div class="d-head">' + headInfo + '</div>' : '')
+        : '<div class="d-head">' + title + (r.address ? '<p class="meta d-address">' + esc(r.address) + '</p>' : '') + tags +
+            (r.visitDate ? '<p class="meta">Visitat el ' + esc(fmtDate(r.visitDate)) + '</p>' : '') + '</div>') +
       '<div class="card d-score">' +
         '<div class="score is-big ' + cls(g) + (g == null ? ' is-empty' : '') + '">' + fmt(g) + '</div>' +
         '<div class="d-score-text"><strong>' + word(g) + '</strong><span class="meta">' + esc(scoreText) + '</span></div>' +
@@ -990,7 +1000,7 @@ function wire() {
       $('#lightbox-img').alt = photo.caption || 'Foto';
       $('#lightbox-cap').textContent = photo.caption || '';
       $('#lightbox').hidden = false;
-      store.photoURL(photo.full).then((url) => { $('#lightbox-img').src = url; }).catch(() => {
+      photoSrc(photo.full).then((url) => { $('#lightbox-img').src = url; }).catch(() => {
         markPhoto($('#lightbox-img'), false);
         toast('No s’ha pogut carregar la foto');
       });
@@ -1234,13 +1244,19 @@ async function startSession(user) {
 // Usa datos inventados y no escribe en Firebase.
 function localPreview() {
   const sc = (a) => ({ producto: a[0], plato: a[1], tecnica: a[2], servicio: a[3], precio: a[4], ambiente: a[5] });
+  // Foto inventada, dibujada aquí mismo: el repo es público y no lleva fotos de restaurantes.
+  const FOTO = 'data:image/svg+xml,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">' +
+    '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9c9a0"/><stop offset="1" stop-color="#8a5a3c"/></linearGradient></defs>' +
+    '<rect width="1200" height="800" fill="url(#g)"/><circle cx="420" cy="430" r="250" fill="#f6efe6"/><circle cx="420" cy="430" r="190" fill="#e7d6c1"/>' +
+    '<circle cx="380" cy="400" r="70" fill="#c0563b"/><circle cx="470" cy="470" r="55" fill="#7c9a4a"/><circle cx="900" cy="300" r="120" fill="#5b3a2a" opacity=".55"/></svg>');
   me = { uid: 'u1', email: 'muestra@localhost', role: 'owner', color: 'azul', displayName: 'Isidre' };
   showScreen(null);
   onData({
     people: [{ uid: 'u1', name: 'Isidre', color: 'azul' }, { uid: 'u2', name: 'Cris', color: 'rosa' }],
     restaurants: [
       { id: 'm1', name: 'Can Exemple', locality: 'Palma', lat: 39.5712, lng: 2.6498, cuisines: ['Mallorquí', 'Arrossos'], price: PRICES[1], address: 'Carrer de Mostra, 1, 07001 Palma, Illes Balears', visitDate: '2026-10-17',
-        blog: 'Primer paràgraf de mostra.\n\nSegon paràgraf.', photos: [], placeId: null, ratings: { u1: { scores: sc([8.5, 9, 7, 8, 8.5, 7.5]), dish: 'Arròs brut' }, u2: { scores: sc([9, 9, 8, 8.5, 9, 7]), dish: 'Llom amb col' } } },
+        blog: 'Primer paràgraf de mostra.\n\nSegon paràgraf.', photos: [{ full: FOTO, thumb: FOTO, caption: 'Foto de mostra' }], placeId: null, ratings: { u1: { scores: sc([8.5, 9, 7, 8, 8.5, 7.5]), dish: 'Arròs brut' }, u2: { scores: sc([9, 9, 8, 8.5, 9, 7]), dish: 'Llom amb col' } } },
       { id: 'm2', name: 'Sa Fonda Fictícia', locality: 'Sóller', lat: 39.7665, lng: 2.7152, cuisines: ['Menú degustació', 'Peix i marisc'], price: PRICES[2], visitDate: '2026-09-05',
         blog: '', photos: [], placeId: null, ratings: { u2: { scores: sc([9.5, 10, 9, 9, 6, 9.5]), dish: 'Gamba roja' } } },
       { id: 'm3', name: 'Bodega Sense Nom', locality: 'Palma', lat: 39.5745, lng: 2.6551, cuisines: ['Autor'], price: PRICES[0], visitDate: '2026-11-07',
