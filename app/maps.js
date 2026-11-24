@@ -191,12 +191,11 @@ function localityOf(components) {
   return '';
 }
 
-export async function attachPlaceSearch(container, { getBias, onPlace, onError }) {
+// Crea una casilla de búsqueda nueva y vacía; quien la llama decide dónde ponerla.
+export async function createPlaceSearch({ getBias, onPlace, onError }) {
   await loadMaps();
   const { BasicPlaceAutocompleteElement, Place } = await google.maps.importLibrary('places');
   const el = new BasicPlaceAutocompleteElement({ requestedLanguage: 'ca', placeholder: 'Nom del restaurant' });
-  container.innerHTML = '';
-  container.appendChild(el);
   el.addEventListener('gmp-select', async (event) => {
     try {
       const id = event.place.id;
@@ -216,4 +215,16 @@ export async function attachPlaceSearch(container, { getBias, onPlace, onError }
   const bias = getBias && getBias();
   if (bias) el.locationBias = bias;
   return el;
+}
+
+// Lo escrito en la casilla de Google sin elegir ningún resultado. Google no lo documenta: se prueba con
+// la propiedad value y con el campo interno si su shadow DOM está abierto. Si no se puede leer, vacío.
+export function searchText(el) {
+  if (!el) return '';
+  let v = '';
+  try {
+    if (typeof el.value === 'string') v = el.value;
+    else if (el.shadowRoot && el.shadowRoot.querySelector('input')) v = el.shadowRoot.querySelector('input').value;
+  } catch (e) { v = ''; }
+  return String(v || '').replace(/\s+/g, ' ').trim().slice(0, 80);
 }

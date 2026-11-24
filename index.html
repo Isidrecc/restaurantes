@@ -72,16 +72,35 @@
       <div class="list" id="list"></div>
     </section>
 
+    <!-- Alta en pasos, edición en una pantalla y nota: los mismos bloques (docs/diseno.md, secciones 5 y 6). -->
     <section class="view" id="view-form" aria-label="Afegeix un restaurant">
-      <form class="form" id="form" novalidate>
-        <h2 class="form-title" id="form-title">Afegeix un restaurant</h2>
+      <div class="form-head">
+        <div class="form-head-row">
+          <h2 class="form-title" id="form-title">Afegeix un restaurant</h2>
+          <button class="icon-btn" type="button" id="f-close" aria-label="Tanca">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+          </button>
+        </div>
+        <div class="progress-row" id="f-progress-row">
+          <div class="progress" id="f-progress" aria-hidden="true"></div>
+          <span class="meta" id="f-step-label">Pas 1 de 4</span>
+        </div>
+      </div>
 
-        <section class="group" id="grp-ubic" aria-label="Restaurant">
-          <h3 class="group-title">Restaurant</h3>
-          <div class="field">
-            <span class="field-label">Cerca a Google Maps</span>
+      <form class="form" id="form" novalidate>
+        <section class="group" id="grp-ubic" aria-label="On és">
+          <h3 class="group-title">On és</h3>
+          <div class="field" id="fld-name">
             <div class="gsearch" id="f-gsearch"></div>
-            <p class="hint">Escriu el nom i tria’l de la llista. El mapa el marcarà.</p>
+            <div class="name-box" id="f-namebox" hidden>
+              <input class="input" id="f-name" type="text" autocomplete="off" maxlength="80" placeholder="Nom del restaurant" aria-label="Nom del restaurant" enterkeyhint="done">
+              <button class="name-x" type="button" id="f-name-x" aria-label="Torna a cercar a Google Maps">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+              </button>
+            </div>
+            <p class="hint" id="name-hint">Escriu el nom i tria’l de la llista. El mapa el marcarà.</p>
+            <p class="hint" id="f-address" hidden></p>
+            <p class="error" id="err-name" hidden>Escriu el nom del restaurant.</p>
           </div>
           <div class="field">
             <div id="pick-map" aria-label="Mapa per situar el restaurant"></div>
@@ -89,18 +108,10 @@
             <div class="loc-actions"><button class="btn" type="button" id="f-geo">Usa la meva ubicació</button></div>
             <p class="error" id="err-loc" hidden>Toca el mapa per marcar on és.</p>
           </div>
-          <div class="field">
-            <label for="f-name">Nom</label>
-            <input class="input" id="f-name" type="text" autocomplete="off" maxlength="80">
-            <p class="hint" id="name-hint" hidden>Copiat de Google Maps. El pots canviar.</p>
-            <p class="error" id="err-name" hidden>Escriu el nom del restaurant.</p>
-          </div>
-          <div class="field">
+          <div class="field" id="fld-locality" hidden>
             <label for="f-locality">Localitat</label>
-            <input class="input" id="f-locality" type="text" maxlength="60" autocomplete="off" list="localities">
+            <input class="input" id="f-locality" type="text" maxlength="60" autocomplete="off" list="localities" enterkeyhint="done">
             <datalist id="localities"></datalist>
-            <p class="hint" id="locality-hint" hidden>Treta de l’adreça de Google Maps. La pots canviar.</p>
-            <p class="hint" id="f-address" hidden></p>
             <p class="error" id="err-muni" hidden>Escriu la localitat.</p>
           </div>
         </section>
@@ -117,30 +128,38 @@
             <p class="hint">Pots marcar-ne diversos.</p>
           </div>
           <div class="field">
-            <label for="f-date">Data de la visita</label>
-            <input class="input" id="f-date" type="date">
+            <span class="field-label" id="lbl-price">Preu per persona, sense beguda</span>
+            <div class="price-grid" role="radiogroup" aria-labelledby="lbl-price" id="f-price"></div>
           </div>
           <div class="field">
-            <span class="field-label" id="lbl-price">Preu per persona, sense beguda</span>
-            <div class="seg seg-wide" role="radiogroup" aria-labelledby="lbl-price" id="f-price"></div>
+            <label for="f-date">Data de la visita</label>
+            <div class="date-row">
+              <button class="chip" type="button" data-day="0" aria-pressed="false">Avui</button>
+              <button class="chip" type="button" data-day="1" aria-pressed="false">Ahir</button>
+              <input class="input" id="f-date" type="date">
+            </div>
           </div>
         </section>
 
         <section class="group" id="grp-val" aria-label="La teva nota">
           <h3 class="group-title">La teva nota</h3>
-          <p class="hint" id="val-hint">Opcional. El pots puntuar ara o més tard des de la fitxa.</p>
-          <div id="rates"></div>
-          <div class="global-row">
-            <span>Nota global (mitjana)</span>
-            <div class="score" id="f-global">Sense nota</div>
+          <p class="hint" id="val-hint">Opcional. La pots posar ara o més tard des de la fitxa.</p>
+          <div class="rate-top">
+            <div class="rate-score">
+              <div class="score is-big is-empty" id="f-global">Sense nota</div>
+              <strong class="rate-word" id="f-global-word"></strong>
+            </div>
+            <div class="rate-rose" id="f-rose"></div>
           </div>
+          <div id="rates"></div>
           <p class="error" id="err-rate" hidden>Puntua almenys un criteri.</p>
+          <button class="btn btn-block" type="button" id="f-later">Puntua més tard</button>
         </section>
 
-        <section class="group" id="grp-res" aria-label="Comentari i fotos">
-          <h3 class="group-title">Comentari i fotos</h3>
+        <section class="group" id="grp-res" aria-label="Text i fotos">
+          <h3 class="group-title">Text i fotos</h3>
           <div class="field">
-            <label for="f-review">Comentari</label>
+            <label for="f-review">Text</label>
             <textarea id="f-review" class="blog-input" placeholder="Explica-ho com en un blog: què vau demanar, com va anar, si hi tornaríeu. Deixa una línia en blanc entre paràgrafs."></textarea>
           </div>
           <div class="field">
@@ -154,11 +173,13 @@
           </div>
         </section>
 
-        <div class="form-actions">
-          <button class="btn" type="button" id="f-cancel">Cancel·la</button>
-          <button class="btn btn-primary" type="submit" id="f-save">Desa el restaurant</button>
-        </div>
       </form>
+
+      <div class="form-foot">
+        <button class="btn" type="button" id="f-back">Enrere</button>
+        <button class="btn btn-primary" type="button" id="f-next">Següent</button>
+        <button class="btn btn-primary" type="button" id="f-save">Desa el restaurant</button>
+      </div>
     </section>
   </main>
 

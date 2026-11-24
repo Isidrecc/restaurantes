@@ -66,18 +66,19 @@ El alta va en **cuatro pasos**. Arriba, una barra de progreso con cuatro segment
 
 - Solo el buscador de Google (autocompletado básico del Places UI Kit) y el mapa, con «Usa la meva ubicació» debajo. Al elegir un sitio se piden sus coordenadas, su nombre y su dirección. El mapa salta allí y **marca el sitio con un aro**.
 - **El pin lo pone el usuario** tocando el sitio marcado: los toques atraviesan el aro y llegan al mapa. Después puede arrastrarlo. Elegir otro resultado quita el pin anterior.
-- **El nombre va en la casilla del buscador.** La casilla de Google se vacía al elegir un resultado y la app no puede escribir en ella, así que, al elegir, se sustituye por un campo de la app con el mismo aspecto, con el nombre de Google, editable ahí mismo y con una X para volver a buscar (confirmado el 24 de noviembre de 2026). No hay casilla «Nom» aparte. Si se pone el pin sin elegir ningún resultado, la casilla pasa igualmente a campo de nombre, con lo que se hubiera escrito en el buscador.
+- **El nombre va en la casilla del buscador.** La casilla de Google se vacía al elegir un resultado y la app no puede escribir en ella, así que, al elegir, se sustituye por un campo de la app con el mismo aspecto, con el nombre de Google, editable ahí mismo y con una X para volver a buscar (confirmado el 24 de noviembre de 2026). No hay casilla «Nom» aparte. Si se pone el pin sin elegir ningún resultado, la casilla pasa igualmente a campo de nombre. Iba a llevar lo escrito en el buscador, pero la casilla de Google no deja leerlo (no tiene `value` y su shadow DOM está cerrado, comprobado el 24 de noviembre de 2026), así que el campo aparece vacío. Si antes se había elegido un sitio y se toca la X sin escribir nada, se recupera ese nombre.
+- Debajo del nombre se ve en pequeño la dirección de Google, para comprobar que es el sitio correcto (24 de noviembre de 2026).
 - **La localidad no se muestra.** Se saca de la dirección de Google y se guarda. La casilla «Localitat», con sugerencias de las ya usadas, solo aparece si Google no la da, por ejemplo al poner el pin sin buscador.
 - Para pasar al paso siguiente hacen falta el nombre, el pin y, si se muestra la casilla, la localidad.
 
 ### Paso 2. Dades
 
-- Tipos de cocina en fichas (sección 2) y precio en cuatro botones grandes.
+- Tipos de cocina en fichas (sección 2) y precio en cuatro botones grandes, en dos filas de dos.
 - Fecha de visita con los atajos «Avui» y «Ahir» además del selector de fecha (confirmado el 24 de noviembre de 2026). Por defecto, hoy.
 
 ### Paso 3. La teva nota
 
-- Arriba, la nota global grande con su color y su texto, y al lado la roseta de quien puntúa, que se dibuja en directo.
+- Arriba, la nota global grande con su color y su texto, y al lado la roseta de quien puntúa, que se dibuja en directo. Esa parte se queda fija arriba al bajar por los deslizadores, y la roseta usa nombres cortos (Producte, Plat, Tècnica, Servei, Q/preu, Ambient) para que se lean a ese tamaño.
 - Debajo, un deslizador por criterio con su valor coloreado. El nombre del plato estrella va dentro de su criterio.
 - Botón «Puntua més tard»: la nota sigue siendo opcional.
 
@@ -98,6 +99,15 @@ Fuentes: https://developers.google.com/maps/documentation/places/web-service/pol
 
 - **«Edita»** (editores) abre una sola pantalla con los bloques del alta seguidos, sin pasos ni barra de progreso. El bloque de la nota solo lo ve quien puntúa. En el primer bloque aparece también la casilla «Localitat», para poder corregirla: la localidad solo desaparece del alta.
 - **«Puntua» o «Edita la meva nota»** se mantiene en la ficha y abre solo el bloque de la nota (confirmado el 24 de noviembre de 2026).
+- Al guardar la edición, la nota de quien puntúa solo se guarda si la ha cambiado.
+
+### Común al alta y a la edición
+
+Decidido el 24 de noviembre de 2026, al aprobar el enfoque de la parte 3g:
+
+- El formulario ocupa la pantalla: arriba el título y la X, abajo los botones. Mientras tanto no se ve el menú flotante.
+- Cerrar con algo puesto pide confirmación («Vols descartar…?»). Sin cambios, se cierra directamente.
+- Intro en un campo solo cierra el teclado; se guarda siempre con el botón.
 
 ## 7. Aspecto: colores, modo oscuro y menú
 
@@ -198,7 +208,7 @@ Orden aprobado por el propietario el 24 de noviembre de 2026. Al final de cada p
 |---|---|
 | 3e · Colores y menú | Paleta «Berenjena» en claro y oscuro, sin interruptor manual, `theme-color` y menú inferior flotante con el «+» (sección 7). Va primero para comprobar pronto que el azul y el rosa se leen bien junto al morado |
 | 3f · Mapa | Estilo «Lavanda» y «Noche» preparado por Claude, Map ID creado por el propietario con guía, y conexión con `FOLLOW_SYSTEM` (sección 8) |
-| 3g · Alta y edición | Alta en cuatro pasos y edición en una pantalla, que comparten los mismos bloques (secciones 5 y 6) |
+| 3g · Alta y edición | Alta en cuatro pasos y edición en una pantalla, que comparten los mismos bloques (secciones 5 y 6). Publicada el 24 de noviembre de 2026, pendiente del visto bueno del propietario en el iPhone |
 | 3h · Cierre | Prueba del propietario en el iPhone y su aprobación, estado al día en `CLAUDE.md` y borrar la carpeta `prueba/` |
 
 Antes de empezar, el propietario publica las reglas de Firestore que aceptan `address`.

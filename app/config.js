@@ -18,13 +18,14 @@ export const MAP_ID = 'ef2c6b7a22cee90b3aee6ac8';
 
 export const FIREBASE_VERSION = '13.4.0';
 
+// mini: nom curt per a la roseta petita del formulari, al costat de la nota.
 export const CRITERIA = [
-  { k: 'producto', label: 'Qualitat del producte', short: 'Producte' },
-  { k: 'plato', label: 'Plat estrella', short: 'Plat estrella' },
-  { k: 'tecnica', label: 'Tècnica i creativitat', short: 'Tècnica' },
-  { k: 'servicio', label: 'Servei', short: 'Servei' },
-  { k: 'precio', label: 'Qualitat/preu', short: 'Qualitat/preu' },
-  { k: 'ambiente', label: 'Ambient', short: 'Ambient' }
+  { k: 'producto', label: 'Qualitat del producte', short: 'Producte', mini: 'Producte' },
+  { k: 'plato', label: 'Plat estrella', short: 'Plat estrella', mini: 'Plat' },
+  { k: 'tecnica', label: 'Tècnica i creativitat', short: 'Tècnica', mini: 'Tècnica' },
+  { k: 'servicio', label: 'Servei', short: 'Servei', mini: 'Servei' },
+  { k: 'precio', label: 'Qualitat/preu', short: 'Qualitat/preu', mini: 'Q/preu' },
+  { k: 'ambiente', label: 'Ambient', short: 'Ambient', mini: 'Ambient' }
 ];
 
 // Tipos de cocina de partida. Los que se añadan desde el formulario salen de los restaurantes guardados.

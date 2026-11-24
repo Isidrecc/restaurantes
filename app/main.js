@@ -1,7 +1,7 @@
 // Puntuam a taula: interfaz. Porta la demo aprobada (demo/index.html) con los cambios de docs/diseno.md.
 import { CRITERIA, CUISINES, PRICES, COLORS, COLOR_NAMES } from './config.js';
 import * as store from './store.js';
-import { createMainMap, createPickMap, attachPlaceSearch } from './maps.js';
+import { createMainMap, createPickMap, createPlaceSearch, searchText } from './maps.js';
 import { preparePhoto } from './photos.js';
 
 // ---------- Estado ----------
@@ -25,8 +25,13 @@ let confirmFn = null;
 let mainMap = null;
 let pickMap = null;
 let pickMapPromise = null;
-let autoName = '';        // nombre y localidad copiados del buscador de Google
-let autoLocality = '';
+let formStep = 0;         // paso del alta (índice en formBlocks())
+let initialSnap = '';     // estado del formulario al abrirlo, para saber si hay algo que descartar
+let searchEl = null;      // casilla de Google del paso 1
+let searchToken = 0;      // descarta casillas que terminan de crearse cuando ya no hacen falta
+let searchFailed = false; // sin buscador de Google: el nombre se escribe a mano
+let nameBeforeSearch = '';// nombre que había antes de tocar la X para volver a buscar
+let autoLocality = '';    // localidad copiada de Google
 
 // Selector de nota: 'all' (media) o el color de quien puntúa.
 let who = 'all';
@@ -58,10 +63,13 @@ function fmtDate(iso) {
   const p = iso.split('-');
   return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('ca-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 }
-function todayISO() {
+// Fecha de hace «back» días en formato AAAA-MM-DD (0: hoy, 1: ayer).
+function dayISO(back) {
   const d = new Date();
+  d.setDate(d.getDate() - (back || 0));
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
+function todayISO() { return dayISO(0); }
 // «de» davant de nom: «d’Isidre», «de Cris».
 function de(name) { return (/^h?[aeiouàáèéíïòóúü]/i.test(name) ? 'd’' : 'de ') + name; }
 function norm(s) { return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
@@ -255,19 +263,23 @@ function setView(v) {
     else b.removeAttribute('aria-current');
   });
   $('#tools').hidden = v === 'form';
+  // El formulario ocupa la pantalla con su X arriba y sus botones abajo: el menú flotante se oculta.
+  $('#tabs').hidden = v === 'form';
   $('#active-chips').hidden = v === 'form' || !activeCount();
   if (v === 'form') ensurePickMap().then(placeDraftOnPickMap).catch((e) => toast('No s’ha pogut carregar el mapa: ' + errText(e)));
 }
 
 // ---------- Roseta ----------
-function chartSVG(list) {
-  const W = 380, H = 252, cx = 190, cy = 128, R = 88, n = CRITERIA.length, step = 360 / n;
+// compact: versión pequeña para el formulario, al lado de la nota, con los nombres cortos (mini) más grandes.
+function chartSVG(list, compact) {
+  const W = compact ? 290 : 380, H = compact ? 212 : 252, cx = W / 2, cy = compact ? 106 : 128, R = compact ? 66 : 88, n = CRITERIA.length, step = 360 / n;
+  const fs = compact ? 17 : 13.5;
   const pt = (rad, deg) => { const a = deg * Math.PI / 180; return [cx + rad * Math.cos(a), cy + rad * Math.sin(a)]; };
   const f = (x) => Math.round(x * 10) / 10;
   const hex = (rad) => CRITERIA.map((c, i) => { const q = pt(rad, -90 + i * step); return f(q[0]) + ',' + f(q[1]); }).join(' ');
   const poly = (scores) => CRITERIA.map((c, i) => { const v = scores[c.k]; const q = pt(R * (v == null ? 0 : v) / 10, -90 + i * step); return f(q[0]) + ',' + f(q[1]); }).join(' ');
   const desc = list.map((o) => personName(o.uid) + ': ' + CRITERIA.map((c) => c.short + ' ' + fmt(o.scores[c.k])).join(', ')).join('. ');
-  let o = '<svg class="rose" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Roseta de puntuacions. ' + esc(desc) + '">';
+  let o = '<svg class="rose' + (compact ? ' is-compact' : '') + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Roseta de puntuacions. ' + esc(desc) + '">';
   o += '<polygon class="hex-outer" points="' + hex(R) + '"></polygon>';
   o += '<polygon class="hex-inner" points="' + hex(R / 2) + '"></polygon>';
   CRITERIA.forEach((c, i) => { const e = pt(R, -90 + i * step); o += '<line class="rose-spoke" x1="' + cx + '" y1="' + cy + '" x2="' + f(e[0]) + '" y2="' + f(e[1]) + '"></line>'; });
@@ -275,8 +287,8 @@ function chartSVG(list) {
   CRITERIA.forEach((c, i) => {
     const deg = -90 + i * step, q = pt(R + 12, deg), cos = Math.cos(deg * Math.PI / 180), sin = Math.sin(deg * Math.PI / 180);
     const anchor = cos > 0.3 ? 'start' : cos < -0.3 ? 'end' : 'middle';
-    const y = sin < -0.9 ? q[1] - 2 : sin > 0.9 ? q[1] + 12 : q[1] + 5;
-    o += '<text class="rose-name" text-anchor="' + anchor + '" x="' + f(q[0]) + '" y="' + f(y) + '">' + c.short + '</text>';
+    const y = sin < -0.9 ? q[1] - 2 : sin > 0.9 ? q[1] + Math.round(fs * 0.9) : q[1] + Math.round(fs * 0.37);
+    o += '<text class="rose-name" text-anchor="' + anchor + '" x="' + f(q[0]) + '" y="' + f(y) + '">' + (compact ? c.mini : c.short) + '</text>';
   });
   return o + '</svg>';
 }
@@ -380,57 +392,90 @@ function openDetail(id, keepScroll) {
 function closeDetail() { $('#detail').hidden = true; detailId = null; }
 
 // ---------- Formulario ----------
+// Tres modos con los mismos bloques (docs/diseno.md, secciones 5 y 6): add (alta en pasos, editores),
+// edit (todos los bloques en una pantalla, editores) y rate (solo mi nota, quien puntúa).
 async function ensurePickMap() {
   if (pickMap) return pickMap;
   if (!pickMapPromise) {
-    pickMapPromise = (async () => {
-      const m = await createPickMap($('#pick-map'), { onPick: setDraftLocation });
-      pickMap = m;
-      attachPlaceSearch($('#f-gsearch'), {
-        getBias: () => {
-          const c = m.map.getCenter();
-          return c ? { center: { lat: c.lat(), lng: c.lng() }, radius: 50000 } : null;
-        },
-        onPlace: (p) => {
-          if (!draft) return;
-          draft.placeId = p.id;
-          // El pin lo pone el usuario tocando el sitio marcado (sección 5 de docs/diseno.md).
-          draft.lat = null;
-          draft.lng = null;
-          m.clearPin();
-          m.showPlace(p.lat, p.lng);
-          m.center(p.lat, p.lng, 18);
-          // Se rellenan si están vacíos o conservan lo copiado de una búsqueda anterior.
-          autoName = autoFill('#f-name', '#name-hint', '#err-name', p.name, autoName);
-          autoLocality = autoFill('#f-locality', '#locality-hint', '#err-muni', p.locality, autoLocality);
-          draft.address = p.address || '';
-          showDraftAddress();
-          $('#pick-status').textContent = 'Toca el restaurant marcat per posar-hi el pin.';
-          $('#pick-map').scrollIntoView({ block: 'center', behavior: 'smooth' });
-        },
-        onError: (e) => toast('No s’ha pogut cercar: ' + errText(e))
-      }).catch((e) => {
-        $('#f-gsearch').innerHTML = '<p class="hint">El cercador de Google no està disponible (' + esc(errText(e)) + '). Situa el restaurant tocant el mapa.</p>';
-      });
-      return m;
-    })();
+    pickMapPromise = createPickMap($('#pick-map'), { onPick: setDraftLocation }).then((m) => { pickMap = m; return m; });
     pickMapPromise.catch(() => { pickMapPromise = null; });
   }
   return pickMapPromise;
 }
+
+// Paso 1. La casilla de Google y el campo del nombre ocupan el mismo sitio. Al elegir un resultado, la casilla
+// (que Google vacía y en la que la app no puede escribir) se sustituye por el campo con el nombre de Google,
+// editable y con una X para volver a buscar (sección 5).
+function searching() { return !$('#f-gsearch').hidden; }
+function showNameBox(name) {
+  $('#f-gsearch').hidden = true;
+  $('#f-namebox').hidden = false;
+  $('#f-name').value = name || '';
+  $('#f-name-x').hidden = searchFailed;
+  $('#name-hint').hidden = true;
+  $('#err-name').hidden = true;
+  showDraftAddress();
+}
+async function showSearch() {
+  const token = ++searchToken;
+  searchEl = null;
+  $('#f-namebox').hidden = true;
+  $('#f-address').hidden = true;
+  $('#f-gsearch').hidden = false;
+  $('#f-gsearch').innerHTML = '';
+  $('#name-hint').textContent = 'Escriu el nom i tria’l de la llista. El mapa el marcarà.';
+  $('#name-hint').hidden = false;
+  try {
+    const m = await ensurePickMap();
+    const el = await createPlaceSearch({
+      getBias: () => {
+        const c = m.map.getCenter();
+        return c ? { center: { lat: c.lat(), lng: c.lng() }, radius: 50000 } : null;
+      },
+      onPlace: (p) => onPlacePicked(m, p),
+      onError: (e) => toast('No s’ha pogut cercar: ' + errText(e))
+    });
+    if (token !== searchToken || !draft) return;
+    $('#f-gsearch').innerHTML = '';
+    $('#f-gsearch').appendChild(el);
+    searchEl = el;
+  } catch (e) {
+    if (token !== searchToken || !draft) return;
+    // Sin buscador, el nombre y la localidad se escriben a mano y el restaurante se sitúa tocando el mapa.
+    searchFailed = true;
+    showNameBox(nameBeforeSearch);
+    showLocality(true);
+    $('#name-hint').textContent = 'El cercador de Google no està disponible (' + errText(e) + '). Escriu el nom i toca el mapa per situar-lo.';
+    $('#name-hint').hidden = false;
+  }
+}
+function onPlacePicked(m, p) {
+  if (!draft) return;
+  draft.placeId = p.id;
+  // El pin lo pone el usuario tocando el sitio marcado: elegir otro resultado quita el anterior.
+  draft.lat = null;
+  draft.lng = null;
+  m.clearPin();
+  m.showPlace(p.lat, p.lng);
+  m.center(p.lat, p.lng, 18);
+  draft.address = p.address || '';
+  showNameBox(p.name);
+  // La localidad sale de la dirección de Google y en el alta no se muestra; si Google no la da, se pide.
+  const input = $('#f-locality');
+  if (p.locality) input.value = p.locality;
+  else if (input.value.trim() === autoLocality) input.value = '';
+  autoLocality = p.locality || '';
+  showLocality(formMode !== 'add' || !p.locality);
+  $('#err-muni').hidden = true;
+  $('#err-loc').hidden = true;
+  $('#pick-status').textContent = 'Toca el restaurant marcat per posar-hi el pin.';
+  $('#pick-map').scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+function showLocality(on) { $('#fld-locality').hidden = !on; }
 function showDraftAddress() {
   const box = $('#f-address');
-  box.hidden = !draft.address;
-  box.textContent = draft.address ? 'Adreça: ' + draft.address : '';
-}
-function autoFill(inputSel, hintSel, errSel, value, prevAuto) {
-  const input = $(inputSel);
-  const current = input.value.trim();
-  if (!value || (current && current !== prevAuto)) return prevAuto;
-  input.value = value;
-  $(hintSel).hidden = false;
-  $(errSel).hidden = true;
-  return value;
+  box.hidden = !draft || !draft.address || searching();
+  box.textContent = draft && draft.address ? draft.address : '';
 }
 function round5(n) { return Math.round(n * 1e5) / 1e5; }
 function setDraftLocation(lat, lng) {
@@ -439,6 +484,24 @@ function setDraftLocation(lat, lng) {
   draft.lng = round5(lng);
   $('#err-loc').hidden = true;
   $('#pick-status').textContent = 'Punt marcat. Pots arrossegar el pin per afinar.';
+  // Pin puesto sin elegir ningún resultado: la casilla pasa a campo de nombre con lo que se hubiera escrito.
+  if (!searching()) return;
+  const typed = searchText(searchEl);
+  searchToken++;
+  if (typed) {
+    // Sitio nuevo escrito a mano: sin datos de Google, y la localidad se pide.
+    draft.placeId = null;
+    draft.address = '';
+    if (pickMap) pickMap.hidePlace();
+    if ($('#f-locality').value.trim() === autoLocality) $('#f-locality').value = '';
+    autoLocality = '';
+    showNameBox(typed);
+    showLocality(true);
+  } else {
+    // No se ha escrito nada: se recupera lo que había antes de volver a buscar.
+    showNameBox(nameBeforeSearch);
+    showLocality(formMode !== 'add' || !$('#f-locality').value.trim());
+  }
 }
 function placeDraftOnPickMap(m) {
   if (!m || !draft) return;
@@ -471,14 +534,42 @@ function setRate(k, v) {
   draft.scores[k] = v;
   const out = $('#f-v-' + k);
   out.textContent = fmt(v);
-  out.classList.toggle('is-empty', v == null);
-  if (v != null) $('#f-r-' + k).value = v;
+  out.className = 'rate-val ' + (v == null ? 'is-empty' : cls(v));
+  $('#f-r-' + k).value = v == null ? 5 : v;
+  renderRateTop();
+}
+// Nota global grande con su color y su texto y, al lado, la roseta de quien puntúa, que se dibuja en directo.
+function renderRateTop() {
   const g = globalOf(draft.scores);
   const box = $('#f-global');
-  box.className = 'score ' + cls(g) + (g == null ? ' is-empty' : '');
+  box.className = 'score is-big ' + cls(g) + (g == null ? ' is-empty' : '');
   box.textContent = fmt(g);
+  $('#f-global-word').textContent = g == null ? '' : word(g);
+  $('#f-rose').innerHTML = me ? chartSVG([{ uid: me.uid, scores: draft.scores }], true) : '';
 }
-// Modos: add (alta, editores), edit (datos, comentario y fotos, editores), rate (mi nota, quien puntúa).
+function updateDateChips() {
+  const v = $('#f-date').value;
+  $$('#grp-datos [data-day]').forEach((b) => b.setAttribute('aria-pressed', v === dayISO(+b.dataset.day) ? 'true' : 'false'));
+}
+
+// Bloques de cada modo, en orden. En el alta son los pasos; si quien da de alta no puntúa, no hay paso de nota.
+const BLOCKS = ['#grp-ubic', '#grp-datos', '#grp-val', '#grp-res'];
+function formBlocks() {
+  if (formMode === 'rate') return ['#grp-val'];
+  return BLOCKS.filter((s) => s !== '#grp-val' || canRate());
+}
+// Alta: se ve un bloque cada vez, con la barra de progreso, «Enrere» y «Següent» o «Desa el restaurant».
+function showStep() {
+  const blocks = formBlocks();
+  const last = blocks.length - 1;
+  BLOCKS.forEach((s) => { $(s).hidden = s !== blocks[formStep]; });
+  $('#f-step-label').textContent = 'Pas ' + (formStep + 1) + ' de ' + blocks.length;
+  $('#f-progress').innerHTML = blocks.map((s, i) => '<i' + (i <= formStep ? ' class="is-on"' : '') + '></i>').join('');
+  $('#f-back').hidden = formStep === 0;
+  $('#f-next').hidden = formStep === last;
+  $('#f-save').hidden = formStep !== last;
+  $('#form').scrollTop = 0;
+}
 function startForm(mode, r) {
   formMode = mode;
   const mine = r && me && r.ratings[me.uid];
@@ -494,36 +585,124 @@ function startForm(mode, r) {
     scores: mine ? Object.assign({}, mine.scores) : {},
     dish: mine ? mine.dish : ''
   };
+  draft.origRating = ratingKey(draft.scores, draft.dish);
+  formStep = 0;
+  searchFailed = false;
+  nameBeforeSearch = draft.name;
+  autoLocality = '';
   $('#form-title').textContent = mode === 'add' ? 'Afegeix un restaurant' : mode === 'edit' ? 'Edita · ' + r.name : (mine ? 'Edita la meva nota · ' : 'Puntua · ') + r.name;
   $('#f-save').textContent = mode === 'add' ? 'Desa el restaurant' : mode === 'edit' ? 'Desa els canvis' : 'Desa la meva nota';
-  $('#grp-datos').hidden = mode === 'rate';
-  $('#grp-ubic').hidden = mode === 'rate';
-  $('#grp-val').hidden = mode === 'edit' || (mode === 'add' && !canRate());
-  $('#grp-res').hidden = mode === 'rate';
+  const blocks = formBlocks();
+  BLOCKS.forEach((s) => { $(s).hidden = !blocks.includes(s); });
   $('#val-hint').hidden = mode !== 'add';
-  $('#f-name').value = draft.name;
-  autoName = '';
-  autoLocality = '';
-  $('#name-hint').hidden = true;
-  $('#locality-hint').hidden = true;
+  $('#f-later').hidden = mode !== 'add';
+  // Paso 1: en el alta se empieza por el buscador y la localidad no se ve; al editar, nombre y localidad a la vista.
+  $('#f-locality').value = draft.locality;
+  $('#localities').innerHTML = localities().map((l) => '<option value="' + esc(l) + '"></option>').join('');
+  if (mode === 'add') {
+    $('#f-name').value = '';
+    showLocality(false);
+    showSearch();
+  } else if (mode === 'edit') {
+    searchToken++;
+    searchEl = null;
+    showNameBox(draft.name);
+    showLocality(true);
+  }
   renderFormCuisines();
   $('#f-cuisine-new').hidden = true;
   $('#f-cuisine-text').value = '';
   $('#f-date').value = draft.visitDate;
-  $('#f-locality').value = draft.locality;
-  showDraftAddress();
-  $('#localities').innerHTML = localities().map((l) => '<option value="' + esc(l) + '"></option>').join('');
+  updateDateChips();
   $('#f-dish').value = draft.dish || '';
   $('#f-review').value = draft.blog;
   $$('#f-price input').forEach((i) => { i.checked = i.value === draft.price; });
   CRITERIA.forEach((c) => {
     const v = draft.scores[c.k];
-    $('#f-r-' + c.k).value = v == null ? 5 : v;
     setRate(c.k, v == null ? null : v);
   });
   ['#err-name', '#err-muni', '#err-loc', '#err-rate'].forEach((s) => { $(s).hidden = true; });
   renderDraftPhotos();
-  $('#view-form').scrollTop = 0;
+  $('#f-progress-row').hidden = mode !== 'add';
+  if (mode === 'add') showStep();
+  else {
+    $('#f-back').hidden = true;
+    $('#f-next').hidden = true;
+    $('#f-save').hidden = false;
+    $('#form').scrollTop = 0;
+  }
+  readForm();
+  initialSnap = snapshot();
+}
+// Pasa lo escrito en el formulario al borrador.
+function readForm() {
+  if (!draft) return;
+  draft.name = $('#f-namebox').hidden ? '' : $('#f-name').value.trim();
+  draft.cuisines = cuisineList(draft.cuisines).filter((c) => draft.cuisines.includes(c));
+  draft.visitDate = $('#f-date').value || todayISO();
+  draft.locality = $('#f-locality').value.trim();
+  draft.dish = $('#f-dish').value.trim();
+  draft.blog = $('#f-review').value.trim();
+  const pr = $('#f-price input:checked');
+  draft.price = pr ? pr.value : PRICES[1];
+}
+function ratingKey(scores, dish) { return JSON.stringify([CRITERIA.map((c) => (scores[c.k] == null ? null : scores[c.k])), dish || '']); }
+function snapshot() {
+  return JSON.stringify([draft.name, draft.locality, draft.lat, draft.lng, draft.placeId, draft.cuisines, draft.price, draft.visitDate, draft.blog,
+    ratingKey(draft.scores, draft.dish), draft.photos.map((p) => [p.thumb || p.preview, p.caption, !!p.cover])]);
+}
+// Comprueba un bloque y marca lo que falta. Devuelve adónde llevar la vista, o null si está completo.
+function checkBlock(sel) {
+  if (sel === '#grp-ubic') {
+    let bad = null;
+    $('#err-name').textContent = searching() ? 'Tria el restaurant de la llista o toca el mapa per situar-lo.' : 'Escriu el nom del restaurant.';
+    $('#err-name').hidden = !!draft.name;
+    if (!draft.name) bad = '#fld-name';
+    $('#err-loc').hidden = draft.lat != null;
+    if (draft.lat == null) bad = bad || '#pick-map';
+    // La localidad solo se pide si la casilla se ve o si ya hay nombre y pin y Google no la ha dado.
+    const needLocality = !$('#fld-locality').hidden || (draft.name && draft.lat != null);
+    if (needLocality && !draft.locality) {
+      showLocality(true);
+      $('#err-muni').hidden = false;
+      bad = bad || '#f-locality';
+    } else $('#err-muni').hidden = true;
+    return bad;
+  }
+  if (sel === '#grp-val') {
+    const hasScore = CRITERIA.some((c) => draft.scores[c.k] != null);
+    const need = formMode === 'rate' || !!draft.dish;
+    $('#err-rate').hidden = !(need && !hasScore);
+    return need && !hasScore ? '#rates' : null;
+  }
+  return null;
+}
+function showProblem(sel) {
+  $(sel).scrollIntoView({ block: 'center' });
+  toast('Falten dades per omplir');
+}
+function nextStep() {
+  readForm();
+  const blocks = formBlocks();
+  const bad = checkBlock(blocks[formStep]);
+  if (bad) { showProblem(bad); return; }
+  if (formStep < blocks.length - 1) { formStep++; showStep(); }
+}
+function closeForm() {
+  const back = draft && draft.id;
+  if (draft) draft.photos.forEach((p) => { if (p.preview) URL.revokeObjectURL(p.preview); });
+  draft = null;
+  searchToken++;
+  setView(lastBrowse);
+  if (back && byId(back)) openDetail(back);
+}
+// Cerrar con algo puesto pide confirmación; sin cambios, se cierra directamente.
+function askCloseForm() {
+  if (!draft || saving) return;
+  readForm();
+  if (snapshot() === initialSnap) { closeForm(); return; }
+  const title = formMode === 'add' ? 'Vols descartar aquest restaurant?' : formMode === 'edit' ? 'Vols descartar els canvis?' : 'Vols descartar la nota?';
+  askConfirm(title, 'El que has posat no es desarà.', closeForm, 'Descarta');
 }
 function renderFormCuisines() {
   $('#f-cuisines').innerHTML = cuisineList(draft.cuisines).map((c) =>
@@ -557,27 +736,19 @@ function renderDraftPhotos() {
   hydratePhotos(box);
 }
 async function saveForm() {
-  if (saving) return;
-  draft.name = $('#f-name').value.trim();
-  draft.cuisines = cuisineList(draft.cuisines).filter((c) => draft.cuisines.includes(c));
-  draft.visitDate = $('#f-date').value || todayISO();
-  draft.locality = $('#f-locality').value.trim();
-  draft.dish = $('#f-dish').value.trim();
-  draft.blog = $('#f-review').value.trim();
-  const pr = $('#f-price input:checked');
-  draft.price = pr ? pr.value : PRICES[1];
-  let bad = null;
-  if (formMode !== 'rate') {
-    $('#err-name').hidden = !!draft.name; if (!draft.name) bad = bad || '#f-name';
-    $('#err-muni').hidden = !!draft.locality; if (!draft.locality) bad = bad || '#f-locality';
-    $('#err-loc').hidden = draft.lat != null; if (draft.lat == null) bad = bad || '#pick-map';
+  if (saving || !draft) return;
+  readForm();
+  const blocks = formBlocks();
+  for (let i = 0; i < blocks.length; i++) {
+    const bad = checkBlock(blocks[i]);
+    if (bad) {
+      if (formMode === 'add' && formStep !== i) { formStep = i; showStep(); }
+      showProblem(bad);
+      return;
+    }
   }
   const hasScore = CRITERIA.some((c) => draft.scores[c.k] != null);
-  const rateVisible = !$('#grp-val').hidden;
-  const needScore = formMode === 'rate' || (formMode === 'add' && rateVisible && !!draft.dish);
-  $('#err-rate').hidden = !(needScore && !hasScore);
-  if (needScore && !hasScore) bad = bad || '#rates';
-  if (bad) { $(bad).scrollIntoView({ block: 'center' }); toast('Falten dades per omplir'); return; }
+  const rateOn = blocks.includes('#grp-val');
 
   saving = true;
   const btn = $('#f-save');
@@ -608,8 +779,12 @@ async function saveForm() {
       }
       btn.textContent = 'Desant…';
       const data = { name: draft.name, locality: draft.locality, address: draft.address, lat: draft.lat, lng: draft.lng, cuisines: draft.cuisines, price: draft.price, visitDate: draft.visitDate, blog: draft.blog, photos, placeId: draft.placeId };
-      if (formMode === 'add') await store.createRestaurant(id, data, rateVisible && hasScore ? rating : null);
-      else await store.updateRestaurant(id, data);
+      if (formMode === 'add') await store.createRestaurant(id, data, rateOn && hasScore ? rating : null);
+      else {
+        await store.updateRestaurant(id, data);
+        // Al editar, la nota de quien puntúa solo se guarda si la ha cambiado.
+        if (rateOn && hasScore && ratingKey(draft.scores, draft.dish) !== draft.origRating) await store.saveMyRating(id, rating);
+      }
       for (const p of draft.removed) { try { await store.removePhotoFiles(p); } catch (e) { console.warn('No se ha podido borrar una foto', e); } }
     }
     const msg = formMode === 'add' ? 'Restaurant afegit' : formMode === 'edit' ? 'Canvis desats' : 'Nota desada';
@@ -671,9 +846,10 @@ function applyRole() {
   $('#avatar-ini').textContent = ini;
   $('#btn-profile').className = 'avatar' + (me.color ? ' p-' + me.color : '');
 }
-function askConfirm(title, text, fn) {
+function askConfirm(title, text, fn, okLabel) {
   $('#cf-title').textContent = title;
   $('#cf-text').textContent = text;
+  $('#cf-ok').textContent = okLabel || 'Esborra';
   confirmFn = fn;
   $('#sheet-confirm').hidden = false;
 }
@@ -791,14 +967,35 @@ function wire() {
   $('#lightbox-close').addEventListener('click', () => { $('#lightbox').hidden = true; });
   $('#lightbox').addEventListener('click', (e) => { if (e.target.id === 'lightbox') $('#lightbox').hidden = true; });
 
-  // Formulario
-  $('#form').addEventListener('submit', (e) => { e.preventDefault(); saveForm(); });
-  $('#f-cancel').addEventListener('click', () => {
-    const back = draft && draft.id;
-    draft = null;
-    setView(lastBrowse);
-    if (back && byId(back)) openDetail(back);
+  // Formulario. Intro en un campo solo cierra el teclado: se guarda con el botón.
+  $('#form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
   });
+  $('#f-save').addEventListener('click', saveForm);
+  $('#f-close').addEventListener('click', askCloseForm);
+  $('#f-next').addEventListener('click', nextStep);
+  $('#f-back').addEventListener('click', () => {
+    readForm();
+    if (formStep > 0) { formStep--; showStep(); }
+  });
+  $('#f-later').addEventListener('click', () => {
+    CRITERIA.forEach((c) => setRate(c.k, null));
+    $('#f-dish').value = '';
+    $('#err-rate').hidden = true;
+    nextStep();
+  });
+  $('#f-name-x').addEventListener('click', () => {
+    nameBeforeSearch = $('#f-name').value.trim();
+    showSearch();
+  });
+  $('#f-name').addEventListener('input', () => { $('#err-name').hidden = true; });
+  $('#f-locality').addEventListener('input', () => { $('#err-muni').hidden = true; });
+  $$('#grp-datos [data-day]').forEach((b) => b.addEventListener('click', () => {
+    $('#f-date').value = dayISO(+b.dataset.day);
+    updateDateChips();
+  }));
+  ['input', 'change'].forEach((t) => $('#f-date').addEventListener(t, updateDateChips));
   const rateInput = (e) => { if (e.target.type === 'range') setRate(e.target.closest('.rate').dataset.k, parseFloat(e.target.value)); };
   ['input', 'change', 'pointerup'].forEach((t) => $('#rates').addEventListener(t, rateInput));
   $('#rates').addEventListener('click', (e) => {
@@ -848,12 +1045,6 @@ function wire() {
   $('#f-thumbs').addEventListener('input', (e) => {
     const i = e.target.dataset.cap;
     if (i != null && draft) draft.photos[+i].caption = e.target.value;
-  });
-  $('#f-name').addEventListener('input', () => {
-    $('#name-hint').hidden = !autoName || $('#f-name').value.trim() !== autoName;
-  });
-  $('#f-locality').addEventListener('input', () => {
-    $('#locality-hint').hidden = !autoLocality || $('#f-locality').value.trim() !== autoLocality;
   });
   $('#f-geo').addEventListener('click', () => {
     if (!navigator.geolocation) { toast('Aquest dispositiu no dona la ubicació'); return; }
@@ -915,7 +1106,8 @@ function wire() {
     if (!$('#lightbox').hidden) { $('#lightbox').hidden = true; return; }
     const open = $$('.sheet').filter((s) => !s.hidden && s.id !== 'sheet-name')[0];
     if (open) { open.hidden = true; return; }
-    if (!$('#detail').hidden) closeDetail();
+    if (!$('#detail').hidden) { closeDetail(); return; }
+    if (view === 'form') askCloseForm();
   });
 }
 

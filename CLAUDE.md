@@ -8,7 +8,9 @@ App web personal para puntuar y reseñar restaurantes: mapa, lista con filtros y
 - Nombre de la app: «Puntuam a taula».
 - Pasos 1 y 2 terminados el 23 de noviembre de 2026. Resultados de la prueba técnica en `docs/especificacion.md`, sección 8.
 - Diseño vigente en `docs/diseno.md`: solo puntúan dos personas (azul y rosa), los demás invitados miran; texto largo y fotos con pie por restaurante (23 de noviembre de 2026). Desde el 24 de noviembre, también el aspecto (paleta «Berenjena», mapa «Lavanda» y «Noche», menú flotante), el alta en cuatro pasos, la edición en una pantalla y la app en catalán. La demo no se actualiza.
-- En curso: paso 3. Falta aplicar el alta en pasos, la edición y el aspecto (`docs/diseno.md`, sección 10).
+- En curso: paso 3. Partes 3e (colores y menú), 3f (mapa) y 3g (alta en pasos y edición en una pantalla) publicadas el 24 de noviembre de 2026; la 3g espera el visto bueno del propietario en el iPhone. Falta la 3h, el cierre (`docs/diseno.md`, sección 10).
+- Se trabaja directamente en `main`, sin ramas ni pull requests, por decisión del propietario (24 de noviembre de 2026). Se retomarán cuando los cambios sean más complicados.
+- Copia local del propietario: `Dropbox\08 CURSOS PERSONALES\11 Puntuam a taula`.
 - La seguridad está en la sección 9 de la especificación.
 
 ## Qué leer antes de tocar nada

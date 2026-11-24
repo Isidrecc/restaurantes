@@ -273,10 +273,30 @@ button.card { display: block; width: 100%; }
 .tabs #tab-add[aria-current="page"] { background: var(--accent-2); color: var(--accent-2-ink); }
 .tabs #tab-add svg { width: 30px; height: 30px; stroke-width: 2.6; }
 
-/* Form */
-#view-form { overflow-y: auto; -webkit-overflow-scrolling: touch; }
-.form { padding: 16px 16px var(--menu-space); display: flex; flex-direction: column; gap: 14px; }
-.form-title { font-size: 22px; font-weight: 700; }
+/* Form: cabecera con la X y el progreso, bloques en medio con su propio desplazamiento y botones abajo
+   (docs/diseno.md, secciones 5 y 6). El menú flotante no se ve mientras tanto. */
+#view-form.is-active { display: flex; flex-direction: column; }
+.form-head {
+  flex: none; display: flex; flex-direction: column; gap: 8px;
+  padding: 10px 8px 12px 16px; background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.form-head-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.form-title { font-size: 20px; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
+.progress-row { display: flex; align-items: center; gap: 12px; padding-right: 8px; }
+.progress { flex: 1; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 5px; }
+.progress i { height: 5px; border-radius: 3px; background: var(--track); }
+.progress i.is-on { background: var(--accent); }
+.progress-row .meta { flex: none; font-weight: 600; font-variant-numeric: tabular-nums; }
+/* Sin relleno arriba (lo pone ::before con el hueco) para que la nota fija del paso 3 quede pegada al borde. */
+.form { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 16px 16px; display: flex; flex-direction: column; gap: 14px; }
+.form::before { content: ""; flex: none; height: 2px; }
+.form-foot {
+  flex: none; display: flex; gap: 10px;
+  padding: 12px 16px max(12px, env(safe-area-inset-bottom));
+  background: var(--surface); border-top: 1px solid var(--line);
+}
+.form-foot .btn { flex: 1; height: 48px; font-size: 15px; }
+.form-foot .btn-primary { flex: 2; }
 .group {
   margin: 0; padding: 14px; min-width: 0;
   background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
@@ -301,7 +321,7 @@ button.card { display: block; width: 100%; }
 .rate { display: flex; flex-direction: column; gap: 6px; }
 .rate-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .rate-head label { font-size: 14px; font-weight: 600; }
-.rate-val { font: 700 17px/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.rate-val { font: 700 17px/1 var(--font-display); font-variant-numeric: tabular-nums; color: var(--c, var(--ink)); }
 .rate-val.is-empty { font: 500 13px/1 var(--font-body); color: var(--muted); }
 .rate-ctl { display: flex; align-items: center; gap: 8px; }
 .rate-ctl input[type="range"] { flex: 1; min-width: 0; height: 36px; accent-color: var(--accent); }
@@ -310,11 +330,6 @@ button.card { display: block; width: 100%; }
   background: var(--surface-2); border: 1px solid var(--line);
   font-size: 20px; line-height: 1; font-weight: 600;
 }
-.global-row {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding-top: 12px; border-top: 1px solid var(--line);
-}
-.global-row span { font-weight: 600; }
 .thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .thumb { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: var(--surface-2); border: 1px solid var(--line); padding: 0; }
 .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -324,8 +339,41 @@ button.card { display: block; width: 100%; }
 }
 .file-btn { position: relative; overflow: hidden; }
 .file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 0; }
-.form-actions { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; }
-.form-actions .btn { height: 48px; font-size: 15px; }
+
+/* Paso 1: el campo del nombre sustituye a la casilla de Google, con una X para volver a buscar. */
+.name-box { position: relative; }
+.name-box .input { padding-right: 46px; font-weight: 600; }
+.name-x {
+  position: absolute; top: 4px; right: 4px; width: 36px; height: 36px;
+  border: 0; border-radius: 8px; background: transparent; color: var(--muted);
+  display: grid; place-items: center;
+}
+/* Paso 2: precio en cuatro botones grandes y fecha con «Avui» y «Ahir». */
+.price-grid { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.price-grid input { position: absolute; opacity: 0; pointer-events: none; }
+.price-grid label {
+  min-height: 54px; display: grid; place-items: center; cursor: pointer;
+  border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line);
+  font: 700 18px/1 var(--font-display); font-variant-numeric: tabular-nums;
+}
+.price-grid input:checked + label { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.price-grid input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+.date-row { display: flex; align-items: center; gap: 8px; }
+.date-row .chip { min-height: 44px; padding: 0 14px; }
+.date-row .input { flex: 1; min-width: 0; }
+/* Paso 3: nota global grande y roseta en directo. Se quedan arriba mientras se mueven los deslizadores. */
+.rate-top {
+  position: sticky; top: 0; z-index: 2;
+  display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 12px;
+  margin: 0 -14px; padding: 6px 14px 10px;
+  background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.rate-score { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.rate-word { font: 700 15px/1.2 var(--font-display); }
+.rate-word:empty { display: none; }
+.rate-rose { min-width: 0; }
+.rose.is-compact { max-width: 250px; margin: 0 0 0 auto; }
+.rose.is-compact .rose-name { font-size: 17px; }
 
 /* Detail panel */
 .panel {
