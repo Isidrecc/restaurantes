@@ -1,0 +1,21 @@
+{
+  "variant": "light",
+  "backgroundColor": "#f7f2fd",
+  "metadata": { "nombre": "Lavanda", "app": "Puntuam a taula", "documento": "docs/diseno.md, sección 8" },
+  "styles": [
+    { "id": "natural.land", "geometry": { "fillColor": "#f7f2fd" } },
+    { "id": "natural.land.landCover", "geometry": { "fillColor": "#ece2f8" } },
+    { "id": "pointOfInterest.recreation.park", "geometry": { "fillColor": "#ece2f8" } },
+    {
+      "id": "natural.water",
+      "geometry": { "fillColor": "#d9cdf0", "strokeColor": "#c9b6e6" },
+      "label": { "textFillColor": "#6b3fa0", "textStrokeColor": "#d9cdf0" }
+    },
+    { "id": "infrastructure.roadNetwork.road.highway", "geometry": { "fillColor": "#ffd77a" } },
+    { "id": "infrastructure.roadNetwork.road.arterial", "geometry": { "fillColor": "#e3d6f3" } },
+    { "id": "infrastructure.roadNetwork.road.local", "geometry": { "fillColor": "#e3d6f3" } },
+    { "id": "political", "label": { "textFillColor": "#6b3fa0", "textStrokeColor": "#f7f2fd" } },
+    { "id": "pointOfInterest", "label": { "visible": false } },
+    { "id": "infrastructure.transitStation", "label": { "visible": false } }
+  ]
+}

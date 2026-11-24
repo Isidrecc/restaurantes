@@ -1,0 +1,21 @@
+{
+  "variant": "dark",
+  "backgroundColor": "#241d30",
+  "metadata": { "nombre": "Noche", "app": "Puntuam a taula", "documento": "docs/diseno.md, sección 8" },
+  "styles": [
+    { "id": "natural.land", "geometry": { "fillColor": "#241d30" } },
+    { "id": "natural.land.landCover", "geometry": { "fillColor": "#2a2338" } },
+    { "id": "pointOfInterest.recreation.park", "geometry": { "fillColor": "#2a2338" } },
+    {
+      "id": "natural.water",
+      "geometry": { "fillColor": "#17203a", "strokeColor": "#3a2f4a" },
+      "label": { "textFillColor": "#6e7fa8", "textStrokeColor": "#17203a" }
+    },
+    { "id": "infrastructure.roadNetwork.road.highway", "geometry": { "fillColor": "#5a4a2a" } },
+    { "id": "infrastructure.roadNetwork.road.arterial", "geometry": { "fillColor": "#33293f" } },
+    { "id": "infrastructure.roadNetwork.road.local", "geometry": { "fillColor": "#33293f" } },
+    { "id": "political", "label": { "textFillColor": "#a79bb8", "textStrokeColor": "#241d30" } },
+    { "id": "pointOfInterest", "label": { "visible": false } },
+    { "id": "infrastructure.transitStation", "label": { "visible": false } }
+  ]
+}

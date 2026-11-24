@@ -137,7 +137,7 @@ Dos colores protagonistas: morado y amarillo mostaza.
 
 ## 8. Mapa
 
-- Estilo propio en la nube de Google, asociado al Map ID: **«Lavanda»** en claro y **«Noche»** en oscuro, en el mismo estilo.
+- Estilo propio en la nube de Google: **«Lavanda»** para el modo claro y **«Noche»** para el oscuro. Son dos estilos de Google, uno de variante clara y otro oscura, asociados al mismo Map ID: cada Map ID admite uno de cada.
 - El mapa se crea con `colorScheme: FOLLOW_SYSTEM`. Solo se puede fijar al crearlo: si el sistema cambia de modo con la app abierta, el mapa no cambia hasta volver a abrirla. Aceptado.
 - En los dos modos se ocultan los puntos de interés de Google (comercios y restaurantes). Se dejan los nombres de pueblos y del mar.
 
@@ -153,12 +153,13 @@ Dos colores protagonistas: morado y amarillo mostaza.
 | Etiquetas del mar | `#6b3fa0` | `#6e7fa8` |
 
 - Coste: usar un Map ID se cobra con el SKU de Dynamic Maps, el mismo de cada carga del mapa; no añade coste aparte. Comprobado el 24 de noviembre de 2026.
-- Según la conversación de las maquetas, el JSON de estilos en la nube es de disponibilidad general desde el 21 de septiembre de 2026, así que el estilo se puede preparar en un archivo e importar en la consola. No se ha podido confirmar en la documentación el 24 de noviembre: comprobarlo al preparar el estilo.
-- Tarea del propietario: crear el Map ID y asociarle el estilo, guiado paso a paso. Mientras tanto se usa `DEMO_MAP_ID`, que muestra los puntos de interés de Google.
+- Los dos estilos están en `docs/mapa/lavanda.json` y `docs/mapa/noche.json`, con los colores de la tabla. Se importan en la consola de Google Cloud desde «Diseños de mapa» → «Crear estilo» → pestaña JSON (comprobado en la documentación el 24 de noviembre de 2026). Si se retocan en la consola, conviene exportarlos y actualizar estos archivos.
+- Tarea del propietario: importar los dos estilos, crear el Map ID y asociarle los dos, guiado paso a paso. Mientras tanto se usa `DEMO_MAP_ID`, que muestra los puntos de interés de Google.
+- El mapa del formulario usa el mismo estilo, así que tampoco muestra los restaurantes de Google: el sitio elegido en el buscador lo marca el aro (sección 5).
 - Pendiente: la maqueta de la pantalla del mapa con el menú flotante y las tarjetas.
 - Ideas comentadas y no aprobadas: pines con la nota escrita dentro, carrusel de tarjetas sobre el mapa, grupos de pines con la nota media, filtros como fichas flotantes y primera foto como portada de la ficha.
 
-Fuentes: https://developers.google.com/maps/documentation/javascript/cloud-customization/setup · https://developers.google.com/maps/documentation/javascript/mapcolorscheme
+Fuentes: https://developers.google.com/maps/documentation/javascript/cloud-customization/setup · https://developers.google.com/maps/documentation/javascript/mapcolorscheme · https://developers.google.com/maps/documentation/javascript/cloud-customization/json · https://developers.google.com/maps/documentation/javascript/cloud-customization/json-reference · https://developers.google.com/maps/documentation/javascript/cloud-customization/map-styles
 
 ## 9. Modelo de datos (Firestore)
 
