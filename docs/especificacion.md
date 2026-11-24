@@ -154,7 +154,7 @@ Confirmado por el propietario.
 2. **Prueba técnica.** Login con Google en el iPhone con la app instalada, guardar y leer una ficha, subir una foto y cargar el mapa. Es el punto con más riesgo y va antes de portar nada.
 3. **App real.** La estructura de la demo con datos reales y mapa de Google, con el aspecto, el alta y la edición de `docs/diseno.md`. Partes y estado en `docs/diseno.md`, sección 10.
 4. **Compartir.** Pantalla de accesos (propietarios, editores e invitados que solo miran, con el color de quien puntúa) y solicitudes de acceso (ver `docs/diseno.md`).
-5. **Remate.** Icono e instalación en el iPhone, consulta sin cobertura de lo ya cargado y exportar una copia de seguridad.
+5. **Remate.** Icono e instalación en el iPhone, consulta sin cobertura de lo ya cargado y exportar una copia de seguridad. Además, sacar la clave de Google Maps del repo (propuesto por el propietario el 24 de noviembre de 2026): clave nueva con las mismas restricciones y topes, guardada como secreto de GitHub y puesta en la página al publicar con GitHub Actions; en local, en un archivo que no se sube. Después, borrar la clave antigua para que las del historial dejen de valer y quitarla de la sección 10. La clave seguirá viéndose en la web publicada: lo que se gana es que no esté en GitHub. Decidir entonces qué hacer con la configuración de Firebase, que también está en el repo.
 6. **Más adelante.** Lo que quede de Places. El buscador para situar el restaurante se adelantó al paso 3 (`docs/diseno.md`, sección 5).
 
 Se enseña el resultado al propietario al final de los pasos 2, 3 y 4.
@@ -243,8 +243,22 @@ Acordado el 23 de noviembre de 2026. El objetivo es que nadie de fuera del grupo
 ### Mapa (Google Maps)
 
 - Clave limitada a la web de GitHub Pages y a `localhost` para el desarrollo, y solo a Maps JavaScript API, Places UI Kit y Places API (New).
-- Cuota diaria máxima de cargas de mapa: no se pudo fijar. El 23 de noviembre de 2026 la consola mostraba «Map loads per day» como ilimitado y no ajustable, con la edición desactivada. Sigue igual tras pasar a cuenta completa, así que no era por la prueba. Ninguna cuota de Maps JavaScript API aparece como ajustable. Pendiente: buscar la causa en la documentación de Google.
-- Mientras no haya tope, la protección del mapa es la restricción de la clave y la alerta de presupuesto. Si hubiera abuso: inhabilitar Maps JavaScript API o cambiar la clave.
+- La clave es pública por necesidad: el navegador la necesita para cargar el mapa, así que está en la página publicada y no se puede ocultar. La restricción por web frena a quien la copie en su página, pero no a quien falsee el origen desde un programa propio. Lo que limita el gasto son los topes diarios.
+- **Topes diarios**, puestos el 24 de noviembre de 2026 en Google Cloud (Google Maps Platform → Cuotas). Están calculados para quedar dentro de los cupos gratuitos mensuales aunque alguien abusara de la clave:
+
+| API | Cuota por día | Tope |
+|---|---|---|
+| Maps JavaScript API | Map loads | 300 |
+| Maps JavaScript API | 3D Map loads, Maps Grounding Widget | 0 |
+| Places API (New) | GetPlaceRequest y AutocompletePlacesRequest | 140 |
+| Places API (New) | Las demás (búsquedas por texto y cercanas, fotos, reseñas) | 0 |
+| Places UI Kit | Query Requests | 300 |
+| Places UI Kit | Session Requests y Advanced Query Requests | 100 |
+
+- Las cuotas por minuto de lo que usa la app se dejan con sus valores de origen: a 0 bloquean el buscador. Las de funciones que no se usan están a 0.
+- Al llegar a un tope, Google rechaza las peticiones siguientes sin cobrarlas. El contador se comprueba con cada petición y se reinicia a medianoche de California, hacia las 9:00 en Mallorca. Se notaría en que el buscador o el mapa dejan de responder ese día; la lista y las fichas siguen funcionando.
+- El 23 de noviembre de 2026 la cuota de cargas del mapa aparecía como no ajustable; el 24 ya se podía cambiar.
+- Si hubiera abuso: inhabilitar la API afectada o cambiar la clave.
 
 ### Gasto
 
@@ -254,7 +268,7 @@ Acordado el 23 de noviembre de 2026. El objetivo es que nadie de fuera del grupo
 
 ### A valorar más adelante
 
-- Firebase App Check, para que solo la propia app pueda llamar a Firebase. No está decidido.
+- Firebase App Check, para que solo la propia app pueda llamar a Firebase y a Places API (New). Según Google, en apps privadas no hace falta. No está decidido.
 
 ## 10. Datos del proyecto en Firebase y Google Cloud
 
