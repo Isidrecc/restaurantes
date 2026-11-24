@@ -249,7 +249,7 @@ Lista del propietario de ese día, ordenada en partes. Al final de cada una se l
 | Parte | Contenido | Estado |
 |---|---|---|
 | 1 · Ficha y mapa | Cabecera de la ficha según su boceto, tarjeta de Google pequeña y mapa que se abre en Palma (sección 4) | Publicada el 24 de noviembre de 2026 |
-| 2 · Datos | Cinco tramos de precio, «Pendent de visitar» y la marca de recomendación de la página de inicio (secciones 2, 5 y 6). Necesita publicar las reglas de Firestore nuevas | Hecha el 24 de noviembre de 2026 |
+| 2 · Datos | Cinco tramos de precio, «Pendent de visitar» y la marca de recomendación de la página de inicio (secciones 2, 5 y 6). Reglas de Firestore nuevas publicadas por el propietario | Publicada el 24 de noviembre de 2026. Comprobada al guardar Bar Vius como recomendado |
 | 3 · Inici | Página de inicio como primera pantalla, con el menú «Inici · Mapa · + · Llista». Paneles «Recomanació per menys de 40 €» (el restaurante marcado, empezando por Bar Vius; sin foto propia, la de Google) y «Millors menús degustació» (tarjetas que llevan a la ficha y «Veure'ls al mapa» con el filtro Menú degustació). Alta de Miceli, Tomeu Caldentey, Boro, Santi Taura y Daica como pendientes de visitar, con el tipo Menú degustació | Pendiente. Falta el tramo de precio de esos cinco |
 | 4 · Comentario con formato | Negrita, cursiva, subrayado y enlaces en el texto largo, con botones | Pendiente. Falta aclarar si «referencias» son enlaces web, enlaces a otras fichas o las dos cosas |
 | 5 · Mapa | Parques, jardines y plazas en verde suave dentro de «Terracota»; sin nombres de autopistas y carreteras, solo los de las calles. El propietario actualiza los dos estilos en Google Cloud | Pendiente |
