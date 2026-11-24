@@ -75,16 +75,44 @@
       <form class="form" id="form" novalidate>
         <h2 class="form-title" id="form-title">Añadir restaurante</h2>
 
-        <section class="group" id="grp-datos" aria-label="Datos">
-          <h3 class="group-title">Datos</h3>
+        <section class="group" id="grp-ubic" aria-label="Restaurante">
+          <h3 class="group-title">Restaurante</h3>
+          <div class="field">
+            <span class="field-label">Buscar en Google Maps</span>
+            <div class="gsearch" id="f-gsearch"></div>
+            <p class="hint">Escribe el nombre y elígelo de la lista. El mapa lo marcará.</p>
+          </div>
+          <div class="field">
+            <div id="pick-map" aria-label="Mapa para situar el restaurante"></div>
+            <p class="hint" id="pick-status">Busca el restaurante o toca el mapa para situarlo.</p>
+            <div class="loc-actions"><button class="btn" type="button" id="f-geo">Usar mi ubicación</button></div>
+            <p class="error" id="err-loc" hidden>Toca el mapa para marcar dónde está.</p>
+          </div>
           <div class="field">
             <label for="f-name">Nombre</label>
             <input class="input" id="f-name" type="text" autocomplete="off" maxlength="80">
+            <p class="hint" id="name-hint" hidden>Copiado de Google Maps. Puedes cambiarlo.</p>
             <p class="error" id="err-name" hidden>Escribe el nombre del restaurante.</p>
           </div>
           <div class="field">
+            <label for="f-locality">Localidad</label>
+            <input class="input" id="f-locality" type="text" maxlength="60" autocomplete="off" list="localities">
+            <datalist id="localities"></datalist>
+            <p class="hint" id="locality-hint" hidden>Sacada de la dirección de Google Maps. Puedes cambiarla.</p>
+            <p class="hint" id="f-address" hidden></p>
+            <p class="error" id="err-muni" hidden>Escribe la localidad.</p>
+          </div>
+        </section>
+
+        <section class="group" id="grp-datos" aria-label="Datos">
+          <h3 class="group-title">Datos</h3>
+          <div class="field">
             <span class="field-label" id="lbl-cuisines">Tipos de cocina</span>
             <div class="chipset" id="f-cuisines" role="group" aria-labelledby="lbl-cuisines"></div>
+            <div class="add-row" id="f-cuisine-new" hidden>
+              <input class="input" id="f-cuisine-text" type="text" maxlength="30" placeholder="Nuevo tipo de cocina" aria-label="Nuevo tipo de cocina" autocomplete="off" enterkeyhint="done">
+              <button class="btn" type="button" id="f-cuisine-ok">Añadir</button>
+            </div>
             <p class="hint">Puedes marcar varios.</p>
           </div>
           <div class="field">
@@ -92,29 +120,8 @@
             <input class="input" id="f-date" type="date">
           </div>
           <div class="field">
-            <span class="field-label" id="lbl-price">Precio</span>
+            <span class="field-label" id="lbl-price">Precio por persona, sin bebida</span>
             <div class="seg seg-wide" role="radiogroup" aria-labelledby="lbl-price" id="f-price"></div>
-          </div>
-        </section>
-
-        <section class="group" id="grp-ubic" aria-label="Ubicación">
-          <h3 class="group-title">Ubicación</h3>
-          <div class="field">
-            <span class="field-label">Buscar en Google Maps</span>
-            <div class="gsearch" id="f-gsearch"></div>
-            <p class="hint">Elige el restaurante y el mapa irá allí. Después toca el mapa para poner el pin.</p>
-          </div>
-          <div class="field">
-            <label for="f-locality">Localidad</label>
-            <input class="input" id="f-locality" type="text" maxlength="60" autocomplete="off" list="localities">
-            <datalist id="localities"></datalist>
-            <p class="error" id="err-muni" hidden>Escribe la localidad.</p>
-          </div>
-          <div class="field">
-            <div id="pick-map" aria-label="Mapa para situar el restaurante"></div>
-            <p class="hint" id="pick-status">Busca el restaurante o toca el mapa para situarlo.</p>
-            <div class="loc-actions"><button class="btn" type="button" id="f-geo">Usar mi ubicación</button></div>
-            <p class="error" id="err-loc" hidden>Toca el mapa para marcar dónde está.</p>
           </div>
         </section>
 
@@ -193,7 +200,7 @@
         </div>
         <div class="field"><span class="field-label">Tipo de cocina</span><div class="chipset" id="flt-cuisines"></div></div>
         <div class="field"><span class="field-label">Localidad</span><div class="chipset" id="flt-munis"></div></div>
-        <div class="field"><span class="field-label">Precio</span><div class="chipset" id="flt-prices"></div></div>
+        <div class="field"><span class="field-label">Precio por persona</span><div class="chipset" id="flt-prices"></div></div>
       </div>
       <div class="sheet-foot">
         <button class="btn" type="button" id="flt-clear">Quitar filtros</button>

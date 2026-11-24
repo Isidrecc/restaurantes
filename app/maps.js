@@ -136,6 +136,23 @@ export async function createPickMap(el, { onPick }) {
   }
   function clearPin() { if (marker) marker.map = null; }
 
+  // Marca el sitio elegido en el buscador. Los toques lo atraviesan y llegan al mapa,
+  // así que el pin lo pone el usuario donde toca (no se guardan coordenadas de Google).
+  let place = null;
+  function showPlace(lat, lng) {
+    if (!place) {
+      const ring = document.createElement('div');
+      ring.className = 'gplace';
+      ring.style.pointerEvents = 'none';
+      place = new AdvancedMarkerElement({ position: { lat, lng }, content: ring, zIndex: -1 });
+      place.style.pointerEvents = 'none';
+    } else {
+      place.position = { lat, lng };
+    }
+    place.map = map;
+  }
+  function hidePlace() { if (place) place.map = null; }
+
   map.addListener('click', (e) => {
     const lat = e.latLng.lat();
     const lng = e.latLng.lng();
@@ -147,14 +164,28 @@ export async function createPickMap(el, { onPick }) {
     map,
     setPin,
     clearPin,
+    showPlace,
+    hidePlace,
     center(lat, lng, zoom) { map.setCenter({ lat, lng }); if (zoom) map.setZoom(zoom); },
     home() { map.setCenter(HOME.center); map.setZoom(HOME.zoom); }
   };
 }
 
 // ---------- Buscador de Google (Places UI Kit) ----------
-// Devuelve solo el identificador del sitio; después se piden sus coordenadas para llevar el mapa allí.
-// El nombre y la dirección de Google no se guardan ni se muestran junto al mapa (EEE).
+// Al elegir un sitio se piden sus coordenadas, su nombre y su dirección (categoría Pro).
+// Nombre, localidad y dirección se copian al formulario: decisión del propietario del 24 de noviembre de 2026,
+// aunque las condiciones de Google no permiten guardarlos (docs/diseno.md, sección 5).
+// Las coordenadas solo sirven para llevar el mapa allí; el pin lo pone el usuario.
+
+// Localidad de la dirección: el pueblo o ciudad (no la provincia).
+function localityOf(components) {
+  const order = ['locality', 'postal_town', 'administrative_area_level_4', 'administrative_area_level_3'];
+  for (const type of order) {
+    const c = (components || []).find((x) => x.types.includes(type));
+    if (c && c.longText) return c.longText;
+  }
+  return '';
+}
 
 export async function attachPlaceSearch(container, { getBias, onPlace, onError }) {
   await loadMaps();
@@ -166,8 +197,15 @@ export async function attachPlaceSearch(container, { getBias, onPlace, onError }
     try {
       const id = event.place.id;
       const place = new Place({ id });
-      await place.fetchFields({ fields: ['location'] });
-      onPlace({ id, lat: place.location.lat(), lng: place.location.lng() });
+      await place.fetchFields({ fields: ['location', 'displayName', 'addressComponents', 'formattedAddress'] });
+      onPlace({
+        id,
+        lat: place.location.lat(),
+        lng: place.location.lng(),
+        name: (place.displayName || '').trim().slice(0, 80),
+        locality: localityOf(place.addressComponents).slice(0, 60),
+        address: (place.formattedAddress || '').slice(0, 200)
+      });
     } catch (e) { onError && onError(e); }
   });
   // Da prioridad a resultados cerca de donde está el mapa.

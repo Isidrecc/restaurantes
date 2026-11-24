@@ -49,12 +49,13 @@ service cloud.firestore {
         && validScore(s.get('ambiente', null));
     }
     function validRestaurant(d) {
-      return d.keys().hasOnly(['name', 'locality', 'location', 'cuisines', 'price', 'visitDate', 'blog',
+      return d.keys().hasOnly(['name', 'locality', 'address', 'location', 'cuisines', 'price', 'visitDate', 'blog',
                                'photos', 'placeId', 'source', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt'])
         && d.keys().hasAll(['name', 'locality', 'location', 'cuisines', 'price', 'visitDate', 'blog',
                             'photos', 'source', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt'])
         && d.name is string && d.name.size() > 0 && d.name.size() <= 80
         && d.locality is string && d.locality.size() > 0 && d.locality.size() <= 60
+        && optString(d.get('address', null), 200)
         && d.location is map && d.location.keys().hasOnly(['lat', 'lng'])
         && d.location.lat is number && d.location.lat >= -90 && d.location.lat <= 90
         && d.location.lng is number && d.location.lng >= -180 && d.location.lng <= 180

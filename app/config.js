@@ -26,8 +26,10 @@ export const CRITERIA = [
   { k: 'ambiente', label: 'Ambiente', short: 'Ambiente' }
 ];
 
-export const CUISINES = ['Mallorquina', 'Mediterránea', 'Arroces', 'Pescado y marisco', 'Brasa', 'Tapas', 'De autor', 'Italiana', 'Japonesa', 'Otra'];
-export const PRICES = ['€', '€€', '€€€', '€€€€'];
+// Tipos de cocina de partida. Los que se añadan desde el formulario salen de los restaurantes guardados.
+export const CUISINES = ['Autor', 'Japonés', 'Nikkei', 'Chino', 'Menú degustación', 'Menú mediodía', 'Mallorquín', 'Asiático', 'Italiano', 'Brasa', 'Arroces'];
+// Precio por persona, sin bebida. Se guarda como 1 a 4.
+export const PRICES = ['<20\u00a0€', '20-50\u00a0€', '50-100\u00a0€', '>100\u00a0€'];
 
 // Colores de quien puntúa. El orden decide quién va primero en barras y leyendas.
 export const COLORS = ['azul', 'rosa'];

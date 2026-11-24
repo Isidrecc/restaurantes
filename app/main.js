@@ -25,6 +25,8 @@ let confirmFn = null;
 let mainMap = null;
 let pickMap = null;
 let pickMapPromise = null;
+let autoName = '';        // nombre y localidad copiados del buscador de Google
+let autoLocality = '';
 
 // Selector de nota: 'all' (media) o el color de quien puntúa.
 let who = 'all';
@@ -101,9 +103,19 @@ function canRate() { return !!me && !!me.color && (me.role === 'owner' || me.rol
 function canEditData() { return !!me && (me.role === 'owner' || me.role === 'editor'); }
 function canDelete() { return !!me && me.role === 'owner'; }
 
+// Tipos de cocina: los de config.js y, detrás y por orden alfabético, los añadidos en algún restaurante.
+function cuisineList(extra) {
+  const seen = new Set(CUISINES.map(norm));
+  const added = [];
+  const add = (c) => { const k = norm(c); if (c && !seen.has(k)) { seen.add(k); added.push(c); } };
+  restaurants.forEach((r) => r.cuisines.forEach(add));
+  (extra || []).forEach(add);
+  return CUISINES.concat(added.sort((a, b) => a.localeCompare(b, 'es')));
+}
+
 // ---------- Filtros ----------
 function passes(r) {
-  if (filters.q && norm(r.name).indexOf(norm(filters.q)) < 0) return false;
+  if (filters.q && norm([r.name, r.locality, r.address].join(' ')).indexOf(norm(filters.q)) < 0) return false;
   if (filters.min > 0) {
     const a = agg(r);
     const v = filters.field === 'global' ? a.g : a.crit[filters.field];
@@ -322,6 +334,7 @@ function openDetail(id, keepScroll) {
     '<div class="panel-body">' +
       '<div class="d-head">' +
         '<h2>' + esc(r.name) + '</h2>' +
+        (r.address ? '<p class="meta d-address">' + esc(r.address) + '</p>' : '') +
         '<div class="tags">' + (r.locality ? tagBtn('munis', r.locality) : '') + r.cuisines.map((c) => tagBtn('cuisines', c)).join('') + tagBtn('prices', r.price) + '</div>' +
         (r.visitDate ? '<p class="meta">Visitado el ' + esc(fmtDate(r.visitDate)) + '</p>' : '') +
       '</div>' +
@@ -360,8 +373,18 @@ async function ensurePickMap() {
         onPlace: (p) => {
           if (!draft) return;
           draft.placeId = p.id;
+          // El pin lo pone el usuario tocando el sitio marcado (sección 5 de docs/diseno.md).
+          draft.lat = null;
+          draft.lng = null;
+          m.clearPin();
+          m.showPlace(p.lat, p.lng);
           m.center(p.lat, p.lng, 18);
-          $('#pick-status').textContent = 'Mapa en el sitio que has elegido. Toca el mapa para poner el pin en el restaurante.';
+          // Se rellenan si están vacíos o conservan lo copiado de una búsqueda anterior.
+          autoName = autoFill('#f-name', '#name-hint', '#err-name', p.name, autoName);
+          autoLocality = autoFill('#f-locality', '#locality-hint', '#err-muni', p.locality, autoLocality);
+          draft.address = p.address || '';
+          showDraftAddress();
+          $('#pick-status').textContent = 'Toca el restaurante marcado para poner el pin.';
           $('#pick-map').scrollIntoView({ block: 'center', behavior: 'smooth' });
         },
         onError: (e) => toast('No se ha podido buscar: ' + errText(e))
@@ -374,6 +397,20 @@ async function ensurePickMap() {
   }
   return pickMapPromise;
 }
+function showDraftAddress() {
+  const box = $('#f-address');
+  box.hidden = !draft.address;
+  box.textContent = draft.address ? 'Dirección: ' + draft.address : '';
+}
+function autoFill(inputSel, hintSel, errSel, value, prevAuto) {
+  const input = $(inputSel);
+  const current = input.value.trim();
+  if (!value || (current && current !== prevAuto)) return prevAuto;
+  input.value = value;
+  $(hintSel).hidden = false;
+  $(errSel).hidden = true;
+  return value;
+}
 function round5(n) { return Math.round(n * 1e5) / 1e5; }
 function setDraftLocation(lat, lng) {
   if (!draft) return;
@@ -384,6 +421,7 @@ function setDraftLocation(lat, lng) {
 }
 function placeDraftOnPickMap(m) {
   if (!m || !draft) return;
+  m.hidePlace();
   if (draft.lat != null) {
     m.setPin(draft.lat, draft.lng);
     m.center(draft.lat, draft.lng, 16);
@@ -395,8 +433,7 @@ function placeDraftOnPickMap(m) {
   }
 }
 function buildFormStatics() {
-  $('#f-cuisines').innerHTML = CUISINES.map((c) => '<button class="chip" type="button" aria-pressed="false" data-c="' + esc(c) + '">' + esc(c) + '</button>').join('');
-  $('#f-price').innerHTML = PRICES.map((p, i) => '<input type="radio" name="f-price" id="f-price-' + i + '" value="' + p + '"><label for="f-price-' + i + '">' + p + '</label>').join('');
+  $('#f-price').innerHTML = PRICES.map((p, i) => '<input type="radio" name="f-price" id="f-price-' + i + '" value="' + esc(p) + '"><label for="f-price-' + i + '">' + esc(p) + '</label>').join('');
   $('#rates').innerHTML = CRITERIA.map((c) => {
     const extra = c.k === 'plato' ? '<input class="input" id="f-dish" type="text" maxlength="80" placeholder="Nombre del plato" aria-label="Nombre del plato estrella" autocomplete="off">' : '';
     return '<div class="rate" data-k="' + c.k + '">' +
@@ -426,8 +463,8 @@ function startForm(mode, r) {
   const mine = r && me && r.ratings[me.uid];
   draft = {
     id: r ? r.id : null,
-    name: r ? r.name : '', locality: r ? r.locality : '', lat: r ? r.lat : null, lng: r ? r.lng : null,
-    cuisines: r ? r.cuisines.slice() : [], price: r ? r.price : '€€',
+    name: r ? r.name : '', locality: r ? r.locality : '', address: r ? r.address : '', lat: r ? r.lat : null, lng: r ? r.lng : null,
+    cuisines: r ? r.cuisines.slice() : [], price: r ? r.price : PRICES[1],
     visitDate: r ? r.visitDate || todayISO() : todayISO(),
     blog: r ? r.blog : '',
     photos: r ? r.photos.map((p) => ({ full: p.full, thumb: p.thumb, caption: p.caption || '' })) : [],
@@ -444,9 +481,16 @@ function startForm(mode, r) {
   $('#grp-res').hidden = mode === 'rate';
   $('#val-hint').hidden = mode !== 'add';
   $('#f-name').value = draft.name;
-  $$('#f-cuisines .chip').forEach((b) => b.setAttribute('aria-pressed', draft.cuisines.includes(b.dataset.c) ? 'true' : 'false'));
+  autoName = '';
+  autoLocality = '';
+  $('#name-hint').hidden = true;
+  $('#locality-hint').hidden = true;
+  renderFormCuisines();
+  $('#f-cuisine-new').hidden = true;
+  $('#f-cuisine-text').value = '';
   $('#f-date').value = draft.visitDate;
   $('#f-locality').value = draft.locality;
+  showDraftAddress();
   $('#localities').innerHTML = localities().map((l) => '<option value="' + esc(l) + '"></option>').join('');
   $('#f-dish').value = draft.dish || '';
   $('#f-review').value = draft.blog;
@@ -459,6 +503,22 @@ function startForm(mode, r) {
   ['#err-name', '#err-muni', '#err-loc', '#err-rate'].forEach((s) => { $(s).hidden = true; });
   renderDraftPhotos();
   $('#view-form').scrollTop = 0;
+}
+function renderFormCuisines() {
+  $('#f-cuisines').innerHTML = cuisineList(draft.cuisines).map((c) =>
+    '<button class="chip" type="button" aria-pressed="' + (draft.cuisines.includes(c) ? 'true' : 'false') + '" data-c="' + esc(c) + '">' + esc(c) + '</button>').join('') +
+    '<button class="chip chip-add" type="button" id="f-cuisine-add">+ Añadir</button>';
+}
+// Añade un tipo de cocina nuevo (o marca el que ya exista escrito con otras mayúsculas o tildes).
+function addCuisine() {
+  const text = $('#f-cuisine-text').value.replace(/\s+/g, ' ').trim();
+  if (text) {
+    const found = cuisineList(draft.cuisines).find((c) => norm(c) === norm(text)) || text;
+    if (!draft.cuisines.includes(found)) draft.cuisines.push(found);
+    renderFormCuisines();
+  }
+  $('#f-cuisine-text').value = '';
+  $('#f-cuisine-new').hidden = true;
 }
 function renderDraftPhotos() {
   const box = $('#f-thumbs');
@@ -474,13 +534,13 @@ function renderDraftPhotos() {
 async function saveForm() {
   if (saving) return;
   draft.name = $('#f-name').value.trim();
-  draft.cuisines = CUISINES.filter((c) => draft.cuisines.includes(c));
+  draft.cuisines = cuisineList(draft.cuisines).filter((c) => draft.cuisines.includes(c));
   draft.visitDate = $('#f-date').value || todayISO();
   draft.locality = $('#f-locality').value.trim();
   draft.dish = $('#f-dish').value.trim();
   draft.blog = $('#f-review').value.trim();
   const pr = $('#f-price input:checked');
-  draft.price = pr ? pr.value : '€€';
+  draft.price = pr ? pr.value : PRICES[1];
   let bad = null;
   if (formMode !== 'rate') {
     $('#err-name').hidden = !!draft.name; if (!draft.name) bad = bad || '#f-name';
@@ -522,7 +582,7 @@ async function saveForm() {
         }
       }
       btn.textContent = 'Guardando…';
-      const data = { name: draft.name, locality: draft.locality, lat: draft.lat, lng: draft.lng, cuisines: draft.cuisines, price: draft.price, visitDate: draft.visitDate, blog: draft.blog, photos, placeId: draft.placeId };
+      const data = { name: draft.name, locality: draft.locality, address: draft.address, lat: draft.lat, lng: draft.lng, cuisines: draft.cuisines, price: draft.price, visitDate: draft.visitDate, blog: draft.blog, photos, placeId: draft.placeId };
       if (formMode === 'add') await store.createRestaurant(id, data, rateVisible && hasScore ? rating : null);
       else await store.updateRestaurant(id, data);
       for (const p of draft.removed) { try { await store.removePhotoFiles(p); } catch (e) { console.warn('No se ha podido borrar una foto', e); } }
@@ -549,7 +609,7 @@ function chipToggle(v, on, group) {
   return '<button class="chip" type="button" aria-pressed="' + (on ? 'true' : 'false') + '" data-g="' + group + '" data-v="' + esc(v) + '">' + esc(v) + '</button>';
 }
 function buildFilterChips() {
-  const cs = CUISINES.filter((c) => restaurants.some((r) => r.cuisines.includes(c)));
+  const cs = cuisineList().filter((c) => restaurants.some((r) => r.cuisines.includes(c)));
   $('#flt-cuisines').innerHTML = cs.map((c) => chipToggle(c, filters.cuisines.has(c), 'cuisines')).join('');
   $('#flt-munis').innerHTML = localities().map((c) => chipToggle(c, filters.munis.has(c), 'munis')).join('');
   $('#flt-prices').innerHTML = PRICES.map((c) => chipToggle(c, filters.prices.has(c), 'prices')).join('');
@@ -719,9 +779,18 @@ function wire() {
   $('#f-cuisines').addEventListener('click', (e) => {
     const b = e.target.closest('.chip');
     if (!b) return;
+    if (b.id === 'f-cuisine-add') {
+      $('#f-cuisine-new').hidden = false;
+      $('#f-cuisine-text').focus();
+      return;
+    }
     const i = draft.cuisines.indexOf(b.dataset.c);
     if (i >= 0) draft.cuisines.splice(i, 1); else draft.cuisines.push(b.dataset.c);
     b.setAttribute('aria-pressed', i >= 0 ? 'false' : 'true');
+  });
+  $('#f-cuisine-ok').addEventListener('click', addCuisine);
+  $('#f-cuisine-text').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); addCuisine(); }
   });
   $('#f-photos').addEventListener('change', (e) => {
     Array.prototype.forEach.call(e.target.files, (f) => {
@@ -740,6 +809,12 @@ function wire() {
   $('#f-thumbs').addEventListener('input', (e) => {
     const i = e.target.dataset.cap;
     if (i != null && draft) draft.photos[+i].caption = e.target.value;
+  });
+  $('#f-name').addEventListener('input', () => {
+    $('#name-hint').hidden = !autoName || $('#f-name').value.trim() !== autoName;
+  });
+  $('#f-locality').addEventListener('input', () => {
+    $('#locality-hint').hidden = !autoLocality || $('#f-locality').value.trim() !== autoLocality;
   });
   $('#f-geo').addEventListener('click', () => {
     if (!navigator.geolocation) { toast('Este dispositivo no da la ubicación'); return; }
@@ -881,11 +956,11 @@ function localPreview() {
   onData({
     people: [{ uid: 'u1', name: 'Isidre', color: 'azul' }, { uid: 'u2', name: 'Cris', color: 'rosa' }],
     restaurants: [
-      { id: 'm1', name: 'Can Exemple', locality: 'Palma', lat: 39.5712, lng: 2.6498, cuisines: ['Mallorquina', 'Arroces'], price: '€€', visitDate: '2026-10-17',
+      { id: 'm1', name: 'Can Exemple', locality: 'Palma', lat: 39.5712, lng: 2.6498, cuisines: ['Mallorquín', 'Arroces'], price: PRICES[1], address: 'Carrer de Mostra, 1, 07001 Palma, Illes Balears', visitDate: '2026-10-17',
         blog: 'Primer párrafo de muestra.\n\nSegundo párrafo.', photos: [], placeId: null, ratings: { u1: { scores: sc([8.5, 9, 7, 8, 8.5, 7.5]), dish: 'Arròs brut' }, u2: { scores: sc([9, 9, 8, 8.5, 9, 7]), dish: 'Llom amb col' } } },
-      { id: 'm2', name: 'Sa Fonda Fictícia', locality: 'Sóller', lat: 39.7665, lng: 2.7152, cuisines: ['Pescado y marisco'], price: '€€€', visitDate: '2026-09-05',
+      { id: 'm2', name: 'Sa Fonda Fictícia', locality: 'Sóller', lat: 39.7665, lng: 2.7152, cuisines: ['Menú degustación', 'Pescado y marisco'], price: PRICES[2], visitDate: '2026-09-05',
         blog: '', photos: [], placeId: null, ratings: { u2: { scores: sc([9.5, 10, 9, 9, 6, 9.5]), dish: 'Gamba roja' } } },
-      { id: 'm3', name: 'Bodega Sense Nom', locality: 'Palma', lat: 39.5745, lng: 2.6551, cuisines: ['Tapas'], price: '€', visitDate: '2026-11-07',
+      { id: 'm3', name: 'Bodega Sense Nom', locality: 'Palma', lat: 39.5745, lng: 2.6551, cuisines: ['Autor'], price: PRICES[0], visitDate: '2026-11-07',
         blog: '', photos: [], placeId: null, ratings: {} }
     ]
   });

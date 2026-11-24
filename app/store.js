@@ -107,6 +107,7 @@ function fromDoc(id, d) {
     id,
     name: d.name || '',
     locality: d.locality || '',
+    address: d.address || '',
     lat: d.location ? d.location.lat : null,
     lng: d.location ? d.location.lng : null,
     cuisines: d.cuisines || [],
@@ -125,6 +126,7 @@ function commonFields(r) {
   return {
     name: r.name,
     locality: r.locality,
+    address: r.address || null,
     location: { lat: r.lat, lng: r.lng },
     cuisines: r.cuisines,
     price: PRICES.indexOf(r.price) + 1,

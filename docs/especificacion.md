@@ -118,8 +118,8 @@ Los colores exactos están en los tokens `--s1` a `--s5` de la demo, con variant
 
 ### Valores usados en la demo
 
-- Tipos de cocina: Mallorquina, Mediterránea, Arroces, Pescado y marisco, Brasa, Tapas, De autor, Italiana, Japonesa, Otra. La lista es ampliable.
-- Precio: €, €€, €€€, €€€€.
+- Tipos de cocina: Mallorquina, Mediterránea, Arroces, Pescado y marisco, Brasa, Tapas, De autor, Italiana, Japonesa, Otra. La lista es ampliable. En la app se sustituyen por los de docs/diseno.md, sección 2, con un botón para añadir más.
+- Precio: €, €€, €€€, €€€€. En la app pasan a ser precio por persona sin bebida: <20 €, 20-50 €, 50-100 € y >100 € (docs/diseno.md, sección 2).
 - Los restaurantes de la demo son inventados.
 
 ### Qué cambia respecto a la demo
@@ -142,7 +142,7 @@ Presentado al propietario en lenguaje llano y sin objeciones. Los nombres de cam
 | `locality` | texto | Libre |
 | `location` | `{lat, lng}` | Posición del pin colocado por el usuario |
 | `cuisines` | lista de textos | Uno o varios |
-| `price` | 1 a 4 | |
+| `price` | 1 a 4 | 1: <20 €, 2: 20-50 €, 3: 50-100 €, 4: >100 € por persona sin bebida |
 | `visitDate` | `AAAA-MM-DD` | |
 | `scores` | objeto | Claves `producto`, `plato`, `tecnica`, `servicio`, `precio`, `ambiente`. De 1 a 10 en pasos de 0,5, o vacío |
 | `global` | número | Media de los criterios puntuados. Se guarda para ordenar y filtrar |
@@ -258,7 +258,7 @@ Acordado el 23 de noviembre de 2026. El objetivo es que nadie de fuera del grupo
 
 ### Mapa (Google Maps)
 
-- Clave limitada a la web de GitHub Pages y a `localhost` para el desarrollo, y solo a Maps JavaScript API.
+- Clave limitada a la web de GitHub Pages y a `localhost` para el desarrollo, y solo a Maps JavaScript API, Places UI Kit y Places API (New).
 - Cuota diaria máxima de cargas de mapa: no se pudo fijar. El 23 de noviembre de 2026 la consola mostraba «Map loads per day» como ilimitado y no ajustable, con la edición desactivada. Sigue igual tras pasar a cuenta completa, así que no era por la prueba. Ninguna cuota de Maps JavaScript API aparece como ajustable. Pendiente: buscar la causa en la documentación de Google.
 - Mientras no haya tope, la protección del mapa es la restricción de la clave y la alerta de presupuesto. Si hubiera abuso: inhabilitar Maps JavaScript API o cambiar la clave.
 
@@ -301,4 +301,4 @@ const firebaseConfig = {
 
 La clave `apiKey` de Firebase está restringida a 25 API de Firebase y no incluye Maps JavaScript API (comprobado el 23 de noviembre de 2026).
 
-Clave de Google Maps, «Mapa web Puntuam»: `AIzaSyC1tU3zrYHXj7WsXPDbgbxz5kAdaHh9GP8`. Limitada a los sitios `https://isidrecc.github.io/restaurantes/*`, `http://localhost/*` y `http://localhost:8000/*`, y solo a Maps JavaScript API. Si se renombra el repo, hay que cambiar el primer sitio.
+Clave de Google Maps, «Mapa web Puntuam»: `AIzaSyC1tU3zrYHXj7WsXPDbgbxz5kAdaHh9GP8`. Limitada a los sitios `https://isidrecc.github.io/restaurantes/*`, `http://localhost/*` y `http://localhost:8000/*`, y solo a Maps JavaScript API, Places UI Kit y Places API (New). Si se renombra el repo, hay que cambiar el primer sitio.

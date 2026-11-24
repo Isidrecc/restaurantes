@@ -20,12 +20,16 @@ Los cambios se aplican directamente en la app real del paso 3: la demo no se vue
 
 | Común | De cada persona que puntúa |
 |---|---|
-| Nombre, localidad, posición, tipos de cocina, precio | Seis notas |
+| Nombre, localidad, dirección, posición, tipos de cocina, precio | Seis notas |
 | **Fecha de visita** (una sola) | **Plato estrella**: nombre y nota propios |
 | **Texto largo tipo blog** (uno por restaurante) | |
 | **Fotos, cada una con su pie de foto** | |
 
 Desaparecen las reseñas de cada persona.
+
+- **Precio por persona, sin bebida**, en cuatro tramos: menos de 20 €, de 20 a 50 €, de 50 a 100 € y más de 100 €. Se muestran como «<20 €», «20-50 €», «50-100 €» y «>100 €». Se guarda como 1 a 4 (decidido el 24 de noviembre de 2026; sustituye a €, €€, €€€ y €€€€ con la misma numeración).
+- **Tipos de cocina** de partida: Autor, Japonés, Nikkei, Chino, Menú degustación, Menú mediodía, Mallorquín, Asiático, Italiano, Brasa y Arroces (decidido el 24 de noviembre de 2026). Al final hay un botón «+ Añadir» para crear otro. Los tipos añadidos no se guardan aparte: salen de los restaurantes que los usan, así que los ven todos y desaparecen si ningún restaurante los usa. Si se escribe uno que ya existe con otras mayúsculas o sin tildes, se marca el existente. Máximo 10 por restaurante.
+- **Dirección**: la de Google al elegir el restaurante en el buscador (sección 5). Se ve en la ficha y el buscador de la app busca también en ella y en la localidad.
 
 ## 3. Nota que se ve
 
@@ -48,15 +52,17 @@ De arriba abajo:
 
 ## 5. Buscar el restaurante para ubicarlo
 
-Decidido el 23 de noviembre de 2026. Adelanta al paso 3 una parte del buscador de Places previsto para el paso 6.
+Decidido el 23 de noviembre de 2026 y ajustado el 24. Adelanta al paso 3 una parte del buscador de Places previsto para el paso 6.
 
-- Al añadir, un buscador de Google (autocompletado básico del Places UI Kit) devuelve solo el identificador del sitio. Con él se piden sus coordenadas y el mapa del formulario **salta a ese sitio**.
-- **El pin lo pone el usuario** tocando el mapa y **el nombre lo escribe él**. Se guardan su pin, su nombre y el identificador de Google (`placeId`, `source: places`).
-- Motivo, según la documentación de Google comprobada el 23 de noviembre de 2026: el nombre y la dirección de Places no se pueden guardar; las coordenadas, solo 30 días; el identificador, indefinidamente. En el EEE, el contenido de Places no se puede mostrar junto a un mapa, salvo coordenadas e identificador; el Places UI Kit está exento. Rellenar nombre y pin automáticamente no estaría permitido.
-- Coste: dentro de los cupos gratuitos (unas 10.000 búsquedas al mes). Hay que activar «Places UI Kit» y «Places API (New)» y añadirlas a la clave. Volver a comprobar precios y nombres de las API al implementarlo.
+- **Lo primero del formulario es el buscador de Google** (autocompletado básico del Places UI Kit). Al elegir un sitio se piden sus coordenadas, su nombre y su dirección. El mapa del formulario salta allí y **marca el sitio con un aro**.
+- **El pin lo pone el usuario** tocando el sitio marcado: los toques atraviesan el aro y llegan al mapa. Después puede arrastrarlo. Elegir otro resultado quita el pin anterior.
+- **Nombre y localidad se copian de Google** y el usuario puede cambiarlos. También se guarda la dirección completa de Google, que se ve en el formulario y en la ficha y sirve para buscar. La localidad es el pueblo o ciudad de la dirección (por ejemplo, Caimari o Port de Pollença, no el municipio). Si Google no la da, se escribe a mano. Solo se rellenan si el campo está vacío o conserva lo copiado de una búsqueda anterior.
+- Se guardan el pin, el nombre, la localidad, la dirección y el identificador de Google (`placeId`, `source: places`).
+- **Esto incumple las condiciones de Google**, comprobadas el 23 y el 24 de noviembre de 2026: el nombre y la dirección de Places no se pueden guardar; las coordenadas, solo 30 días; el identificador, indefinidamente. Isidre lo decidió el 24 de noviembre de 2026, sabiendo que el riesgo es que Google desactive la clave del mapa; en una app privada y pequeña lo considera bajo. Las coordenadas de Google no se guardan: el pin es el que pone el usuario.
+- Coste: el nombre hace que cada elección cuente como Place Details Pro, con 5.000 gratis al mes. Dirección, componentes de la dirección y coordenadas son Essentials. «Places UI Kit» y «Places API (New)» están activadas y añadidas a la clave.
 - En la demo, el buscador está simulado con sitios inventados.
 
-Fuentes: https://developers.google.com/maps/documentation/places/web-service/policies · https://developers.google.com/maps/comms/eea/places · https://developers.google.com/maps/documentation/javascript/places-ui-kit/basic-autocomplete · https://developers.google.com/maps/billing-and-pricing/pricing
+Fuentes: https://developers.google.com/maps/documentation/places/web-service/policies · https://developers.google.com/maps/comms/eea/places · https://developers.google.com/maps/documentation/javascript/places-ui-kit/basic-autocomplete · https://developers.google.com/maps/billing-and-pricing/pricing · https://developers.google.com/maps/documentation/places/web-service/data-fields
 
 ## 6. Modelo de datos (Firestore)
 
@@ -64,7 +70,7 @@ Fuentes: https://developers.google.com/maps/documentation/places/web-service/pol
 |---|---|---|
 | `members/{correo}` | `role`: `owner`, `editor` o `viewer`. `color`: `azul`, `rosa` o ninguno | Propietarios |
 | `users/{uid}` | `displayName`, `color` (debe coincidir con el de `members`), `updatedAt` | Cada uno el suyo |
-| `restaurants/{id}` | `name`, `locality`, `location`, `cuisines`, `price`, `visitDate`, `blog`, `photos` (lista de `{full, thumb, caption}`), `placeId`, `source`, `createdBy`, `createdAt`, `updatedBy`, `updatedAt` | Editores |
+| `restaurants/{id}` | `name`, `locality`, `address` (opcional), `location`, `cuisines`, `price`, `visitDate`, `blog`, `photos` (lista de `{full, thumb, caption}`), `placeId`, `source`, `createdBy`, `createdAt`, `updatedBy`, `updatedAt` | Editores |
 | `restaurants/{id}/ratings/{uid}` | `scores`, `global`, `dish`, `updatedAt` | Solo su autor, si tiene color |
 | `accessRequests/{uid}` | `email`, `displayName`, `status`, `createdAt` | El solicitante la crea; los propietarios la resuelven |
 
