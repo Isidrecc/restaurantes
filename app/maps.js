@@ -68,7 +68,8 @@ function pinElement(text, klass) {
 
 export async function createMainMap(el, { onMapClick }) {
   const { Map, AdvancedMarkerElement } = await loadMaps();
-  const map = new Map(el, BASE_OPTIONS);
+  // Botones de zoom a media altura: abajo los taparía el menú flotante.
+  const map = new Map(el, { ...BASE_OPTIONS, zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER } });
   map.addListener('click', () => onMapClick && onMapClick());
   const markers = new globalThis.Map();
   const clusterer = new window.markerClusterer.MarkerClusterer({
