@@ -615,25 +615,113 @@ function placeDraftOnPickMap(m) {
 }
 function buildFormStatics() {
   $('#f-price').innerHTML = PRICES.map((p, i) => '<input type="radio" name="f-price" id="f-price-' + i + '" value="' + esc(p) + '"><label for="f-price-' + i + '">' + esc(p) + '</label>').join('');
+  // Cada criterio: nombre, nota tecleable y deslizador propio de 1 a 10 con décimas (docs/diseno.md, sección 5).
   $('#rates').innerHTML = CRITERIA.map((c) => {
     const extra = c.k === 'plato' ? '<input class="input" id="f-dish" type="text" maxlength="80" placeholder="Nom del plat" aria-label="Nom del plat estrella" autocomplete="off">' : '';
     return '<div class="rate" data-k="' + c.k + '">' +
-      '<div class="rate-head"><label for="f-r-' + c.k + '">' + c.label + '</label><span class="rate-val is-empty" id="f-v-' + c.k + '">Sense nota</span></div>' + extra +
+      '<div class="rate-head"><span class="rate-label" id="f-l-' + c.k + '">' + c.label + '</span>' +
+        '<input class="rate-num" id="f-v-' + c.k + '" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" maxlength="4" placeholder="–" aria-label="Nota de ' + c.label + ', de 1 a 10"></div>' + extra +
       '<div class="rate-ctl">' +
-        '<button class="step" type="button" data-step="-0.5" aria-label="Baixa mig punt a ' + c.label + '">−</button>' +
-        '<input type="range" id="f-r-' + c.k + '" min="1" max="10" step="0.5" value="5">' +
-        '<button class="step" type="button" data-step="0.5" aria-label="Puja mig punt a ' + c.label + '">+</button>' +
+        '<button class="step" type="button" data-step="-0.1" aria-label="Baixa una dècima a ' + c.label + '">−</button>' +
+        '<div class="slider is-empty" id="f-r-' + c.k + '" role="slider" tabindex="0" aria-valuemin="1" aria-valuemax="10" aria-labelledby="f-l-' + c.k + '">' +
+          '<div class="slider-track"><div class="slider-fill"></div></div><div class="slider-thumb"></div></div>' +
+        '<button class="step" type="button" data-step="0.1" aria-label="Puja una dècima a ' + c.label + '">+</button>' +
       '</div></div>';
   }).join('');
   $('#flt-field').innerHTML = '<option value="global">Nota global</option>' + CRITERIA.map((c) => '<option value="' + c.k + '">' + c.label + '</option>').join('');
 }
-function setRate(k, v) {
+// Nota de un criterio: de 1 a 10 con una décima, o null (sin nota).
+function clampScore(v) { return Math.round(Math.min(10, Math.max(1, v)) * 10) / 10; }
+// pos: dónde dibujar el tirador mientras se arrastra (continuo); si no, va a la nota.
+function setRate(k, v, pos) {
+  v = v == null ? null : clampScore(v);
   draft.scores[k] = v;
-  const out = $('#f-v-' + k);
-  out.textContent = fmt(v);
-  out.className = 'rate-val ' + (v == null ? 'is-empty' : cls(v));
-  $('#f-r-' + k).value = v == null ? 5 : v;
+  const num = $('#f-v-' + k);
+  if (document.activeElement !== num) num.value = v == null ? '' : fmt(v);
+  num.className = 'rate-num ' + (v == null ? 'is-empty' : cls(v));
+  const s = $('#f-r-' + k);
+  s.className = 'slider ' + (v == null ? 'is-empty' : cls(v)) + (s.classList.contains('is-dragging') ? ' is-dragging' : '');
+  s.style.setProperty('--p', String(((pos != null ? pos : v == null ? 5 : v) - 1) / 9));
+  s.setAttribute('aria-valuenow', v == null ? '' : String(v));
+  s.setAttribute('aria-valuetext', v == null ? 'Sense nota' : fmt(v));
   renderRateTop();
+}
+// Deslizador: el tirador sigue al dedo sin saltos y la nota va de décima en décima; al soltar, el tirador
+// se coloca en la nota. Tocar la barra lleva el tirador allí. Deslizar en vertical mueve la página, no la nota.
+function sliderValue(s, clientX) {
+  const r = s.getBoundingClientRect();
+  const inset = 17; // medio tirador: la barra empieza y acaba en el centro del tirador
+  const p = Math.min(1, Math.max(0, (clientX - r.left - inset) / (r.width - inset * 2)));
+  return 1 + p * 9;
+}
+function wireSliders() {
+  let drag = null;
+  $('#rates').addEventListener('pointerdown', (e) => {
+    const s = e.target.closest('.slider');
+    if (!s || !draft) return;
+    drag = { s, k: s.closest('.rate').dataset.k, x: e.clientX, y: e.clientY, id: e.pointerId, moved: false };
+  });
+  $('#rates').addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    if (!drag.moved) {
+      // Empieza a arrastrar solo si el gesto es horizontal.
+      if (Math.abs(e.clientX - drag.x) < 4) return;
+      drag.moved = true;
+      drag.s.classList.add('is-dragging');
+      try { drag.s.setPointerCapture(e.pointerId); } catch (err) { /* sin captura */ }
+    }
+    const raw = sliderValue(drag.s, e.clientX);
+    setRate(drag.k, raw, raw);
+  });
+  const end = (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const d = drag;
+    drag = null;
+    d.s.classList.remove('is-dragging');
+    if (e.type === 'pointercancel') return;
+    // Un toque sin arrastrar también pone la nota donde se ha tocado.
+    setRate(d.k, d.moved ? draft.scores[d.k] : sliderValue(d.s, e.clientX));
+  };
+  $('#rates').addEventListener('pointerup', end);
+  $('#rates').addEventListener('pointercancel', end);
+  // Teclado: flechas, una décima; avance y retroceso de página, un punto; Inicio y Fin, 1 y 10.
+  $('#rates').addEventListener('keydown', (e) => {
+    const s = e.target.closest('.slider');
+    if (!s || !draft) return;
+    const k = s.closest('.rate').dataset.k;
+    const cur = draft.scores[k] == null ? 5 : draft.scores[k];
+    const map = { ArrowLeft: -0.1, ArrowDown: -0.1, ArrowRight: 0.1, ArrowUp: 0.1, PageDown: -1, PageUp: 1 };
+    let v = null;
+    if (e.key in map) v = cur + map[e.key];
+    else if (e.key === 'Home') v = 1;
+    else if (e.key === 'End') v = 10;
+    if (v == null) return;
+    e.preventDefault();
+    setRate(k, v);
+  });
+  // Nota tecleada: acepta «8,6» u «8.6»; vacía, quita la nota del criterio.
+  const typed = (e) => {
+    const inp = e.target.closest('.rate-num');
+    if (!inp || !draft) return;
+    const k = inp.closest('.rate').dataset.k;
+    const t = inp.value.replace(',', '.').trim();
+    const n = parseFloat(t);
+    if (!t) setRate(k, null);
+    else if (!isNaN(n)) setRate(k, n);
+    if (e.type === 'change') inp.value = draft.scores[k] == null ? '' : fmt(draft.scores[k]);
+  };
+  $('#rates').addEventListener('input', (e) => {
+    // Mientras se escribe se actualiza la nota, pero no se reescribe el número.
+    const inp = e.target.closest('.rate-num');
+    if (!inp || !draft) return;
+    const n = parseFloat(inp.value.replace(',', '.'));
+    if (!isNaN(n) && n >= 1 && n <= 10) setRate(inp.closest('.rate').dataset.k, n);
+  });
+  $('#rates').addEventListener('change', typed);
+  $('#rates').addEventListener('focusin', (e) => { if (e.target.closest('.rate-num')) e.target.select(); });
+  $('#rates').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.closest('.rate-num')) { e.preventDefault(); e.target.blur(); }
+  });
 }
 // Nota global grande con su color y su texto y, al lado, la roseta de quien puntúa, que se dibuja en directo.
 function renderRateTop() {
@@ -1127,14 +1215,13 @@ function wire() {
     updateDateChips();
   }));
   ['input', 'change'].forEach((t) => $('#f-date').addEventListener(t, updateDateChips));
-  const rateInput = (e) => { if (e.target.type === 'range') setRate(e.target.closest('.rate').dataset.k, parseFloat(e.target.value)); };
-  ['input', 'change', 'pointerup'].forEach((t) => $('#rates').addEventListener(t, rateInput));
+  wireSliders();
   $('#rates').addEventListener('click', (e) => {
     const b = e.target.closest('.step');
     if (!b) return;
     const k = b.closest('.rate').dataset.k;
     const cur = draft.scores[k];
-    setRate(k, cur == null ? parseFloat($('#f-r-' + k).value) : Math.min(10, Math.max(1, cur + parseFloat(b.dataset.step))));
+    setRate(k, cur == null ? 5 : cur + parseFloat(b.dataset.step));
   });
   $('#f-cuisines').addEventListener('click', (e) => {
     const b = e.target.closest('.chip');

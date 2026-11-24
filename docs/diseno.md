@@ -82,6 +82,7 @@ El alta va en **cuatro pasos**. Arriba, una barra de progreso con cuatro segment
 
 - Arriba, la nota global grande con su color y su texto, y al lado la roseta de quien puntúa, que se dibuja en directo. Esa parte se queda fija arriba al bajar por los deslizadores, y la roseta usa nombres cortos (Producte, Plat, Tècnica, Servei, Q/preu, Ambient) para que se lean a ese tamaño.
 - Debajo, un deslizador por criterio con su valor coloreado. El nombre del plato estrella va dentro de su criterio.
+- **Notas con décimas** (8,6), desde el 24 de noviembre de 2026; antes, medios puntos. El deslizador es propio: barra con relleno del color de la nota y tirador grande y translúcido que sigue al dedo sin saltos; la nota va de décima en décima y, al soltar, el tirador se coloca en ella. Tocar la barra lleva el tirador allí; deslizar en vertical mueve la página. Los botones − y + suben o bajan una décima. El número de cada criterio se toca y se escribe (acepta «8,6» u «8.6»; se redondea a la décima, entre 1 y 10; vacío quita la nota de ese criterio).
 - Botón «Puntua més tard»: la nota sigue siendo opcional.
 
 ### Paso 4. Text i fotos

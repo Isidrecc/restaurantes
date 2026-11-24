@@ -35,9 +35,11 @@ service cloud.firestore {
     function optString(v, max) {
       return v == null || (v is string && v.size() <= max);
     }
+    // Notas de 1 a 10 con una décima (8,6), desde el 24 de noviembre de 2026; antes, medios puntos.
+    // El margen cubre el redondeo de los decimales (1,1 × 10 da 11,000000000000002).
     function validScore(v) {
       return v == null
-        || (v is number && v >= 1 && v <= 10 && math.floor(v * 2) == v * 2);
+        || (v is number && v >= 1 && v <= 10 && math.abs(v * 10 - math.round(v * 10)) < 0.001);
     }
     function validScores(s) {
       return s is map

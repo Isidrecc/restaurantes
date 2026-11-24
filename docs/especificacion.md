@@ -16,7 +16,7 @@ App personal para puntuar y reseñar los restaurantes visitados.
 |---|---|
 | Vistas | Dos: mapa y lista. Los filtros son comunes a ambas. |
 | Criterios | Seis, en este orden: calidad del producto, plato estrella, técnica y creatividad, servicio, calidad/precio, ambiente. |
-| Escala | De 1 a 10 con medios puntos. |
+| Escala | De 1 a 10 con una décima (8,6), desde el 24 de noviembre de 2026; antes, medios puntos. |
 | Nota global | Media simple de los criterios puntuados. |
 | Plato estrella | Lleva nombre propio del plato además de la nota. |
 | Fichas | Una por restaurante, no una por visita. |
@@ -107,7 +107,7 @@ Los colores exactos están en los tokens `--s1` a `--s5` de `app/styles.css` (lo
 - Alta en cuatro pasos (dónde está, datos, nota, texto y fotos) con barra de progreso. Edición en una sola pantalla. Detalle en `docs/diseno.md`, secciones 5 y 6.
 - Datos: nombre (obligatorio), tipos de cocina (selección múltiple), fecha de visita (por defecto hoy, con atajos «Avui» y «Ahir») y precio en cuatro tramos.
 - Ubicación: el buscador de Google lleva el mapa al sitio; el pin lo pone el usuario tocando el mapa y se puede arrastrar para afinar. La localidad se saca de Google.
-- Valoración: un deslizador por criterio, en pasos de medio punto. Un criterio sin tocar queda «Sense nota». El plato estrella lleva además el nombre del plato. La nota global y la roseta se actualizan en vivo. Es opcional.
+- Valoración: un deslizador por criterio, con décimas desde el 24 de noviembre de 2026 (`docs/diseno.md`, sección 5). Un criterio sin tocar queda «Sense nota». El plato estrella lleva además el nombre del plato. La nota global y la roseta se actualizan en vivo. Es opcional.
 - Texto largo y fotos con pie. Se pueden añadir varias fotos y quitarlas antes de guardar.
 
 ### Ficha
@@ -243,7 +243,7 @@ Acordado el 23 de noviembre de 2026 y cambiado el 24: desde entonces cualquiera 
 - Crear y editar la parte común de un restaurante: solo los editores.
 - Escribir una puntuación: solo su autor y solo la suya.
 - Modificar las listas de permisos: solo el propietario.
-- Se validan los datos: notas de 1 a 10 en pasos de 0,5, precio de 1 a 4 y textos con longitud máxima.
+- Se validan los datos: notas de 1 a 10 con una décima (antes del 24 de noviembre de 2026, en pasos de 0,5), precio de 1 a 4 y textos con longitud máxima.
 
 ### Mapa (Google Maps)
 

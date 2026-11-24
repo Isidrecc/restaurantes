@@ -319,12 +319,42 @@ button.card { display: block; width: 100%; }
 #pick-map { height: 260px; border-radius: 10px; border: 1px solid var(--line); overflow: hidden; }
 
 .rate { display: flex; flex-direction: column; gap: 6px; }
-.rate-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-.rate-head label { font-size: 14px; font-weight: 600; }
-.rate-val { font: 700 17px/1 var(--font-display); font-variant-numeric: tabular-nums; color: var(--c, var(--ink)); }
-.rate-val.is-empty { font: 500 13px/1 var(--font-body); color: var(--muted); }
+.rate-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.rate-label { font-size: 14px; font-weight: 600; }
+/* Nota tecleable: parece un número hasta que se toca. */
+.rate-num {
+  width: 58px; height: 34px; padding: 0 8px; border-radius: 8px; text-align: right;
+  border: 1px solid transparent; background: transparent; color: var(--c, var(--ink));
+  font: 700 18px/1 var(--font-display); font-variant-numeric: tabular-nums;
+}
+.rate-num::placeholder { color: var(--muted); font-weight: 500; }
+.rate-num:focus { outline: 0; border-color: var(--accent); background: var(--surface-2); }
 .rate-ctl { display: flex; align-items: center; gap: 8px; }
-.rate-ctl input[type="range"] { flex: 1; min-width: 0; height: 36px; accent-color: var(--accent); }
+/* Deslizador: barra con relleno del color de la nota y tirador grande translúcido que se mueve sin saltos.
+   --p (0 a 1) lo pone la app. El tirador mide 34 px y la barra va de centro a centro del tirador. */
+.slider {
+  position: relative; flex: 1; min-width: 0; height: 44px; --p: .5;
+  cursor: pointer; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
+}
+.slider-track { position: absolute; left: 17px; right: 17px; top: 50%; height: 8px; margin-top: -4px; border-radius: 4px; background: var(--track); }
+.slider-fill { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--p) * 100%); border-radius: 4px; background: var(--c, var(--accent)); }
+.slider-thumb {
+  position: absolute; top: 50%; left: calc(17px + var(--p) * (100% - 34px));
+  width: 34px; height: 26px; margin: -13px 0 0 -17px; border-radius: 13px;
+  background: rgba(255, 255, 255, .62); border: 1px solid rgba(255, 255, 255, .95);
+  box-shadow: 0 2px 8px rgba(20, 10, 30, .22), inset 0 1px 0 rgba(255, 255, 255, .9);
+  -webkit-backdrop-filter: blur(6px) saturate(1.5); backdrop-filter: blur(6px) saturate(1.5);
+  transition: left .15s ease, transform .15s ease;
+}
+.slider.is-dragging .slider-thumb { transition: transform .15s ease; transform: scale(1.12); }
+.slider.is-empty .slider-fill { width: 0; }
+.slider.is-empty .slider-thumb { opacity: .55; }
+.slider:focus-visible { outline: 0; }
+.slider:focus-visible .slider-thumb { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-color-scheme: dark) {
+  .slider-thumb { background: rgba(255, 255, 255, .28); border-color: rgba(255, 255, 255, .55); box-shadow: 0 2px 8px rgba(0, 0, 0, .5); }
+}
+@media (prefers-reduced-motion: reduce) { .slider-thumb { transition: none; } }
 .step {
   flex: none; width: 40px; height: 40px; border-radius: 10px;
   background: var(--surface-2); border: 1px solid var(--line);
