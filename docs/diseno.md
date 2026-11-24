@@ -211,6 +211,6 @@ Orden aprobado por el propietario el 24 de noviembre de 2026. Al final de cada p
 | 3g · Alta y edición | Alta en cuatro pasos y edición en una pantalla, que comparten los mismos bloques (secciones 5 y 6). Publicada el 24 de noviembre de 2026, pendiente del visto bueno del propietario en el iPhone |
 | 3h · Cierre | Prueba del propietario en el iPhone y su aprobación, estado al día en `CLAUDE.md` y borrar la carpeta `prueba/` |
 
-Antes de empezar, el propietario publica las reglas de Firestore que aceptan `address`.
+Tareas del propietario hechas: publicar las reglas de Firestore que aceptan `address` (comprobado el 24 de noviembre de 2026 al guardar en la app publicada un restaurante con la dirección de Google), poner `color` en los dos documentos de `members`, borrar las fichas de prueba y crear el Map ID con los estilos (sección 8).
 
-Tareas del propietario: publicar las reglas de Firestore que aceptan `address` (pendiente desde el 24 de noviembre; sin ellas, guardar da error) Hechas: poner `color` en los dos documentos de `members`, borrar las fichas de prueba y crear el Map ID con los estilos (sección 8).
+Fichas de prueba que el propietario decidió conservar por ahora (24 de noviembre de 2026): «Celler de proves» y «Prova Claude (esborrar)».
