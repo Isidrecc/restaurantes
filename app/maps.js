@@ -256,11 +256,13 @@ export async function placeCard(placeId) {
 }
 
 // ---------- Foto de Google para la página de inicio ----------
-// Para los restaurantes sin foto propia: el mismo elemento compacto del UI Kit, en vertical y solo con la foto
-// y su atribución (sin nombre ni estrellas). Las condiciones de Google piden no tapar la atribución y separar
-// su contenido del resto, así que va en su propio recuadro y el texto de la app, debajo (docs/diseno.md,
-// sección 4b; comprobado en la documentación el 24 de noviembre de 2026). Cuenta una consulta «Places UI Kit
-// Query» por tarjeta creada; se guarda cada una y no se vuelve a pedir. slot: cada panel tiene la suya, porque un
+// Para los restaurantes sin foto propia: el elemento compacto avanzado del UI Kit, en vertical y solo con la foto
+// y su atribución (sin nombre, estrellas ni botones). Es el avanzado porque el normal lleva siempre el botón
+// «Maps», y el propietario pidió quitar los enlaces a Google Maps de Inici (24 de noviembre de 2026); sin
+// gmp-place-link no sale ningún botón (comprobado ese día). Se cobra como «Places UI Kit Pro»: 5.000 gratis al
+// mes y después 5 dólares por 1.000. Las condiciones de Google piden no tapar la atribución y separar su
+// contenido del resto, así que va en su propio recuadro y el texto de la app, debajo (docs/diseno.md,
+// sección 4b). Se guarda cada tarjeta creada y no se vuelve a pedir. slot: cada panel tiene la suya, porque un
 // mismo elemento no puede estar en dos sitios a la vez.
 const placePhotos = new Map();
 export async function placePhoto(placeId, slot) {
@@ -270,11 +272,11 @@ export async function placePhoto(placeId, slot) {
     await loadMaps();
     await google.maps.importLibrary('places');
     const wrap = document.createElement('div');
-    wrap.innerHTML = '<gmp-place-details-compact orientation="vertical">' +
+    wrap.innerHTML = '<gmp-advanced-place-details-compact orientation="vertical">' +
       '<gmp-place-details-place-request></gmp-place-details-place-request>' +
       '<gmp-place-media></gmp-place-media>' +
       '<gmp-place-attribution light-scheme-color="gray" dark-scheme-color="white"></gmp-place-attribution>' +
-      '</gmp-place-details-compact>';
+      '</gmp-advanced-place-details-compact>';
     const el = wrap.firstElementChild;
     el.querySelector('gmp-place-details-place-request').setAttribute('place', placeId);
     el.loaded = new Promise((resolve, reject) => {

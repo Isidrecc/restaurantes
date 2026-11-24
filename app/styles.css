@@ -735,8 +735,8 @@ img[data-path]:not([src]) { visibility: hidden; }
 .hcard-google { position: relative; border-bottom: 1px solid var(--line); }
 .hcard-google:not([data-state="loaded"]) { aspect-ratio: 4 / 3; display: grid; place-items: center; background: var(--surface-2); color: var(--muted); }
 .hcard.is-wide .hcard-google:not([data-state="loaded"]) { aspect-ratio: 16 / 10; }
-.hcard-google:not([data-state="loaded"]) gmp-place-details-compact { position: absolute; opacity: 0; pointer-events: none; }
-.hcard-google gmp-place-details-compact { width: 100%; border: 0; border-radius: 0; }
+.hcard-google:not([data-state="loaded"]) > :not(svg) { position: absolute; opacity: 0; pointer-events: none; }
+.hcard-google > :not(svg) { width: 100%; border: 0; border-radius: 0; }
 .hcard-body { flex: none; display: block; width: 100%; padding: 10px 12px 12px; border: 0; background: transparent; text-align: left; color: inherit; }
 .hcard-name { font: var(--title-weight) 15px/1.25 var(--font-display); overflow-wrap: anywhere; }
 .score.is-small { width: 44px; height: 44px; font-size: 17px; }
@@ -748,4 +748,4 @@ img[data-path]:not([src]) { visibility: hidden; }
 .home .hcard { background: var(--home-card); border-color: var(--home-line); }
 .home .hcard-none, .home .hcard-google:not([data-state="loaded"]) { background: var(--home-ph); }
 .home .hcard-google { border-bottom-color: var(--home-line); }
-.home .hcard-google gmp-place-details-compact { --gmp-mat-color-surface: var(--home-card); background: var(--home-card); }
+.home .hcard-google > :not(svg) { --gmp-mat-color-surface: var(--home-card); background: var(--home-card); }

@@ -1285,6 +1285,15 @@ function wire() {
     if (b.dataset.act === 'open') openDetail(b.dataset.id);
     if (b.dataset.act === 'clear') { clearFilters(); render(); }
   });
+  // La foto de Google se queda los toques: se recogen antes de que le lleguen (fase de captura) y abren la ficha.
+  // La franja de abajo, con la atribución de Google y su botón ⓘ, se deja para Google.
+  $('#home').addEventListener('click', (e) => {
+    const box = e.target.closest && e.target.closest('.hcard-google');
+    if (!box || box.dataset.state !== 'loaded') return;
+    if (e.clientY > box.getBoundingClientRect().bottom - 44) return;
+    e.stopPropagation();
+    openDetail(box.dataset.id);
+  }, true);
   $('#home').addEventListener('click', (e) => {
     const b = e.target.closest('[data-act]');
     if (!b) return;
