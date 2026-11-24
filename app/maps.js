@@ -255,6 +255,40 @@ export async function placeCard(placeId) {
   return ready;
 }
 
+// ---------- Foto de Google para la página de inicio ----------
+// Para los restaurantes sin foto propia: el mismo elemento compacto del UI Kit, en vertical y solo con la foto
+// y su atribución (sin nombre ni estrellas). Las condiciones de Google piden no tapar la atribución y separar
+// su contenido del resto, así que va en su propio recuadro y el texto de la app, debajo (docs/diseno.md,
+// sección 4b; comprobado en la documentación el 24 de noviembre de 2026). Cuenta una consulta «Places UI Kit
+// Query» por tarjeta creada; se guarda cada una y no se vuelve a pedir. slot: cada panel tiene la suya, porque un
+// mismo elemento no puede estar en dos sitios a la vez.
+const placePhotos = new Map();
+export async function placePhoto(placeId, slot) {
+  const key = placeId + '|' + (slot || '');
+  if (placePhotos.has(key)) return placePhotos.get(key);
+  const ready = (async () => {
+    await loadMaps();
+    await google.maps.importLibrary('places');
+    const wrap = document.createElement('div');
+    wrap.innerHTML = '<gmp-place-details-compact orientation="vertical">' +
+      '<gmp-place-details-place-request></gmp-place-details-place-request>' +
+      '<gmp-place-media></gmp-place-media>' +
+      '<gmp-place-attribution light-scheme-color="gray" dark-scheme-color="white"></gmp-place-attribution>' +
+      '</gmp-place-details-compact>';
+    const el = wrap.firstElementChild;
+    el.querySelector('gmp-place-details-place-request').setAttribute('place', placeId);
+    el.loaded = new Promise((resolve, reject) => {
+      el.addEventListener('gmp-load', resolve, { once: true });
+      el.addEventListener('gmp-error', reject, { once: true });
+    });
+    el.loaded.catch(() => placePhotos.delete(key));
+    return el;
+  })();
+  placePhotos.set(key, ready);
+  ready.catch(() => placePhotos.delete(key));
+  return ready;
+}
+
 // Enlace a Google Maps (Maps URLs, sin clave ni coste): el sitio de Google si lo hay; si no, el punto.
 export function mapsLink(r) {
   const q = r.placeId ? r.name : r.lat + ',' + r.lng;

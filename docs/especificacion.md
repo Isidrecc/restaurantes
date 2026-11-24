@@ -64,7 +64,7 @@ La referencia es la demo, salvo el aspecto, el alta y la edición, que están en
 
 ### Navegación
 
-Menú inferior flotante con Mapa y Llista a los lados y un botón «+» central para añadir (`docs/diseno.md`, sección 7). La ficha se abre a pantalla completa por encima.
+La app se abre en Inici, con paneles destacados (`docs/diseno.md`, sección 4b). Menú inferior flotante «Inici · Mapa · + · Llista», con el «+» para añadir (sección 7). La ficha se abre a pantalla completa por encima.
 
 ### Filtros (comunes a mapa y lista)
 

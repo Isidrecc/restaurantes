@@ -51,7 +51,12 @@
   <div class="active-chips" id="active-chips" hidden></div>
 
   <main id="views">
-    <section class="view is-active" id="view-map" aria-label="Mapa">
+    <!-- Inici: primera pantalla, con paneles (docs/diseno.md, sección 4b). -->
+    <section class="view is-active" id="view-home" aria-label="Inici">
+      <div class="home" id="home"></div>
+    </section>
+
+    <section class="view" id="view-map" aria-label="Mapa">
       <div id="map"></div>
       <div class="map-chip" id="map-count"></div>
       <div class="legend" id="legend" aria-label="Color dels pins segons la nota global">
@@ -195,7 +200,11 @@
   </main>
 
   <nav class="tabs" id="tabs" aria-label="Seccions">
-    <button type="button" data-view="map" aria-current="page">
+    <button type="button" data-view="home" aria-current="page">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5V20h-5.5v-6h-5v6H4z"></path></svg>
+      Inici
+    </button>
+    <button type="button" data-view="map">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"></path><path d="M9 4v14M15 6v14"></path></svg>
       Mapa
     </button>

@@ -66,6 +66,16 @@ De arriba abajo:
 
 Las maquetas del aspecto (24 de noviembre de 2026) incluyeron la ficha; las barras en tinta y turquesa se comprobaron en la app en local, en claro y oscuro.
 
+## 4b. Inici
+
+Primera pantalla de la app desde el 24 de noviembre de 2026 (pedida por el propietario). Sin buscador ni filtros arriba: solo paneles, que se pueden recorrer deslizando en horizontal.
+
+- **Recomanació per menys de 40 €**: los restaurantes marcados en «Edita» (sección 6) con precio «<20 €» o «20-40 €», en una tarjeta grande con la portada y debajo la misma información que en la lista (nota, nombre, precio, localidad y cocina, platos estrella, notas de cada uno y fecha). Si hay varios, se deslizan. Sin ninguno, quien edita ve cómo marcar uno; quien no ha entrado no ve el panel.
+- **Millors menús degustació**: los restaurantes con el tipo «Menú degustació», primero los puntuados, de más a menos nota, y después los demás por nombre. Tarjetas pequeñas con la foto, la nota (o «Pendent»), el nombre, la localidad y el precio. Arriba, «Veure’ls al mapa» abre el mapa con ese filtro, sustituyendo los que hubiera.
+- Tocar una tarjeta abre la ficha.
+- **Foto de cada tarjeta**: la portada propia. Si no hay, la de Google (decidido por el propietario el 24 de noviembre de 2026), con el elemento compacto del Places UI Kit en vertical y solo con la foto, el botón «Maps» y la atribución «Google Maps», que Google pone siempre. Las condiciones de Google piden no tapar ni quitar la atribución y separar su contenido del resto con un borde, un fondo o espacio (comprobado en su documentación el 24 de noviembre de 2026), así que la foto de Google va en su propio recuadro, separada por una línea, y el texto de la app debajo, nunca encima. Sin foto propia ni sitio de Google, un recuadro con un plato.
+- **Coste de las fotos de Google**: cada tarjeta creada cuenta una consulta «Places UI Kit Query», como la tarjeta de la ficha (sección 4). Para gastar pocas, solo se piden las de las tarjetas que se ven, con Inici a la vista y sin ficha abierta, y no se vuelven a pedir mientras la app está abierta. Con cinco menús degustación sin foto, abrir la app pide dos o tres.
+
 ## 5. Alta de un restaurante
 
 Acordado el 23 de noviembre de 2026 y ajustado el 24. Adelanta al paso 3 una parte del buscador de Places previsto para el paso 6.
@@ -169,7 +179,7 @@ Tonos pastel poco saturados: terracota suave (el color de la icona) y amarillo m
 ### Menú inferior flotante
 
 - Pieza clara y redondeada (22 px), con borde fino, separada de los bordes y flotando sobre el mapa. La sección activa en el acento intenso sobre fondo suave.
-- En el centro, un botón «+» más grande, cuadrado redondeado, en el acento con texto oscuro. A los lados, Mapa y Llista.
+- Botones «Inici · Mapa · + · Llista» desde el 24 de noviembre de 2026 (elegido por el propietario); antes, Mapa y Llista a los lados del «+». El «+» es más grande, cuadrado redondeado, en el acento con texto oscuro. Quien no puede añadir no ve el «+» y los otros tres se reparten el ancho.
 
 ## 8. Mapa
 
@@ -250,7 +260,7 @@ Lista del propietario de ese día, ordenada en partes. Al final de cada una se l
 |---|---|---|
 | 1 · Ficha y mapa | Cabecera de la ficha según su boceto, tarjeta de Google pequeña y mapa que se abre en Palma (sección 4) | Publicada el 24 de noviembre de 2026 |
 | 2 · Datos | Cinco tramos de precio, «Pendent de visitar» y la marca de recomendación de la página de inicio (secciones 2, 5 y 6). Reglas de Firestore nuevas publicadas por el propietario | Publicada el 24 de noviembre de 2026. Comprobada al guardar Bar Vius como recomendado |
-| 3 · Inici | Página de inicio como primera pantalla, con el menú «Inici · Mapa · + · Llista». Paneles «Recomanació per menys de 40 €» (el restaurante marcado, empezando por Bar Vius; sin foto propia, la de Google) y «Millors menús degustació» (tarjetas que llevan a la ficha y «Veure'ls al mapa» con el filtro Menú degustació). Alta de Miceli, Tomeu Caldentey, Boro, Santi Taura y Daica como pendientes de visitar, con el tipo Menú degustació | Pendiente. Falta el tramo de precio de esos cinco |
+| 3 · Inici | Página de inicio como primera pantalla, con el menú «Inici · Mapa · + · Llista». Paneles «Recomanació per menys de 40 €» (el restaurante marcado, empezando por Bar Vius; sin foto propia, la de Google) y «Millors menús degustació» (tarjetas que llevan a la ficha y «Veure'ls al mapa» con el filtro Menú degustació) (sección 4b). Alta de Miceli, Tomeu Caldentey, Boro, Santi Taura y Daica como pendientes de visitar, con el tipo Menú degustació y precio «>100 €» mientras el propietario no diga otro | Pantalla publicada el 24 de noviembre de 2026. Falta dar de alta los cinco restaurantes |
 | 4 · Comentario con formato | Negrita, cursiva, subrayado y enlaces en el texto largo, con botones | Pendiente. Falta aclarar si «referencias» son enlaces web, enlaces a otras fichas o las dos cosas |
 | 5 · Mapa | Parques, jardines y plazas en verde suave dentro de «Terracota»; sin nombres de autopistas y carreteras, solo los de las calles. El propietario actualiza los dos estilos en Google Cloud | Pendiente |
 

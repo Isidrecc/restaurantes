@@ -1,7 +1,7 @@
 // Puntuam a taula: interfaz. Porta la demo aprobada (demo/index.html) con los cambios de docs/diseno.md.
 import { CRITERIA, CUISINES, PRICES, CHEAP_PRICES, COLORS, COLOR_NAMES } from './config.js';
 import * as store from './store.js';
-import { createMainMap, createPickMap, createPlaceSearch, localityAt, placeCard, mapsLink } from './maps.js';
+import { createMainMap, createPickMap, createPlaceSearch, localityAt, placeCard, placePhoto, mapsLink } from './maps.js';
 import { preparePhoto } from './photos.js';
 
 // ---------- Estado ----------
@@ -15,8 +15,8 @@ let linkId = null;        // ficha de un enlace compartido (?r=id), que se abre 
 
 const filters = { q: '', min: 0, field: 'global', cuisines: new Set(), munis: new Set(), prices: new Set() };
 let sortBy = 'nota';
-let view = 'map';
-let lastBrowse = 'map';
+let view = 'home';
+let lastBrowse = 'home';
 let selectedId = null;
 let detailId = null;
 let draft = null;
@@ -230,7 +230,7 @@ function renderChips() {
   filters.munis.forEach((c) => chips.push({ t: c, k: 'munis', v: c }));
   filters.prices.forEach((c) => chips.push({ t: c, k: 'prices', v: c }));
   const box = $('#active-chips');
-  box.hidden = !chips.length || view === 'form';
+  box.hidden = !chips.length || view === 'form' || view === 'home';
   box.innerHTML = chips.map((c) =>
     '<button class="chip chip-x" type="button" data-rm="' + c.k + '" data-v="' + esc(c.v || '') + '" aria-label="Treu el filtre ' + esc(c.t) + '">' + esc(c.t) + XICON + '</button>').join('') +
     (chips.length ? '<button class="chip chip-clear" type="button" data-act="clear">Treu-los tots</button>' : '');
@@ -259,6 +259,117 @@ function render() {
   renderMarkers(list);
   renderPreview();
   renderList(list);
+  renderHome();
+}
+
+// ---------- Inici ----------
+// Primera pantalla (pedida por el propietario el 24 de noviembre de 2026; docs/diseno.md, sección 4b):
+// «Recomanació per menys de 40 €» (los marcados en «Edita») y «Millors menús degustació».
+const DEGUSTACIO = 'Menú degustació';
+const PLATE = '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="6.5"></circle><circle cx="12" cy="12" r="3.5"></circle><path d="M3 4v5M3 9v11M21 4c-1.5 1-2 3-2 5s.5 2 2 2v9"></path></svg>';
+function homeRecommended() {
+  return restaurants.filter((r) => r.featured && CHEAP_PRICES.includes(r.price)).sort((a, b) => a.name.localeCompare(b.name, 'ca'));
+}
+// Menús degustación: primero los puntuados, de más a menos nota; después los demás, por nombre.
+function homeTasting() {
+  return restaurants.filter((r) => r.cuisines.includes(DEGUSTACIO)).map((r) => ({ r, g: agg(r).g })).sort((a, b) => {
+    if (a.g != null || b.g != null) return (b.g == null ? -1 : b.g) - (a.g == null ? -1 : a.g);
+    return a.r.name.localeCompare(b.r.name, 'ca');
+  }).map((x) => x.r);
+}
+// Foto de la tarjeta: la portada propia; si no hay, la de Google (se pone al verse, ver flushHomePhotos);
+// si tampoco, un recuadro con un plato.
+function homePhoto(r, wide, slot) {
+  const ci = coverIndex(r.photos);
+  const open = ' data-act="open" data-id="' + esc(r.id) + '"';
+  if (ci >= 0) {
+    const p = r.photos[ci];
+    return '<div class="thumb hcard-photo"' + open + '><img data-path="' + esc(wide ? p.full : p.thumb) + '" alt=""></div>';
+  }
+  if (r.placeId) return '<div class="hcard-google"' + open + ' data-place="' + esc(r.placeId) + '" data-slot="' + slot + '"></div>';
+  return '<div class="hcard-photo hcard-none"' + open + '>' + PLATE + '</div>';
+}
+function homeCard(r, wide, slot) {
+  const g = agg(r).g;
+  const body = wide
+    ? rowHTML(r)
+    : '<span class="row"><span class="score is-small ' + cls(g) + (g == null ? ' is-empty' : '') + '">' + scoreLabel(r, g) + '</span>' +
+      '<span class="row-main"><strong class="hcard-name">' + esc(r.name) + '</strong><span class="meta">' + esc([r.locality, r.price].filter(Boolean).join(' · ')) + '</span></span></span>';
+  return '<article class="hcard' + (wide ? ' is-wide' : '') + '">' + homePhoto(r, wide, slot) +
+    '<button class="hcard-body" type="button" data-act="open" data-id="' + esc(r.id) + '">' + body + '</button></article>';
+}
+// Solo se dibuja con Inici a la vista (o debajo de una ficha); si no, se apunta y se dibuja al volver.
+let homeDirty = true;
+function renderHome() {
+  const box = $('#home');
+  if (view !== 'home') { homeDirty = true; return; }
+  homeDirty = false;
+  if (!dataReady) { box.innerHTML = ''; return; }
+  const rec = homeRecommended();
+  const tasting = homeTasting();
+  let html = '';
+  if (rec.length || canEditData()) {
+    html += '<section class="home-sec" aria-labelledby="h-rec"><div class="home-head"><h2 class="home-title" id="h-rec">Recomanació per menys de 40 €</h2></div>' +
+      (rec.length
+        ? '<div class="hrow' + (rec.length > 1 ? ' is-many' : '') + '">' + rec.map((r) => homeCard(r, true, 'rec')).join('') + '</div>'
+        : '<p class="hint">Encara no n’hi ha cap. Es marca a «Edita», en un restaurant de menys de 40 €.</p>') +
+      '</section>';
+  }
+  if (tasting.length || canEditData()) {
+    html += '<section class="home-sec" aria-labelledby="h-tast"><div class="home-head"><h2 class="home-title" id="h-tast">Millors menús degustació</h2>' +
+      (tasting.length ? '<button class="link-btn" type="button" data-act="map-filter" data-g="cuisines" data-v="' + esc(DEGUSTACIO) + '">Veure’ls al mapa</button>' : '') + '</div>' +
+      (tasting.length
+        ? '<div class="hrow">' + tasting.map((r) => homeCard(r, false, 'tast')).join('') + '</div>'
+        : '<p class="hint">Encara no n’hi ha cap amb el tipus «' + esc(DEGUSTACIO) + '».</p>') +
+      '</section>';
+  }
+  if (!html) html = '<div class="empty"><p>Encara no hi ha res a destacar.</p></div>';
+  box.innerHTML = html;
+  hydratePhotos(box);
+  watchHomePhotos();
+}
+// Fotos de Google: cada una es una consulta de pago (gratis hasta 10.000 al mes), así que solo se piden las de
+// las tarjetas que se ven, con Inici a la vista y sin ficha abierta. Las ya pedidas no se vuelven a pedir.
+let homeIO = null;
+const homeSeen = new Set();
+function watchHomePhotos() {
+  homeSeen.clear();
+  const boxes = $$('#home .hcard-google');
+  if (!('IntersectionObserver' in window)) { boxes.forEach((b) => homeSeen.add(b)); flushHomePhotos(); return; }
+  if (!homeIO) {
+    homeIO = new IntersectionObserver((entries) => {
+      entries.forEach((en) => { if (en.isIntersecting) homeSeen.add(en.target); else homeSeen.delete(en.target); });
+      flushHomePhotos();
+    });
+  }
+  homeIO.disconnect();
+  boxes.forEach((b) => homeIO.observe(b));
+}
+function flushHomePhotos() {
+  if (view !== 'home' || !$('#detail').hidden) return;
+  homeSeen.forEach((box) => {
+    homeSeen.delete(box);
+    if (box.dataset.state) return;
+    box.dataset.state = 'loading';
+    if (homeIO) homeIO.unobserve(box);
+    const fail = () => { box.dataset.state = 'failed'; box.innerHTML = PLATE; };
+    placePhoto(box.dataset.place, box.dataset.slot).then((el) => {
+      if (!document.body.contains(box)) return;
+      box.appendChild(el);
+      el.loaded.then(() => { box.dataset.state = 'loaded'; }, fail);
+    }).catch(fail);
+  });
+}
+// Mapa con un solo filtro, sustituyendo los que hubiera (etiquetas de la ficha y «Veure’ls al mapa»).
+function showFilteredMap(group, value) {
+  clearFilters();
+  filters[group].add(value);
+  selectedId = null;
+  closeDetail();
+  setView('map');
+  buildFilterChips();
+  render();
+  toast('Filtre: ' + value);
 }
 
 // ---------- Vistas ----------
@@ -270,10 +381,12 @@ function setView(v) {
     if (b.dataset.view === v && !(v === 'form' && formMode !== 'add')) b.setAttribute('aria-current', 'page');
     else b.removeAttribute('aria-current');
   });
-  $('#tools').hidden = v === 'form';
+  // En Inici no hay buscador ni filtros: son paneles fijos.
+  $('#tools').hidden = v === 'form' || v === 'home';
   // El formulario ocupa la pantalla con su X arriba y sus botones abajo: el menú flotante se oculta.
   $('#tabs').hidden = v === 'form';
-  $('#active-chips').hidden = v === 'form' || !activeCount();
+  $('#active-chips').hidden = v === 'form' || v === 'home' || !activeCount();
+  if (v === 'home') { if (homeDirty) renderHome(); flushHomePhotos(); }
   if (v === 'form') ensurePickMap().then(placeDraftOnPickMap).catch((e) => toast('No s’ha pogut carregar el mapa: ' + errText(e)));
 }
 
@@ -459,7 +572,7 @@ function openDetail(id, keepScroll) {
   hydratePhotos($('#detail'));
   if (r.placeId) showPlaceCard(r.id, r.placeId);
 }
-function closeDetail() { $('#detail').hidden = true; detailId = null; }
+function closeDetail() { $('#detail').hidden = true; detailId = null; flushHomePhotos(); }
 // Pone la tarjeta de Google en la ficha abierta. Si no carga (sin red o tope diario), se quita y queda el enlace.
 function showPlaceCard(rid, placeId) {
   const box = $('#gmaps-card');
@@ -1099,7 +1212,7 @@ function renderProfile() {
 // Botón de arriba a la derecha: «Entra» sin sesión; con sesión, la inicial en el color de quien puntúa.
 function applyRole() {
   $('#tab-add').hidden = !canEditData();
-  $('#tabs').classList.toggle('is-two', !canEditData());
+  $('#tabs').classList.toggle('is-viewer', !canEditData());
   const btn = $('#btn-profile');
   if (!me) {
     btn.className = 'btn btn-enter';
@@ -1172,6 +1285,12 @@ function wire() {
     if (b.dataset.act === 'open') openDetail(b.dataset.id);
     if (b.dataset.act === 'clear') { clearFilters(); render(); }
   });
+  $('#home').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-act]');
+    if (!b) return;
+    if (b.dataset.act === 'open') openDetail(b.dataset.id);
+    if (b.dataset.act === 'map-filter') showFilteredMap(b.dataset.g, b.dataset.v);
+  });
   $('#preview').addEventListener('click', (e) => {
     const b = e.target.closest('[data-act]');
     if (!b) return;
@@ -1204,17 +1323,8 @@ function wire() {
         } catch (err) { toast('No s’ha pogut esborrar: ' + errText(err)); }
       });
     }
-    if (act === 'tag') {
-      // Etiqueta tocable: abre el mapa con ese filtro, sustituyendo los que hubiera.
-      clearFilters();
-      filters[b.dataset.g].add(b.dataset.v);
-      selectedId = null;
-      closeDetail();
-      setView('map');
-      buildFilterChips();
-      render();
-      toast('Filtre: ' + b.dataset.v);
-    }
+    // Etiqueta tocable: abre el mapa con ese filtro, sustituyendo los que hubiera.
+    if (act === 'tag') showFilteredMap(b.dataset.g, b.dataset.v);
     if (act === 'photo') {
       openLightbox(r.photos, +b.dataset.i);
     }
@@ -1489,17 +1599,20 @@ function localPreview() {
   me = params.has('visitant') ? null : { uid: 'u1', email: 'muestra@localhost', role: 'owner', color: 'azul', displayName: 'Isidre' };
   showScreen(null);
   applyRole();
+  // Con &gplace=<placeId>, los de muestra sin fotos usan ese sitio de Google; con &sensefotos, Can Exemple tampoco tiene.
+  const gplace = params.get('gplace') || null;
+  const sense = params.has('sensefotos');
   onData({
     people: [{ uid: 'u1', name: 'Isidre', color: 'azul' }, { uid: 'u2', name: 'Cris', color: 'rosa' }],
     restaurants: [
       { id: 'm1', name: 'Can Exemple', locality: 'Palma', lat: 39.5712, lng: 2.6498, cuisines: ['Mallorquí', 'Arrossos'], price: PRICES[1], featured: true, address: 'Carrer de Mostra, 1, 07001 Palma, Illes Balears', visitDate: '2026-10-17',
-        blog: 'Primer paràgraf de mostra.\n\nSegon paràgraf.', photos: [{ full: FOTO, thumb: FOTO, caption: 'Foto de mostra' }, { full: FOTO2, thumb: FOTO2, caption: 'Segona foto' }], placeId: null, ratings: { u1: { scores: sc([8.5, 9, 7, 8, 8.5, 7.5]), dish: 'Arròs brut' }, u2: { scores: sc([9, 9, 8, 8.5, 9, 7]), dish: 'Llom amb col' } } },
+        blog: 'Primer paràgraf de mostra.\n\nSegon paràgraf.', photos: sense ? [] : [{ full: FOTO, thumb: FOTO, caption: 'Foto de mostra' }, { full: FOTO2, thumb: FOTO2, caption: 'Segona foto' }], placeId: gplace, ratings: { u1: { scores: sc([8.5, 9, 7, 8, 8.5, 7.5]), dish: 'Arròs brut' }, u2: { scores: sc([9, 9, 8, 8.5, 9, 7]), dish: 'Llom amb col' } } },
       { id: 'm2', name: 'Sa Fonda Fictícia', locality: 'Sóller', lat: 39.7665, lng: 2.7152, cuisines: ['Menú degustació', 'Peix i marisc'], price: PRICES[2], visitDate: '2026-09-05',
-        blog: '', photos: [], placeId: null, ratings: { u2: { scores: sc([9.5, 10, 9, 9, 6, 9.5]), dish: 'Gamba roja' } } },
+        blog: '', photos: [], placeId: gplace, ratings: { u2: { scores: sc([9.5, 10, 9, 9, 6, 9.5]), dish: 'Gamba roja' } } },
       { id: 'm3', name: 'Bodega Sense Nom', locality: 'Palma', lat: 39.5745, lng: 2.6551, cuisines: ['Autor'], price: PRICES[0], visitDate: '2026-11-07',
         blog: '', photos: [], placeId: null, ratings: {} },
       { id: 'm4', name: 'Celler Pendent', locality: 'Palma', lat: 39.5689, lng: 2.6420, cuisines: ['Menú degustació'], price: PRICES[4], visitDate: '',
-        blog: '', photos: [], placeId: null, ratings: {} }
+        blog: '', photos: [], placeId: gplace, ratings: {} }
     ]
   });
   createMainMap($('#map'), { onMapClick: () => { if (selectedId) { selectedId = null; render(); } } })
@@ -1509,6 +1622,7 @@ function localPreview() {
 
 buildFormStatics();
 wire();
+setView(view);
 // Enlace compartido a una ficha: se abre al llegar los datos y se quita de la dirección.
 const params = new URLSearchParams(location.search);
 if (params.get('r')) {
