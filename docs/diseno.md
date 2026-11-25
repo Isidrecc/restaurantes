@@ -193,6 +193,12 @@ Tonos pastel poco saturados: terracota suave (el color de la icona) y amarillo m
 - Pieza clara y redondeada (22 px), con borde fino, separada de los bordes y flotando sobre el mapa. La sección activa en el acento intenso sobre fondo suave.
 - Botones «Inici · Mapa · + · Llista» desde el 24 de noviembre de 2026 (elegido por el propietario); antes, Mapa y Llista a los lados del «+». El «+» es más grande, cuadrado redondeado, en el acento con texto oscuro. Quien no puede añadir no ve el «+» y los otros tres se reparten el ancho.
 
+### Icono
+
+- Desde el 25 de noviembre de 2026, la **opción A** del logotipo: una mesa ovalada vista en planta con ocho sillas como puntos alrededor (tres a cada lado y una en cada cabecera), en crema `#faf6f2` sobre terracota `#a3553a`. Idea del propietario, que la eligió «de momento»; antes, un plato crema sobre un terracota más vivo (`#b4442c`).
+- Las demás opciones estudiadas, con láminas y scripts, están en `docs/logo/README.md`, para volver a ellas más adelante.
+- `python tools/icons.py` genera todos los tamaños en `icons/`: 180 px para el iPhone, 192 y 512 px para el manifiesto y la vista previa al compartir, una versión de 512 px con más margen para Android (que recorta el icono en círculo) y 32 px para la pestaña del navegador.
+
 ## 8. Mapa
 
 - Estilo propio en la nube de Google: **«Terracota»** para el modo claro y **«Terracota nit»** para el oscuro, a juego con la paleta (24 de noviembre de 2026; antes, «Lavanda» y «Noche», en el historial de git). Son dos estilos de Google, uno de variante clara y otro oscura, asociados al mismo Map ID: cada Map ID admite uno de cada.
@@ -282,3 +288,16 @@ Lista del propietario de ese día, ordenada en partes. Al final de cada una se l
 | 5 · Mapa | Parques, jardines y plazas en verde suave dentro de «Terracota»; sin nombres de autopistas y carreteras, solo los de las calles. El propietario actualiza los dos estilos en Google Cloud (sección 8) | Publicada el 25 de noviembre de 2026 y aprobada por el propietario. Zonas verdes en menta; las plazas no se pueden colorear |
 
 En espera, sin fecha: fotos intercaladas con el texto en el comentario.
+
+### Paso 5, por partes
+
+Orden de construcción en `docs/especificacion.md`, sección 6. Antes de construir cada parte se propone el enfoque; al final, se enseña el resultado.
+
+| Parte | Contenido | Estado |
+|---|---|---|
+| 5a · Icono e instalación | Logotipo en todos los tamaños (sección 7, «Icono») y comprobar la instalación en el iPhone | Icono publicado el 25 de noviembre de 2026 (opción A). Falta comprobar la instalación en el iPhone |
+| 5b · Consulta sin cobertura | Abrir la app y ver lo ya cargado sin conexión | Pendiente |
+| 5c · Copia de seguridad | Descargar los restaurantes, notas y comentarios | Pendiente |
+| 5d · Clave del mapa | Sacar la clave de Google Maps del repo y borrar la antigua | Pendiente |
+| 5e · Estadísticas de uso | Analizar las opciones antes de elegir | Pendiente |
+| 5f · Vista para ordenador | Aprovechar las pantallas anchas | Pendiente |

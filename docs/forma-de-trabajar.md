@@ -46,7 +46,7 @@ Cómo trabaja el propietario (Isidre) y lo aprendido en las sesiones del 21 al 2
 ## Aprendizajes técnicos
 
 - **Fin de línea.** La copia de trabajo usa CRLF (`core.autocrlf true`). En los scripts, pasar a `\n`, editar y devolver CRLF. Los avisos «LF will be replaced by CRLF» de git son normales.
-- **Editar archivos grandes.** Mejor un script de Node en el scratchpad que se ejecuta con `node archivo.js`; algunos `node -e` en línea los bloquea la comprobación de seguridad. Sustituir con `indexOf` y `slice`, no con `String.replace`, que interpreta `$$` y `$'` del texto nuevo. El Edit no encuentra líneas con espacios duros (` `) literales, como las de `PRICES` en `app/config.js`.
+- **Editar archivos grandes.** Mejor un script de Node en el scratchpad que se ejecuta con `node archivo.js`; algunos `node -e` en línea los bloquea la comprobación de seguridad. Sustituir con `indexOf` y `slice`, no con `String.replace`, que interpreta `$$` y `$'` del texto nuevo. Nunca meter texto con comillas invertidas dentro de un `node -e "…"` en la consola: bash las ejecuta como comandos (pasó el 25 de noviembre de 2026; por suerte no cambió nada). El Edit no encuentra líneas con espacios duros (` `) literales, como las de `PRICES` en `app/config.js`.
 - **Comprobar sintaxis.** `node --check app/main.js` falla por ser módulo ES; se copia a un `.mjs` y se comprueba ese. Un módulo suelto, como `app/text.js`, se prueba importándolo con una URL `data:` desde un script de Node.
 - **Prueba local.** Servidor «puntuam-local» de `.claude/launch.json` (`python -m http.server 8765`).
   - `?muestra`: datos de muestra sin sesión. Guardar falla con «reading 'uid'», es lo esperado.
