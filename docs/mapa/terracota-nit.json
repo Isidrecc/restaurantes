@@ -5,6 +5,7 @@
   "styles": [
     { "id": "natural.land", "geometry": { "fillColor": "#221b16" } },
     { "id": "natural.land.landCover", "geometry": { "fillColor": "#29211b" } },
+    { "id": "infrastructure.urbanArea", "geometry": { "fillColor": "#29211b" } },
     { "id": "pointOfInterest.recreation.park", "geometry": { "fillColor": "#213628" } },
     { "id": "pointOfInterest.recreation.sportsField", "geometry": { "fillColor": "#213628" } },
     { "id": "pointOfInterest.recreation.sportsComplex", "geometry": { "fillColor": "#213628" } },
