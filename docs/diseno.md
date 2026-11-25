@@ -201,7 +201,7 @@ Tonos pastel poco saturados: terracota suave (el color de la icona) y amarillo m
 - Sin nombres de autopistas y vías rápidas ni de sus enlaces, sin placas de carreteras (Ma-20, Ma-1110…) y sin números de salida; las calles y avenidas conservan el nombre, también las que Google agrupa como «arterial» con las carreteras secundarias (parte 5 de las peticiones, 25 de noviembre de 2026).
 - Zonas verdes en **verde menta** (elegido por el propietario el 25 de noviembre de 2026, en lugar del verde salvia propuesto): parques y jardines (Google los trata igual), campos e instalaciones de deporte, golf y zonas peatonales. Antes, los parques iban en beis y el deporte en el verde intenso de Google.
 - **Plazas:** no se pueden colorear. Google tiene el elemento «plaza» (`townSquare`), y su documentación dice que se representa con una forma, pero la consola lo rechaza al importar («No se encontró el elemento», geometría; 25 de noviembre de 2026). Las zonas peatonales se pintan por si alguna plaza está dibujada así; en Palma no se ha visto que cambie ninguna. Dibujarlas desde la app con contornos de OpenStreetMap se descartó por el trabajo que da para lo que aporta.
-- En «Terracota nit», Google pinta las zonas urbanas en azul marino si no se les da color; van en el marrón de la cubierta del suelo (25 de noviembre de 2026). En «Terracota» se deja su gris claro. Quedan algunas manchas azuladas pequeñas en oscuro, sin identificar, que no se han tocado.
+- En «Terracota nit», Google pinta las zonas urbanas en azul marino si no se les da color; van en el marrón de la cubierta del suelo (25 de noviembre de 2026). Con ese fondo, las calles casi no se veían y se aclararon, y las vías principales con ellas, para seguir destacando (aprobado por el propietario ese día). En «Terracota» se deja su gris claro. Quedan algunas manchas azuladas pequeñas en oscuro, sin identificar, que no se han tocado.
 
 | Elemento | Terracota | Terracota nit |
 |---|---|---|
@@ -210,8 +210,8 @@ Tonos pastel poco saturados: terracota suave (el color de la icona) y amarillo m
 | Cubierta del suelo | `#efe7dc` | `#29211b` |
 | Parques, jardines, deporte y zonas peatonales | `#cdebd5` | `#213628` |
 | Zona urbana | (gris de Google) | `#29211b` |
-| Carreteras principales | `#f1d9b5` | `#5a4630` |
-| Carreteras secundarias | `#ebe1d6` | `#33291f` |
+| Vías principales | `#f1d9b5` | `#7a5f3c` |
+| Calles y avenidas | `#ebe1d6` | `#524333` |
 | Etiquetas de pueblos | `#7a4a35` | `#b5a597` |
 | Etiquetas del mar | `#3f7a78` | `#6fa5a3` |
 
