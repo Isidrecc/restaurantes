@@ -10,7 +10,10 @@ export const firebaseConfig = {
   appId: '1:1052734827532:web:0af35c48cc58ab17975229'
 };
 
-export const MAPS_KEY = 'AIzaSyC1tU3zrYHXj7WsXPDbgbxz5kAdaHh9GP8';
+// Clave de Google Maps: no está en el repo (parte 5d, 25 de noviembre de 2026; docs/publicacion.md). Al publicar,
+// tools/build-site.mjs cambia esta marca por el secreto MAPS_KEY de GitHub. En local, app/maps.js la lee de
+// app/clau-local.js, que no se sube (.gitignore).
+export const MAPS_KEY = '__MAPS_KEY__';
 
 // Map ID de Google Maps «Puntuam a taula», con los estilos «Terracota» (claro) y «Terracota nit» (oscuro)
 // asociados en Google Cloud (docs/diseno.md, sección 8). Es un identificador público.

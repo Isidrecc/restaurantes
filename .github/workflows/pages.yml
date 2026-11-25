@@ -30,6 +30,9 @@ jobs:
           node-version: 20
       - name: Monta la web y las páginas de compartir
         run: node tools/build-site.mjs _site
+        env:
+          # Clave de Google Maps, guardada como secreto del repo (docs/publicacion.md).
+          MAPS_KEY: ${{ secrets.MAPS_KEY }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

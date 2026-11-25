@@ -7,7 +7,7 @@ Desde el 24 de noviembre de 2026, GitHub Pages publica lo que monta un flujo de 
 El flujo `.github/workflows/pages.yml` ejecuta `tools/build-site.mjs`, que:
 
 1. Copia la app: `index.html`, `manifest.webmanifest`, `app/`, `icons/` y `demo/` (y `sw.js` en el paso 5). Lo demás del repo (`docs/`, reglas, herramientas) ya no se publica.
-2. Pone la versión del commit (`?v=…`) a los archivos de la app y a sus importaciones, para que el navegador no siga con los de la publicación anterior.
+2. Pone la versión del commit (`?v=…`) a los archivos de la app y a sus importaciones, para que el navegador no siga con los de la publicación anterior. Desde el 25 de noviembre de 2026 (parte 5d) pone también la clave de Google Maps en `app/config.js`, en lugar de la marca `__MAPS_KEY__`: la saca del secreto `MAPS_KEY` del repo (**Settings** → **Secrets and variables** → **Actions**). Sin el secreto, el montaje falla y sigue publicada la versión anterior.
 3. Lee de Firestore, sin clave ni sesión, los restaurantes, las notas y los nombres de quien puntúa, y crea `f/<id>/index.html` por restaurante con la vista previa (nombre; nota, localidad, cocinas y precio; la portada) y una redirección inmediata a la ficha (`?r=id`).
 4. Crea `404.html`: un enlace `f/<id>/` de una ficha que aún no tiene página lleva igualmente a la ficha.
 5. Copia `sw.js`, el service worker que deja abrir la app sin conexión, con la versión del commit y la lista de archivos que guarda el teléfono: la página, el manifiesto, todo `app/` con su versión, todo `icons/` y los módulos de Firebase que importa `app/store.js`. Un archivo nuevo en `app/` o `icons/` entra solo en la lista; uno en otro sitio hay que añadirlo a mano.
@@ -37,6 +37,8 @@ node tools/build-site.mjs
 ```
 
 Deja la web montada en `_site/` (no se sube al repo).
+
+La clave de Google Maps no está en el repo. En local, la app la lee de `app/clau-local.js`, que no se sube (`.gitignore`) y contiene solo `export const MAPS_KEY = '…';`. Si falta, el mapa y el buscador no cargan. El montaje local deja la marca y usa ese mismo archivo; con `MAPS_KEY` en el entorno, pone esa clave, como en GitHub.
 
 ## Ajuste de GitHub Pages
 

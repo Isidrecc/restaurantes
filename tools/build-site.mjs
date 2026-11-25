@@ -145,6 +145,20 @@ async function main() {
     await writeFile(p, js);
   }
 
+  // Clave de Google Maps (parte 5d): no está en el repo. La pone el secreto MAPS_KEY de GitHub (pages.yml). Sin él,
+  // en GitHub el montaje falla y sigue publicada la versión anterior; en local se deja la marca y la app usa
+  // app/clau-local.js.
+  const cfgPath = join(OUT, 'app', 'config.js');
+  const cfg = await readFile(cfgPath, 'utf8');
+  const key = (process.env.MAPS_KEY || '').trim();
+  if (key) {
+    if (!/^[A-Za-z0-9_-]{30,60}$/.test(key)) throw new Error('MAPS_KEY no té forma de clau de Google');
+    if (!cfg.includes("'__MAPS_KEY__'")) throw new Error('config.js: no hi ha la marca de la clau del mapa');
+    await writeFile(cfgPath, cfg.split("'__MAPS_KEY__'").join("'" + key + "'"));
+  } else if (process.env.GITHUB_ACTIONS) {
+    throw new Error('Falta el secret MAPS_KEY: sense la clau, el mapa no funcionaria');
+  }
+
   await writeFile(join(OUT, '404.html'), NOT_FOUND);
 
   // Service worker (docs/diseno.md, sección 10, parte 5b): la versión, para borrar la copia anterior, y los

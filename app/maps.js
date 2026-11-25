@@ -4,14 +4,25 @@ import { MAPS_KEY, MAP_ID, HOME } from './config.js';
 
 let loading = null;
 
+// La clave: la que pone el montaje al publicar o, si sigue la marca (en local), la de app/clau-local.js.
+async function mapsKey() {
+  if (MAPS_KEY !== '__MAPS_KEY__') return MAPS_KEY;
+  try {
+    return (await import('./clau-local.js')).MAPS_KEY;
+  } catch (e) {
+    throw new Error('Falta la clau de Google Maps (app/clau-local.js)');
+  }
+}
+
 // Cargador dinámico oficial de Google Maps (importLibrary), versión mínima.
-function bootstrap() {
-  if (window.google && window.google.maps && window.google.maps.importLibrary) return Promise.resolve();
-  return new Promise((resolve, reject) => {
+async function bootstrap() {
+  if (window.google && window.google.maps && window.google.maps.importLibrary) return;
+  const key = await mapsKey();
+  await new Promise((resolve, reject) => {
     window.__gmReady = resolve;
     window.gm_authFailure = () => console.error('Google Maps ha rebutjat la clau');
     const s = document.createElement('script');
-    const params = new URLSearchParams({ key: MAPS_KEY, v: 'weekly', language: 'ca', region: 'ES', loading: 'async', callback: '__gmReady' });
+    const params = new URLSearchParams({ key, v: 'weekly', language: 'ca', region: 'ES', loading: 'async', callback: '__gmReady' });
     s.src = 'https://maps.googleapis.com/maps/api/js?' + params.toString();
     s.async = true;
     s.onerror = () => reject(new Error('No s’ha pogut carregar Google Maps'));
