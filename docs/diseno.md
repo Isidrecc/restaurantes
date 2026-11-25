@@ -302,7 +302,7 @@ Pedido por el propietario al dar de alta Santa Chiara y Klüg, que tienen dos lo
 |---|---|
 | App: datos, pines, apartado «Locals» y «Altres locals» en «Edita» | Publicada el 25 de noviembre de 2026 y probada en local con datos de muestra y el buscador real de Google, en claro y oscuro |
 | Reglas de Firestore que aceptan `branches` | Publicadas por el propietario el 25 de noviembre de 2026. Comprobado ese día al guardar las dos fichas de la fila siguiente |
-| Segundo local de Santa Chiara (carrer de Can Salat, 2; en Google, «Santa Chiara Raimundo Pizza Napoletana Contemporanea») y de Klüg (carrer del Comte de Barcelona, 22), quitando del comentario la línea que lo explicaba | Hecho el 25 de noviembre de 2026 por Claude en la app publicada con la sesión del propietario, eligiéndolos en el buscador de Google. Comprobado en la ficha (las dos tarjetas de Google) y en el mapa (los dos pines marcados con «Mostra al mapa»). Enseñado al propietario con capturas; no comentó el resultado y pidió documentar para seguir en otra sesión. Falta que lo mire en su iPhone y lo dé por bueno |
+| Segundo local de Santa Chiara (carrer de Can Salat, 2; en Google, «Santa Chiara Raimundo Pizza Napoletana Contemporanea») y de Klüg (carrer del Comte de Barcelona, 22), quitando del comentario la línea que lo explicaba | Hecho el 25 de noviembre de 2026 por Claude en la app publicada con la sesión del propietario, eligiéndolos en el buscador de Google. Comprobado en la ficha (las dos tarjetas de Google) y en el mapa (los dos pines marcados con «Mostra al mapa»). Enseñado al propietario con capturas. Mirado y aprobado por el propietario en su iPhone el 25 de noviembre de 2026 |
 
 ### Altas del 25 de noviembre de 2026
 
@@ -315,11 +315,11 @@ Criterios usados (para repetirlos en próximas altas):
 - **Tipo:** los bares de copas y las terrazas de hoteles van con el tipo nuevo «Prendre una copa». A los restaurantes no se les puso tipo de cocina.
 - **Varios locales de una misma marca:** una sola ficha con los dos locales (sección 2, «Otros locales»).
 
-Preguntas al propietario sin respuesta (25 de noviembre de 2026):
+Preguntas al propietario y sus respuestas (25 de noviembre de 2026):
 
-- Su lista de bares de copas acababa con un punto vacío: ¿faltaba alguno?
-- ¿Se ponen tipos de cocina a los restaurantes nuevos (por ejemplo Xinès en Hemudu, Japonès en Arume Sushi Bar, Asiàtic en Kasui)?
-- Precios provisionales: «20-40 €» en los tres hoteles y en Selvatge (Google no da precio) y en The Poppa Club (Google da 20-60 €).
+- Su lista de bares de copas acababa con un punto vacío: no faltaba ninguno.
+- Tipos de cocina en los restaurantes nuevos (por ejemplo Xinès en Hemudu, Japonès en Arume Sushi Bar, Asiàtic en Kasui): sí. Pendiente: los pone Claude en la app publicada a las 15 fichas sin tipo, según lo que diga Google de cada sitio, con los tipos que ya hay y creando otro solo si hace falta, y le pasa la tabla.
+- Precios provisionales («20-40 €» en los tres hoteles y en Selvatge, porque Google no da precio, y en The Poppa Club, porque Google da 20-60 €): los tres hoteles, sin precio. Hoy el precio es obligatorio en la app y en las reglas, así que siguen en «20-40 €». Se le propuso una opción «Sense preu» (sin precio en la lista y en la ficha, fuera del filtro de precio y de la recomendación de Inici, con reglas nuevas que publica él), pendiente de respuesta. De Selvatge y The Poppa Club no dijo nada: siguen en «20-40 €» provisional.
 
 ### Paso 5, por partes
 
@@ -328,8 +328,8 @@ Orden de construcción en `docs/especificacion.md`, sección 6. Antes de constru
 | Parte | Contenido | Estado |
 |---|---|---|
 | 5a · Icono e instalación | Logotipo en todos los tamaños (sección 7, «Icono») y comprobar la instalación en el iPhone | Hecha el 25 de noviembre de 2026: icono de la opción A publicado y comprobado por el propietario en su iPhone al volver a añadir la app a la pantalla de inicio (nombre «Puntuam» y mesa con sillas) |
-| 5b · Consulta sin cobertura | Abrir la app y ver lo ya cargado sin conexión (detalle debajo) | Publicada el 25 de noviembre de 2026 y probada en local. Falta la prueba del propietario en su iPhone con el modo avión |
-| 5c · Copia de seguridad | Descargar los restaurantes, notas y comentarios | Pendiente |
+| 5b · Consulta sin cobertura | Abrir la app y ver lo ya cargado sin conexión (detalle debajo) | Publicada el 25 de noviembre de 2026 y probada en local. Probada por el propietario en su iPhone con el modo avión ese mismo día |
+| 5c · Copia de seguridad | Pasar las puntuaciones a un .csv guardado en Dropbox (detalle debajo) | Hecha el 25 de noviembre de 2026, con la primera copia. Falta el visto bueno del propietario |
 | 5d · Clave del mapa | Sacar la clave de Google Maps del repo y borrar la antigua | Pendiente |
 | 5e · Estadísticas de uso | Analizar las opciones antes de elegir | Pendiente |
 | 5f · Vista para ordenador | Aprovechar las pantallas anchas | Pendiente |
@@ -346,3 +346,14 @@ Enfoque aprobado por el propietario el 25 de noviembre de 2026.
 - La primera vez después de publicarlo hay que abrir la app con conexión para que se guarde la copia.
 - **Sin comprobar:** cuánto tarda en salir lo guardado de Firestore con el teléfono sin red de verdad, y si el iPhone borra lo guardado cuando la app pasa semanas sin usarse.
 - No incluido (decidido al aprobar el enfoque): fotos propias ya vistas sin conexión, y puntuar sin conexión para guardarlo al volver la red, que sería una parte aparte si se quiere.
+
+#### 5c · Copia de seguridad
+
+Decidido por el propietario el 25 de noviembre de 2026: «me bastaría con pasar las puntuaciones a un .csv y guardarlo en Dropbox o GitHub. No es necesario que esté en la app». Descartó por demasiado compleja la propuesta anterior (botón «Descarrega una còpia» en el perfil, con un archivo completo y otro para Excel). Se guarda en Dropbox y no en GitHub, porque el repo es público.
+
+- **Cómo:** `node tools/copia-csv.mjs` desde la carpeta del proyecto, o pedírselo a Claude («haz una copia»). Lee Firestore con la lectura pública, sin clave ni sesión.
+- **Dónde:** `copias/puntuam-AAAA-MM-DD.csv`, dentro de la carpeta del proyecto en Dropbox. `copias/` está en `.gitignore`, así que no se sube. Un archivo por día; repetirla el mismo día lo sustituye.
+- **Qué guarda:** una fila por restaurante, con nombre, localidad, dirección, tipos, precio, fecha de visita («Pendent» si no hay), nota media y, de cada persona que puntúa, la nota global, las seis notas y el nombre del plato estrella. Al final, el comentario (con sus marcas de formato) y el id de la ficha. Punto y coma, coma decimal y BOM, para que Excel en español lo abra bien.
+- **No guarda:** fotos ni pies de foto, otros locales, coordenadas, sitio de Google ni la marca de recomendación. Restaurar no está automatizado: con el CSV se rehacen notas y textos, pero las fichas habría que situarlas de nuevo.
+- **Primera copia:** 25 de noviembre de 2026, 28 restaurantes, 3 con nota.
+- **Copias programadas de Firestore:** no se activan. Comprobado el 25 de noviembre de 2026 en https://firebase.google.com/docs/firestore/backups y https://firebase.google.com/docs/firestore/pricing: se configuran en la consola de Google Cloud (diaria o semanal, guardadas hasta 14 semanas), no tienen cuota gratuita, la restauración crea una base de datos nueva con un comando en Cloud Shell y no cubren las fotos de Storage. El precio por GiB en `europe-southwest1` no se pudo confirmar.

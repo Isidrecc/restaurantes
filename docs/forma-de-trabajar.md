@@ -44,6 +44,7 @@ Cómo trabaja el propietario (Isidre) y lo aprendido en las sesiones del 21 al 2
 - Los datos se pueden comprobar con la lectura pública de Firestore por REST, sin clave: `https://firestore.googleapis.com/v1/projects/puntuam-a-taula/databases/(default)/documents/restaurants?pageSize=100`.
 - **Altas y cambios que pide él** («añade estos restaurantes»): se hacen en la app publicada, en el navegador integrado con su sesión y en tamaño móvil. Criterios de nombre, precio y tipo en `docs/diseno.md`, sección 10, «Altas del 25 de noviembre de 2026». Al acabar, se cuentan las fichas por REST y se le da una tabla con lo que dice Google y lo que se ha puesto, marcando lo provisional.
 - `?r=<id>` en la web publicada abre directamente esa ficha (el id sale de la lectura por REST).
+- **Copia de seguridad** (25 de noviembre de 2026): si pide «haz una copia», `node tools/copia-csv.mjs`, que deja `copias/puntuam-AAAA-MM-DD.csv` en su Dropbox, fuera de git. Detalle en `docs/diseno.md`, sección 10, «5c · Copia de seguridad».
 
 ## Aprendizajes técnicos
 

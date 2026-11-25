@@ -58,6 +58,8 @@ El 23 de noviembre de 2026 se aprobó primero un «cuaderno común» en el que p
 
 No se activaron al crear Firestore (23 de noviembre de 2026). Se decide en el paso 5: copias programadas de Firestore (verificar antes su precio), qué hacer con las fotos de Storage, que esas copias no cubren, o si basta con la exportación desde la app.
 
+Decidido por el propietario el 25 de noviembre de 2026: un .csv con las puntuaciones, sacado con un script y guardado en Dropbox, sin nada en la app y sin copias programadas. Detalle en `docs/diseno.md`, sección 10, «5c · Copia de seguridad».
+
 ## 4. Pantallas y comportamiento
 
 La referencia es la demo, salvo el aspecto, el alta y la edición, que están en `docs/diseno.md`. Este apartado resume lo que hay que conservar y lo que cambia.
