@@ -330,7 +330,7 @@ Orden de construcción en `docs/especificacion.md`, sección 6. Antes de constru
 | 5a · Icono e instalación | Logotipo en todos los tamaños (sección 7, «Icono») y comprobar la instalación en el iPhone | Hecha el 25 de noviembre de 2026: icono de la opción A publicado y comprobado por el propietario en su iPhone al volver a añadir la app a la pantalla de inicio (nombre «Puntuam» y mesa con sillas) |
 | 5b · Consulta sin cobertura | Abrir la app y ver lo ya cargado sin conexión (detalle debajo) | Publicada el 25 de noviembre de 2026 y probada en local. Probada por el propietario en su iPhone con el modo avión ese mismo día |
 | 5c · Copia de seguridad | Pasar las puntuaciones a un .csv guardado en Dropbox (detalle debajo) | Hecha el 25 de noviembre de 2026, con la primera copia, y aprobada por el propietario ese mismo día |
-| 5d · Clave del mapa | Sacar la clave de Google Maps del repo y borrar la antigua (detalle debajo) | Hecha el 25 de noviembre de 2026 y comprobada en la web publicada. Falta el visto bueno del propietario |
+| 5d · Clave del mapa | Sacar la clave de Google Maps del repo y borrar la antigua (detalle debajo) | Hecha el 25 de noviembre de 2026, comprobada en la web publicada y aprobada por el propietario ese mismo día |
 | 5e · Estadísticas de uso | Analizar las opciones antes de elegir | Pendiente |
 | 5f · Vista para ordenador | Aprovechar las pantallas anchas | Pendiente |
 
