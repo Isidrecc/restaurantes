@@ -5,7 +5,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js';
 import {
   initializeFirestore, persistentLocalCache, doc, collection, collectionGroup, getDoc, getDocFromCache,
-  setDoc, updateDoc, writeBatch, serverTimestamp, onSnapshot
+  setDoc, updateDoc, writeBatch, serverTimestamp, onSnapshot, deleteField
 } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js';
 import {
   getStorage, ref, uploadBytes, getDownloadURL, deleteObject
@@ -106,6 +106,10 @@ function fromDoc(id, d) {
     blog: d.blog || '',
     photos: d.photos || [],
     placeId: d.placeId || null,
+    // Otros locales de la misma ficha (25 de noviembre de 2026): cada uno con su pin, su dirección y su sitio de Google.
+    branches: (d.branches || []).filter((b) => b && b.location).map((b) => ({
+      address: b.address || '', lat: b.location.lat, lng: b.location.lng, placeId: b.placeId || null
+    })),
     createdBy: d.createdBy || null
   };
 }
@@ -129,6 +133,10 @@ function commonFields(r) {
     source: r.placeId ? 'places' : 'manual'
   };
 }
+// Otros locales. Sin ninguno, el campo no se escribe: así la ficha sigue valiendo con las reglas anteriores.
+function branchFields(r) {
+  return (r.branches || []).map((b) => ({ address: b.address || null, location: { lat: b.lat, lng: b.lng }, placeId: b.placeId || null }));
+}
 
 export function newRestaurantId() { return doc(collection(db, 'restaurants')).id; }
 
@@ -148,14 +156,16 @@ export async function createRestaurant(id, r, myRating) {
   const uid = auth.currentUser.uid;
   const batch = writeBatch(db);
   const rRef = doc(db, 'restaurants', id);
-  batch.set(rRef, { ...commonFields(r), createdBy: uid, createdAt: serverTimestamp(), updatedBy: uid, updatedAt: serverTimestamp() });
+  const branches = branchFields(r);
+  batch.set(rRef, { ...commonFields(r), ...(branches.length ? { branches } : {}), createdBy: uid, createdAt: serverTimestamp(), updatedBy: uid, updatedAt: serverTimestamp() });
   if (myRating) batch.set(doc(rRef, 'ratings', uid), ratingFields(myRating));
   await batch.commit();
 }
 
 export function updateRestaurant(id, r) {
   const uid = auth.currentUser.uid;
-  return updateDoc(doc(db, 'restaurants', id), { ...commonFields(r), updatedBy: uid, updatedAt: serverTimestamp() });
+  const branches = branchFields(r);
+  return updateDoc(doc(db, 'restaurants', id), { ...commonFields(r), branches: branches.length ? branches : deleteField(), updatedBy: uid, updatedAt: serverTimestamp() });
 }
 
 export function saveMyRating(rid, rating) {

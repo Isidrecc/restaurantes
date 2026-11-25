@@ -125,6 +125,13 @@
             <datalist id="localities"></datalist>
             <p class="error" id="err-muni" hidden>Escriu la localitat.</p>
           </div>
+          <!-- Otros locales de la misma ficha: solo al editar (docs/diseno.md, sección 6). -->
+          <div class="field" id="fld-branches" hidden>
+            <span class="field-label">Altres locals</span>
+            <div class="branch-list" id="f-branches" hidden></div>
+            <button class="btn" type="button" id="f-branch-add">+ Afegeix un altre local</button>
+            <p class="hint" id="f-branch-hint"></p>
+          </div>
         </section>
 
         <section class="group" id="grp-datos" aria-label="Dades">
@@ -276,6 +283,34 @@
       <div class="sheet-foot">
         <button class="btn" type="button" data-close>Cancel·la</button>
         <button class="btn btn-danger" type="button" id="cf-ok">Esborra</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet" id="sheet-branch" hidden>
+    <button class="sheet-backdrop" type="button" data-close aria-label="Cancel·la"></button>
+    <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="branch-title">
+      <div class="sheet-head">
+        <h2 id="branch-title">Afegeix un local</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Tanca">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+        <div class="field">
+          <div class="gsearch" id="b-gsearch"></div>
+          <p class="hint" id="b-hint">Cerca el local i tria’l de la llista. El mapa el marcarà.</p>
+          <p class="hint b-address" id="b-address" hidden></p>
+        </div>
+        <div class="field">
+          <div id="branch-map" aria-label="Mapa per situar el local"></div>
+          <p class="hint" id="b-status">Cerca el local o toca el mapa per situar-lo.</p>
+          <p class="error" id="err-bloc" hidden>Toca el mapa per marcar on és.</p>
+        </div>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn" type="button" data-close>Cancel·la</button>
+        <button class="btn btn-primary" type="button" id="b-ok">Afegeix el local</button>
       </div>
     </div>
   </div>

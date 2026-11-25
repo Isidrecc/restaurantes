@@ -1,5 +1,5 @@
 // Puntuam a taula: interfaz. Porta la demo aprobada (demo/index.html) con los cambios de docs/diseno.md.
-import { CRITERIA, CUISINES, PRICES, CHEAP_PRICES, COLORS, COLOR_NAMES } from './config.js';
+import { CRITERIA, CUISINES, PRICES, CHEAP_PRICES, COLORS, COLOR_NAMES, MAX_BRANCHES } from './config.js';
 import * as store from './store.js';
 import { createMainMap, createPickMap, createPlaceSearch, localityAt, placeCard, placePhoto, mapsLink } from './maps.js';
 import { preparePhoto } from './photos.js';
@@ -80,6 +80,10 @@ function de(name) { return (/^h?[aeiouàáèéíïòóúü]/i.test(name) ? 'd’
 function norm(s) { return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
 function placeLine(r, withPrice) { return [r.locality, r.cuisines.join(', '), withPrice ? r.price : ''].filter(Boolean).map(esc).join(' · '); }
 function byId(id) { return restaurants.find((r) => r.id === id); }
+// Locales de una ficha: el principal y los otros (25 de noviembre de 2026; docs/diseno.md, sección 2).
+function locales(r) {
+  return [{ address: r.address, lat: r.lat, lng: r.lng, placeId: r.placeId }].concat(r.branches || []);
+}
 // «Pendent de visitar»: guardado sin fecha de visita.
 function isPending(r) { return !r.visitDate; }
 // Texto de la casilla de nota: la nota, «Sense nota» o, si está pendiente y sin nota, «Pendent».
@@ -166,7 +170,7 @@ function cuisineList(extra) {
 
 // ---------- Filtros ----------
 function passes(r) {
-  if (filters.q && norm([r.name, r.locality, r.address].join(' ')).indexOf(norm(filters.q)) < 0) return false;
+  if (filters.q && norm([r.name, r.locality].concat(locales(r).map((l) => l.address)).join(' ')).indexOf(norm(filters.q)) < 0) return false;
   if (filters.min > 0) {
     const a = agg(r);
     const v = filters.field === 'global' ? a.g : a.crit[filters.field];
@@ -219,12 +223,18 @@ function rowHTML(r) {
     '</span></span>';
 }
 
+// Un pin por local, todos con la nota de la ficha. Al elegir una ficha se marcan todos sus pines.
 function renderMarkers(list) {
   if (!mainMap) return;
-  mainMap.setMarkers(list.slice().reverse().map((r) => {
+  const items = [];
+  list.slice().reverse().forEach((r) => {
     const g = agg(r).g;
-    return { id: r.id, lat: r.lat, lng: r.lng, text: g == null ? '·' : fmt(g), klass: cls(g), title: r.name + (g == null && isPending(r) ? ', pendent de visitar' : ', nota ' + fmt(g)), selected: r.id === selectedId };
-  }), selectOnMap);
+    const title = r.name + (g == null && isPending(r) ? ', pendent de visitar' : ', nota ' + fmt(g));
+    locales(r).forEach((l, i) => items.push({
+      key: r.id + ':' + i, id: r.id, lat: l.lat, lng: l.lng, text: g == null ? '·' : fmt(g), klass: cls(g), title, selected: r.id === selectedId
+    }));
+  });
+  mainMap.setMarkers(items, selectOnMap);
 }
 function renderPreview() {
   const box = $('#preview');
@@ -238,11 +248,13 @@ function renderPreview() {
   box.hidden = false;
   $('#legend').hidden = true;
 }
-function selectOnMap(id) {
+// pin: el pin tocado, para centrar el mapa en ese local.
+function selectOnMap(id, pin) {
   selectedId = id;
   render();
   const r = byId(id);
-  if (r && mainMap) mainMap.focus(r.lat, r.lng, null, $('#preview').offsetHeight + 12);
+  const at = pin && pin.lat != null ? pin : r;
+  if (at && mainMap) mainMap.focus(at.lat, at.lng, null, $('#preview').offsetHeight + 12);
 }
 function renderList(list) {
   const el = $('#list');
@@ -604,7 +616,7 @@ function openDetail(id, keepScroll) {
           '</div>' +
         '</div>' +
         '<div class="hero-bottom">' +
-          '<div class="hero-info">' + (r.address ? '<span>' + esc(r.address) + '</span>' : '') +
+          '<div class="hero-info">' + (r.address ? '<span>' + esc(r.address) + '</span>' : '') + moreLocals(r) +
             (r.visitDate ? '<span>Visitat el ' + esc(fmtDate(r.visitDate)) + '</span>' : '') + '</div>' +
           tags +
         '</div>' +
@@ -632,25 +644,48 @@ function openDetail(id, keepScroll) {
         : (canRate() ? '<button class="btn btn-primary btn-block" type="button" data-act="rate">' + (mine ? 'Edita la meva nota' : 'Puntua aquest restaurant') + '</button>' : '')) +
       (r.blog ? '<div class="card"><p class="section-title">Comentari</p><div class="blog">' + blogHTML(r.blog) + '</div></div>' : '') +
       (photos ? '<div class="card"><p class="section-title">Fotos</p><div class="photos">' + photos + '</div></div>' : '') +
-      // Google Maps: la tarjeta de Google si el sitio se eligió en su buscador (lleva su propio botón «Maps»);
-      // si no la hay o no carga, el enlace.
-      '<div class="gmaps"><p class="section-title">A Google Maps</p>' +
-        (r.placeId ? '<div class="gmaps-card" id="gmaps-card"></div>' : '') +
-        '<a class="btn btn-block" id="gmaps-link" href="' + esc(mapsLink(r)) + '" target="_blank" rel="noopener"' + (r.placeId ? ' hidden' : '') + '>Obre a Google Maps</a></div>' +
+      gmapsHTML(r) +
       '<button class="btn btn-block" type="button" data-act="show-on-map">Mostra al mapa</button>' +
     '</div>';
   $('#detail').hidden = false;
   $('#detail .panel-body').scrollTop = prevScroll;
   hydratePhotos($('#detail'));
-  if (r.placeId) showPlaceCard(r.id, r.placeId);
+  $$('#detail .gmaps-loc[data-place]').forEach((loc) => showPlaceCard(r.id, loc));
 }
 function closeDetail() { $('#detail').hidden = true; detailId = null; flushHomePhotos(); }
-// Pone la tarjeta de Google en la ficha abierta. Si no carga (sin red o tope diario), se quita y queda el enlace.
-function showPlaceCard(rid, placeId) {
-  const box = $('#gmaps-card');
-  const link = $('#gmaps-link');
+// Cabecera: bajo la dirección, cuántos locales más tiene la ficha.
+function moreLocals(r) {
+  const n = (r.branches || []).length;
+  if (!n) return '';
+  return '<span>' + (r.address ? 'i ' + n + (n === 1 ? ' local més' : ' locals més') : (n + 1) + ' locals') + '</span>';
+}
+// Google Maps: la tarjeta de Google si el sitio se eligió en su buscador (lleva su propio botón «Maps»); si no la
+// hay o no carga, el enlace. Con varios locales, «Locals»: cada uno con su dirección y su tarjeta (sección 4).
+// Un mismo elemento de Google no puede estar en dos sitios: si dos locales tienen el mismo sitio, el segundo
+// lleva el enlace.
+function gmapsHTML(r) {
+  const locs = locales(r);
+  const many = locs.length > 1;
+  const used = new Set();
+  return '<div class="gmaps' + (many ? ' is-many' : '') + '"><p class="section-title">' + (many ? 'Locals' : 'A Google Maps') + '</p>' +
+    locs.map((l, i) => {
+      const card = !!l.placeId && !used.has(l.placeId);
+      if (card) used.add(l.placeId);
+      const link = mapsLink({ name: r.name, placeId: l.placeId, lat: l.lat, lng: l.lng });
+      return '<div class="gmaps-loc"' + (card ? ' data-place="' + esc(l.placeId) + '"' : '') + '>' +
+        (many ? '<p class="gmaps-addr">' + esc(l.address || 'Local ' + (i + 1)) + '</p>' : '') +
+        (card ? '<div class="gmaps-card"></div>' : '') +
+        '<a class="btn btn-block gmaps-link" href="' + esc(link) + '" target="_blank" rel="noopener"' + (card ? ' hidden' : '') + '>Obre a Google Maps</a>' +
+      '</div>';
+    }).join('') + '</div>';
+}
+// Pone la tarjeta de Google de un local en la ficha abierta. Si no carga (sin red o tope diario), se quita y queda
+// el enlace.
+function showPlaceCard(rid, loc) {
+  const box = $('.gmaps-card', loc);
+  const link = $('.gmaps-link', loc);
   const fail = () => { box.hidden = true; link.hidden = false; };
-  placeCard(placeId).then((el) => {
+  placeCard(loc.dataset.place).then((el) => {
     if (detailId !== rid || !document.body.contains(box)) return;
     box.appendChild(el);
     el.loaded.catch(fail);
@@ -1042,6 +1077,7 @@ function startForm(mode, r, visited) {
     photos: r ? r.photos.map((p) => ({ full: p.full, thumb: p.thumb, caption: p.caption || '', cover: !!p.cover })) : [],
     removed: [],
     placeId: r ? r.placeId : null,
+    branches: r ? (r.branches || []).map((b) => Object.assign({}, b)) : [],
     scores: mine ? Object.assign({}, mine.scores) : {},
     dish: mine ? mine.dish : ''
   };
@@ -1072,6 +1108,11 @@ function startForm(mode, r, visited) {
     showNameBox(draft.name);
     showLocality(true);
   }
+  // Otros locales: solo al editar (sección 6).
+  $('#fld-branches').hidden = mode !== 'edit';
+  $('#sheet-branch').hidden = true;
+  branchToken++;
+  renderBranches();
   renderFormCuisines();
   $('#f-cuisine-new').hidden = true;
   $('#f-cuisine-text').value = '';
@@ -1118,7 +1159,7 @@ function readForm() {
 }
 function ratingKey(scores, dish) { return JSON.stringify([CRITERIA.map((c) => (scores[c.k] == null ? null : scores[c.k])), dish || '']); }
 function snapshot() {
-  return JSON.stringify([draft.name, draft.locality, draft.lat, draft.lng, draft.placeId, draft.cuisines, draft.price, draft.visitDate, draft.featured, draft.blog,
+  return JSON.stringify([draft.name, draft.locality, draft.lat, draft.lng, draft.placeId, draft.branches.map((b) => [b.lat, b.lng, b.placeId]), draft.cuisines, draft.price, draft.visitDate, draft.featured, draft.blog,
     ratingKey(draft.scores, draft.dish), draft.photos.map((p) => [p.thumb || p.preview, p.caption, !!p.cover])]);
 }
 // Comprueba un bloque y marca lo que falta. Devuelve adónde llevar la vista, o null si está completo.
@@ -1163,6 +1204,8 @@ function closeForm() {
   if (draft) draft.photos.forEach((p) => { if (p.preview) URL.revokeObjectURL(p.preview); });
   draft = null;
   searchToken++;
+  branchToken++;
+  $('#sheet-branch').hidden = true;
   setView(lastBrowse);
   if (back && byId(back)) openDetail(back);
 }
@@ -1249,7 +1292,7 @@ async function saveForm() {
         }
       }
       btn.textContent = 'Desant…';
-      const data = { name: draft.name, locality: draft.locality, address: draft.address, lat: draft.lat, lng: draft.lng, cuisines: draft.cuisines, price: draft.price, visitDate: draft.visitDate, featured: draft.featured, blog: draft.blog, photos, placeId: draft.placeId };
+      const data = { name: draft.name, locality: draft.locality, address: draft.address, lat: draft.lat, lng: draft.lng, cuisines: draft.cuisines, price: draft.price, visitDate: draft.visitDate, featured: draft.featured, blog: draft.blog, photos, placeId: draft.placeId, branches: draft.branches };
       if (formMode === 'add') await store.createRestaurant(id, data, rateOn && hasScore ? rating : null);
       else {
         await store.updateRestaurant(id, data);
@@ -1273,6 +1316,106 @@ async function saveForm() {
     btn.disabled = false;
     btn.textContent = label;
   }
+}
+
+// ---------- Otros locales (docs/diseno.md, sección 6) ----------
+// Al editar, «+ Afegeix un altre local» abre una hoja con el buscador de Google y un mapa, como el paso 1 del
+// alta: se elige el local y se pone el pin tocándolo. Se guardan su pin, su dirección y su sitio de Google.
+let branchDraft = null;   // local que se está añadiendo: { address, lat, lng, placeId }
+let branchMap = null;
+let branchMapPromise = null;
+let branchToken = 0;      // descarta lo que termina de cargar cuando la hoja ya se ha cerrado
+const BRANCH_HINT = 'Si el restaurant té més d’un local. Cada local surt al mapa amb el seu pin.';
+function renderBranches() {
+  if (!draft) return;
+  const list = draft.branches;
+  $('#f-branches').hidden = !list.length;
+  $('#f-branches').innerHTML = list.map((b, i) =>
+    '<div class="branch-row"><span>' + esc(b.address || 'Local sense adreça') + '</span>' +
+    '<button class="icon-btn" type="button" data-rmbranch="' + i + '" aria-label="Treu el local ' + esc(b.address || 'sense adreça') + '">' + XICON + '</button></div>').join('');
+  const full = list.length >= MAX_BRANCHES;
+  $('#f-branch-add').hidden = full;
+  $('#f-branch-hint').textContent = full ? 'Com a màxim, ' + MAX_BRANCHES + ' locals més.' : BRANCH_HINT;
+}
+function ensureBranchMap() {
+  if (branchMap) return Promise.resolve(branchMap);
+  if (!branchMapPromise) {
+    branchMapPromise = createPickMap($('#branch-map'), { onPick: setBranchLocation }).then((m) => { branchMap = m; return m; });
+    branchMapPromise.catch(() => { branchMapPromise = null; });
+  }
+  return branchMapPromise;
+}
+async function openBranchSheet() {
+  if (!draft || draft.branches.length >= MAX_BRANCHES) return;
+  const token = ++branchToken;
+  branchDraft = { address: '', lat: null, lng: null, placeId: null };
+  $('#b-gsearch').innerHTML = '';
+  $('#b-hint').textContent = 'Cerca el local i tria’l de la llista. El mapa el marcarà.';
+  $('#b-hint').hidden = false;
+  $('#b-address').hidden = true;
+  $('#err-bloc').hidden = true;
+  $('#b-status').textContent = 'Cerca el local o toca el mapa per situar-lo.';
+  $('#sheet-branch').hidden = false;
+  let m;
+  try {
+    m = await ensureBranchMap();
+  } catch (e) {
+    if (token === branchToken) $('#b-status').textContent = 'No s’ha pogut carregar el mapa: ' + errText(e);
+    return;
+  }
+  if (token !== branchToken) return;
+  m.clearPin();
+  m.hidePlace();
+  // Se empieza junto al local principal: el buscador da prioridad a lo que hay cerca.
+  if (draft.lat != null) m.center(draft.lat, draft.lng, 14); else m.home();
+  try {
+    const el = await createPlaceSearch({
+      placeholder: 'Cerca el local a Google Maps',
+      getBias: () => {
+        const c = m.map.getCenter();
+        return c ? { center: { lat: c.lat(), lng: c.lng() }, radius: 50000 } : null;
+      },
+      onPlace: (p) => onBranchPlace(m, p),
+      onError: (e) => toast('No s’ha pogut cercar: ' + errText(e))
+    });
+    if (token !== branchToken) return;
+    $('#b-gsearch').appendChild(el);
+  } catch (e) {
+    if (token !== branchToken) return;
+    $('#b-hint').textContent = 'El cercador de Google no està disponible (' + errText(e) + '). Toca el mapa per situar el local.';
+  }
+}
+// Como en el alta, el pin lo pone la persona tocando el sitio marcado; elegir otro resultado quita el anterior.
+function onBranchPlace(m, p) {
+  if (!branchDraft) return;
+  branchDraft.placeId = p.id;
+  branchDraft.address = p.address || '';
+  branchDraft.lat = null;
+  branchDraft.lng = null;
+  m.clearPin();
+  m.showPlace(p.lat, p.lng);
+  m.center(p.lat, p.lng, 18);
+  $('#b-address').textContent = p.address || p.name;
+  $('#b-address').hidden = false;
+  $('#b-hint').hidden = true;
+  $('#err-bloc').hidden = true;
+  $('#b-status').textContent = 'Toca el local marcat per posar-hi el pin.';
+}
+function setBranchLocation(lat, lng) {
+  if (!branchDraft) return;
+  branchDraft.lat = round5(lat);
+  branchDraft.lng = round5(lng);
+  $('#err-bloc').hidden = true;
+  $('#b-status').textContent = 'Punt marcat. Pots arrossegar el pin per afinar.';
+}
+function addBranch() {
+  if (!draft || !branchDraft) return;
+  if (branchDraft.lat == null) { $('#err-bloc').hidden = false; return; }
+  draft.branches.push(branchDraft);
+  branchDraft = null;
+  branchToken++;
+  $('#sheet-branch').hidden = true;
+  renderBranches();
 }
 
 // ---------- Hojas: filtros, nota, perfil, confirmar ----------
@@ -1453,7 +1596,12 @@ function wire() {
       closeDetail();
       setView('map');
       render();
-      if (mainMap) setTimeout(() => mainMap.focus(r.lat, r.lng, 14, $('#preview').offsetHeight + 12), 30);
+      // Con varios locales, se encuadran todos.
+      if (mainMap) setTimeout(() => {
+        const locs = locales(r);
+        const pad = $('#preview').offsetHeight + 12;
+        if (locs.length > 1) mainMap.frame(locs, pad, 16); else mainMap.focus(r.lat, r.lng, 14, pad);
+      }, 30);
     }
   });
   $('#cf-ok').addEventListener('click', () => {
@@ -1585,6 +1733,14 @@ function wire() {
     const i = e.target.dataset.cap;
     if (i != null && draft) draft.photos[+i].caption = e.target.value;
   });
+  $('#f-branch-add').addEventListener('click', openBranchSheet);
+  $('#f-branches').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-rmbranch]');
+    if (!b || !draft) return;
+    draft.branches.splice(+b.dataset.rmbranch, 1);
+    renderBranches();
+  });
+  $('#b-ok').addEventListener('click', addBranch);
   $('#f-geo').addEventListener('click', () => {
     if (!navigator.geolocation) { toast('Aquest dispositiu no dona la ubicació'); return; }
     toast('Cercant la teva ubicació…');
@@ -1737,6 +1893,7 @@ function localPreview() {
     people: [{ uid: 'u1', name: 'Isidre', color: 'azul' }, { uid: 'u2', name: 'Cris', color: 'rosa' }],
     restaurants: [
       { id: 'm1', name: 'Can Exemple', locality: 'Palma', lat: 39.5712, lng: 2.6498, cuisines: ['Mallorquí', 'Arrossos'], price: PRICES[1], featured: true, address: 'Carrer de Mostra, 1, 07001 Palma, Illes Balears', visitDate: '2026-10-17',
+        branches: [{ address: 'Carrer de Prova, 20, 07002 Palma, Illes Balears', lat: 39.5752, lng: 2.6455, placeId: null }],
         blog: 'Primer paràgraf de mostra, amb **negreta**, *cursiva*, __subratllat__ i un [enllaç a una altra web](https://www.example.com/).\n\nSegon paràgraf.', photos: sense ? [] : [{ full: FOTO, thumb: FOTO, caption: 'Foto de mostra' }, { full: FOTO2, thumb: FOTO2, caption: 'Segona foto' }], placeId: gplace, ratings: { u1: { scores: sc([8.5, 9, 7, 8, 8.5, 7.5]), dish: 'Arròs brut' }, u2: { scores: sc([9, 9, 8, 8.5, 9, 7]), dish: 'Llom amb col' } } },
       { id: 'm2', name: 'Sa Fonda Fictícia', locality: 'Sóller', lat: 39.7665, lng: 2.7152, cuisines: ['Menú degustació', 'Peix i marisc'], price: PRICES[2], visitDate: '2026-09-05',
         blog: '', photos: [], placeId: gplace, ratings: { u2: { scores: sc([9.5, 10, 9, 9, 6, 9.5]), dish: 'Gamba roja' } } },

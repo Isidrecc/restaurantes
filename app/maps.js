@@ -89,7 +89,8 @@ export async function createMainMap(el, { onMapClick }) {
     }
   });
 
-  // items: [{ id, lat, lng, text, klass, title, selected }]
+  // items: [{ key, id, lat, lng, text, klass, title, selected }]. key distingue los pines de una misma ficha
+  // con varios locales (id es la ficha); al tocar uno, onSelect recibe la ficha y el pin.
   function setMarkers(items, onSelect) {
     clusterer.clearMarkers();
     markers.forEach((m) => { m.map = null; });
@@ -102,8 +103,8 @@ export async function createMainMap(el, { onMapClick }) {
         gmpClickable: true,
         zIndex: x.selected ? 1000 : 0
       });
-      m.addEventListener('gmp-click', () => onSelect(x.id));
-      markers.set(x.id, m);
+      m.addEventListener('gmp-click', () => onSelect(x.id, x));
+      markers.set(x.key || x.id, m);
       return m;
     });
     clusterer.addMarkers(list);
@@ -116,7 +117,16 @@ export async function createMainMap(el, { onMapClick }) {
     if (bottomPad) map.panBy(0, bottomPad / 2);
   }
 
-  return { map, setMarkers, focus };
+  // Encuadra varios puntos (los locales de una ficha) dejando sitio abajo para la tarjeta resumen, sin acercarse
+  // más de maxZoom si están muy juntos.
+  function frame(points, bottomPad, maxZoom) {
+    const bounds = new google.maps.LatLngBounds();
+    points.forEach((p) => bounds.extend({ lat: p.lat, lng: p.lng }));
+    google.maps.event.addListenerOnce(map, 'idle', () => { if (maxZoom && map.getZoom() > maxZoom) map.setZoom(maxZoom); });
+    map.fitBounds(bounds, { top: 90, right: 60, bottom: (bottomPad || 0) + 60, left: 60 });
+  }
+
+  return { map, setMarkers, focus, frame };
 }
 
 // ---------- Mapa para situar el pin ----------
@@ -193,10 +203,10 @@ function localityOf(components) {
 }
 
 // Crea una casilla de búsqueda nueva y vacía; quien la llama decide dónde ponerla.
-export async function createPlaceSearch({ getBias, onPlace, onError }) {
+export async function createPlaceSearch({ getBias, onPlace, onError, placeholder }) {
   await loadMaps();
   const { BasicPlaceAutocompleteElement, Place } = await google.maps.importLibrary('places');
-  const el = new BasicPlaceAutocompleteElement({ requestedLanguage: 'ca', placeholder: 'Nom del restaurant' });
+  const el = new BasicPlaceAutocompleteElement({ requestedLanguage: 'ca', placeholder: placeholder || 'Nom del restaurant' });
   el.addEventListener('gmp-select', async (event) => {
     try {
       const id = event.place.id;

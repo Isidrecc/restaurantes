@@ -46,6 +46,10 @@ export const PRICES = ['<20 €', '20-40 €', '40-60 €', '60-100 €', '>
 // Tramos de la recomendación de la página de inicio («per menys de 40 €»): <20 y 20-40.
 export const CHEAP_PRICES = PRICES.slice(0, 2);
 
+// Otros locales de una ficha, además del principal (docs/diseno.md, sección 2; 25 de noviembre de 2026).
+// El tope lo fijan también las reglas de Firestore.
+export const MAX_BRANCHES = 3;
+
 // Colores de quien puntúa. El orden decide quién va primero en barras y leyendas.
 export const COLORS = ['azul', 'rosa'];
 
