@@ -198,13 +198,18 @@ Tonos pastel poco saturados: terracota suave (el color de la icona) y amarillo m
 - Estilo propio en la nube de Google: **«Terracota»** para el modo claro y **«Terracota nit»** para el oscuro, a juego con la paleta (24 de noviembre de 2026; antes, «Lavanda» y «Noche», en el historial de git). Son dos estilos de Google, uno de variante clara y otro oscura, asociados al mismo Map ID: cada Map ID admite uno de cada.
 - El mapa se crea con `colorScheme: FOLLOW_SYSTEM`. Solo se puede fijar al crearlo: si el sistema cambia de modo con la app abierta, el mapa no cambia hasta volver a abrirla. Aceptado.
 - En los dos modos se ocultan los puntos de interés de Google (comercios y restaurantes). Se dejan los nombres de pueblos y del mar.
+- Sin nombres de autopistas y vías rápidas ni de sus enlaces, sin placas de carreteras (Ma-20, Ma-1110…) y sin números de salida; las calles y avenidas conservan el nombre, también las que Google agrupa como «arterial» con las carreteras secundarias (parte 5 de las peticiones, 25 de noviembre de 2026).
+- Zonas verdes en **verde menta** (elegido por el propietario el 25 de noviembre de 2026, en lugar del verde salvia propuesto): parques y jardines (Google los trata igual), campos e instalaciones de deporte, golf y zonas peatonales. Antes, los parques iban en beis y el deporte en el verde intenso de Google.
+- **Plazas:** no se pueden colorear. Google tiene el elemento «plaza» (`townSquare`), y su documentación dice que se representa con una forma, pero la consola lo rechaza al importar («No se encontró el elemento», geometría; 25 de noviembre de 2026). Las zonas peatonales se pintan por si alguna plaza está dibujada así; en Palma no se ha visto que cambie ninguna. Dibujarlas desde la app con contornos de OpenStreetMap se descartó por el trabajo que da para lo que aporta.
+- En «Terracota nit», Google pinta las zonas urbanas en azul marino si no se les da color; van en el marrón de la cubierta del suelo (25 de noviembre de 2026). En «Terracota» se deja su gris claro. Quedan algunas manchas azuladas pequeñas en oscuro, sin identificar, que no se han tocado.
 
 | Elemento | Terracota | Terracota nit |
 |---|---|---|
 | Mar | `#cfe3e1` | `#142427` |
 | Tierra | `#f8f3ee` | `#221b16` |
 | Cubierta del suelo | `#efe7dc` | `#29211b` |
-| Parques y zonas verdes | `#ebe6d6` | `#29241c` |
+| Parques, jardines, deporte y zonas peatonales | `#cdebd5` | `#213628` |
+| Zona urbana | (gris de Google) | `#29211b` |
 | Carreteras principales | `#f1d9b5` | `#5a4630` |
 | Carreteras secundarias | `#ebe1d6` | `#33291f` |
 | Etiquetas de pueblos | `#7a4a35` | `#b5a597` |
@@ -213,7 +218,7 @@ Tonos pastel poco saturados: terracota suave (el color de la icona) y amarillo m
 - La línea de costa no se puede aplicar: al importar, Google rechaza el color de borde en el agua (`strokeColor` en `natural.water`, 24 de noviembre de 2026). La costa queda como el contraste entre mar y tierra.
 - Coste: usar un Map ID se cobra con el SKU de Dynamic Maps, el mismo de cada carga del mapa; no añade coste aparte. Comprobado el 24 de noviembre de 2026.
 - Los dos estilos están en `docs/mapa/terracota.json` y `docs/mapa/terracota-nit.json`, con los colores de la tabla. Se importan en la consola de Google Cloud desde «Diseños de mapa» → «Crear estilo» → pestaña JSON (comprobado en la documentación el 24 de noviembre de 2026) y se asocian al Map ID en lugar de los anteriores. Si se retocan en la consola, conviene exportarlos y actualizar estos archivos.
-- Map ID «Puntuam a taula» (`ef2c6b7a22cee90b3aee6ac8`, vectorial, sin inclinación ni rotación), en `app/config.js`. Desde el 24 de noviembre de 2026 tiene «Terracota» en claro y «Terracota nit» en oscuro, importados y asociados por el propietario (antes, «Lavanda» y «Noche»). El cambio tardó unos minutos en verse.
+- Map ID «Puntuam a taula» (`ef2c6b7a22cee90b3aee6ac8`, vectorial, sin inclinación ni rotación), en `app/config.js`. Desde el 24 de noviembre de 2026 tiene «Terracota» en claro y «Terracota nit» en oscuro, importados y asociados por el propietario (antes, «Lavanda» y «Noche»). El cambio tardó unos minutos en verse. El 25 de noviembre de 2026 el propietario los actualizó desde el editor de cada estilo: «Personalizar», pestaña JSON, «Subir» con el archivo de `docs/mapa/`, «Aplicar», «Guardar» y «Publicar», sin tocar el Map ID. Comprobado después en la app publicada, en claro y en oscuro.
 - El mapa del formulario usa el mismo estilo, así que tampoco muestra los restaurantes de Google: el sitio elegido en el buscador lo marca el aro (sección 5).
 - Pendiente: la maqueta de la pantalla del mapa con el menú flotante y las tarjetas.
 - Ideas comentadas y no aprobadas: pines con la nota escrita dentro, carrusel de tarjetas sobre el mapa, grupos de pines con la nota media, y filtros como fichas flotantes. La portada de la ficha sí se aprobó el 24 de noviembre de 2026 (sección 4).
@@ -273,7 +278,7 @@ Lista del propietario de ese día, ordenada en partes. Al final de cada una se l
 | 1 · Ficha y mapa | Cabecera de la ficha según su boceto, tarjeta de Google pequeña y mapa que se abre en Palma (sección 4) | Publicada el 24 de noviembre de 2026 |
 | 2 · Datos | Cinco tramos de precio, «Pendent de visitar» y la marca de recomendación de la página de inicio (secciones 2, 5 y 6). Reglas de Firestore nuevas publicadas por el propietario | Publicada el 24 de noviembre de 2026. Comprobada al guardar Bar Vius como recomendado |
 | 3 · Inici | Página de inicio como primera pantalla, con el menú «Inici · Mapa · + · Llista». Paneles «Recomanació per menys de 40 €» (el restaurante marcado, empezando por Bar Vius; sin foto propia, la de Google) y «Millors menús degustació» (tarjetas que llevan a la ficha y «Veure'ls al mapa» con el filtro Menú degustació) (sección 4b). Alta de Miceli, Tomeu Caldentey, Boro, Santi Taura y Daica como pendientes de visitar, con el tipo Menú degustació y precio «>100 €» mientras el propietario no diga otro | Hecha el 24 de noviembre de 2026 y aprobada por el propietario, con Inici como portada de periódico. Los cinco los dio de alta Claude en la app publicada con la sesión del propietario, eligiéndolos en el buscador de Google («Boro» es VORO, el único que sale en Mallorca) |
-| 4 · Comentario con formato | Negrita, cursiva, subrayado y enlaces a otras webs en el texto largo, con botones (sección 5, paso 4). «Referencias» son enlaces a otras webs, aclarado por el propietario | Publicada el 24 de noviembre de 2026 |
-| 5 · Mapa | Parques, jardines y plazas en verde suave dentro de «Terracota»; sin nombres de autopistas y carreteras, solo los de las calles. El propietario actualiza los dos estilos en Google Cloud | Pendiente |
+| 4 · Comentario con formato | Negrita, cursiva, subrayado y enlaces a otras webs en el texto largo, con botones (sección 5, paso 4). «Referencias» son enlaces a otras webs, aclarado por el propietario | Publicada el 24 de noviembre de 2026 y aprobada por el propietario |
+| 5 · Mapa | Parques, jardines y plazas en verde suave dentro de «Terracota»; sin nombres de autopistas y carreteras, solo los de las calles. El propietario actualiza los dos estilos en Google Cloud (sección 8) | Publicada el 25 de noviembre de 2026 y aprobada por el propietario. Zonas verdes en menta; las plazas no se pueden colorear |
 
 En espera, sin fecha: fotos intercaladas con el texto en el comentario.
