@@ -301,8 +301,8 @@ Pedido por el propietario al dar de alta Santa Chiara y Klüg, que tienen dos lo
 | Qué | Estado |
 |---|---|
 | App: datos, pines, apartado «Locals» y «Altres locals» en «Edita» | Publicada el 25 de noviembre de 2026 y probada en local con datos de muestra y el buscador real de Google, en claro y oscuro |
-| Reglas de Firestore que aceptan `branches` | Pendiente de publicar por el propietario. Hasta entonces la app funciona como antes, pero guardar una ficha con otros locales da error de permisos |
-| Segundo local de Santa Chiara (carrer de Can Salat) y de Klüg (carrer del Comte de Barcelona), quitando del comentario la línea que lo explicaba | Pendiente, después de las reglas |
+| Reglas de Firestore que aceptan `branches` | Publicadas por el propietario el 25 de noviembre de 2026. Comprobado ese día al guardar las dos fichas de la fila siguiente |
+| Segundo local de Santa Chiara (carrer de Can Salat, 2; en Google, «Santa Chiara Raimundo Pizza Napoletana Contemporanea») y de Klüg (carrer del Comte de Barcelona, 22), quitando del comentario la línea que lo explicaba | Hecho el 25 de noviembre de 2026 por Claude en la app publicada con la sesión del propietario, eligiéndolos en el buscador de Google. Comprobado en la ficha (las dos tarjetas de Google) y en el mapa (los dos pines marcados con «Mostra al mapa»). Falta el visto bueno del propietario |
 
 ### Paso 5, por partes
 
