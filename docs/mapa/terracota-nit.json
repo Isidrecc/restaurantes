@@ -16,12 +16,12 @@
       "geometry": { "fillColor": "#142427" },
       "label": { "textFillColor": "#6fa5a3", "textStrokeColor": "#142427" }
     },
-    { "id": "infrastructure.roadNetwork.road.highway", "geometry": { "fillColor": "#5a4630" }, "label": { "visible": false } },
+    { "id": "infrastructure.roadNetwork.road.highway", "geometry": { "fillColor": "#7a5f3c" }, "label": { "visible": false } },
     { "id": "infrastructure.roadNetwork.ramp", "label": { "visible": false } },
     { "id": "infrastructure.roadNetwork.roadShield", "label": { "visible": false } },
     { "id": "infrastructure.roadNetwork.roadSign", "label": { "visible": false } },
-    { "id": "infrastructure.roadNetwork.road.arterial", "geometry": { "fillColor": "#33291f" } },
-    { "id": "infrastructure.roadNetwork.road.local", "geometry": { "fillColor": "#33291f" } },
+    { "id": "infrastructure.roadNetwork.road.arterial", "geometry": { "fillColor": "#524333" } },
+    { "id": "infrastructure.roadNetwork.road.local", "geometry": { "fillColor": "#524333" } },
     { "id": "political", "label": { "textFillColor": "#b5a597", "textStrokeColor": "#221b16" } },
     { "id": "pointOfInterest", "label": { "visible": false } },
     { "id": "infrastructure.transitStation", "label": { "visible": false } }
