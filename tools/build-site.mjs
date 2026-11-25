@@ -96,7 +96,7 @@ function sharePage(r, note) {
   const cover = (r.photos || []).find((p) => p && p.cover) || (r.photos || [])[0];
   // La miniatura (400 px, unas decenas de KB): las vistas previas no cargan imágenes pesadas.
   const image = cover && cover.thumb ? photoURL(cover.thumb) : SITE + 'icons/icon-512.png';
-  const price = PRICES[(r.price || 2) - 1];
+  const price = r.price == null ? '' : PRICES[r.price - 1]; // nulo: «Sense preu», no se pone
   const desc = [note == null ? 'Sense puntuar' : fmt(note) + ' · ' + word(note), r.locality, (r.cuisines || []).join(', '), price]
     .filter(Boolean).join(' · ');
   const page = SITE + 'f/' + r.id + '/';

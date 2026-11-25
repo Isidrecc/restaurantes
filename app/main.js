@@ -1,5 +1,5 @@
 // Puntuam a taula: interfaz. Porta la demo aprobada (demo/index.html) con los cambios de docs/diseno.md.
-import { CRITERIA, CUISINES, PRICES, CHEAP_PRICES, COLORS, COLOR_NAMES, MAX_BRANCHES } from './config.js';
+import { CRITERIA, CUISINES, PRICES, CHEAP_PRICES, NO_PRICE, COLORS, COLOR_NAMES, MAX_BRANCHES } from './config.js';
 import * as store from './store.js';
 import { createMainMap, createPickMap, createPlaceSearch, localityAt, placeCard, placePhoto, mapsLink } from './maps.js';
 import { preparePhoto } from './photos.js';
@@ -599,7 +599,7 @@ function openDetail(id, keepScroll) {
   // Cabecera (boceto del propietario, 24 de noviembre de 2026; docs/diseno.md, sección 4): sobre la portada, arriba
   // el nombre y la nota; abajo, a la izquierda la dirección y la fecha de visita y a la derecha las etiquetas.
   // Sin fotos, lo mismo sobre un fondo de color.
-  const tags = '<div class="tags">' + (r.locality ? tagBtn('munis', r.locality) : '') + r.cuisines.map((c) => tagBtn('cuisines', c)).join('') + tagBtn('prices', r.price) + '</div>';
+  const tags = '<div class="tags">' + (r.locality ? tagBtn('munis', r.locality) : '') + r.cuisines.map((c) => tagBtn('cuisines', c)).join('') + (r.price ? tagBtn('prices', r.price) : '') + '</div>';
   const hero =
     '<div class="hero' + (ci < 0 ? ' no-photo' : '') + '">' +
       (ci < 0 ? '' :
@@ -874,7 +874,8 @@ function placeDraftOnPickMap(m) {
   }
 }
 function buildFormStatics() {
-  $('#f-price').innerHTML = PRICES.map((p, i) => '<input type="radio" name="f-price" id="f-price-' + i + '" value="' + esc(p) + '"><label for="f-price-' + i + '">' + esc(p) + '</label>').join('');
+  $('#f-price').innerHTML = PRICES.map((p, i) => '<input type="radio" name="f-price" id="f-price-' + i + '" value="' + esc(p) + '"><label for="f-price-' + i + '">' + esc(p) + '</label>').join('') +
+    '<input type="radio" name="f-price" id="f-price-none" value=""><label class="price-none" for="f-price-none">' + esc(NO_PRICE) + '</label>';
   // Cada criterio: nombre, nota tecleable y deslizador propio de 1 a 10 con décimas (docs/diseno.md, sección 5).
   $('#rates').innerHTML = CRITERIA.map((c) => {
     const extra = c.k === 'plato' ? '<input class="input" id="f-dish" type="text" maxlength="80" placeholder="Nom del plat" aria-label="Nom del plat estrella" autocomplete="off">' : '';
@@ -1900,7 +1901,9 @@ function localPreview() {
       { id: 'm3', name: 'Bodega Sense Nom', locality: 'Palma', lat: 39.5745, lng: 2.6551, cuisines: ['Autor'], price: PRICES[0], visitDate: '2026-11-07',
         blog: '', photos: [], placeId: null, ratings: {} },
       { id: 'm4', name: 'Celler Pendent', locality: 'Palma', lat: 39.5689, lng: 2.6420, cuisines: ['Menú degustació'], price: PRICES[4], visitDate: '',
-        blog: '', photos: [], placeId: gplace, ratings: {} }
+        blog: '', photos: [], placeId: gplace, ratings: {} },
+      { id: 'm5', name: 'Terrassa Sense Preu', locality: 'Palma', lat: 39.5701, lng: 2.6475, cuisines: ['Prendre una copa'], price: '', visitDate: '',
+        blog: '', photos: [], placeId: null, ratings: {} }
     ]
   });
   ensureMainMap();
