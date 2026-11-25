@@ -53,7 +53,7 @@ Cómo trabaja el propietario (Isidre) y lo aprendido en las sesiones del 21 al 2
 - **Scripts en el scratchpad con la herramienta de escribir archivos**, no con un heredoc en bash: un heredoc largo con apóstrofos catalanes (`’`) y comillas falló el 25 de noviembre de 2026 («unexpected EOF»). Patrón que funciona: un `edit_util.js` que sustituye texto exacto con `indexOf`, falla si no lo encuentra o si aparece dos veces, y respeta CRLF; y un script por cambio que lo usa.
 - **Campos nuevos en Firestore** (aprendido con los varios locales, 25 de noviembre de 2026): las reglas no recorren listas, así que se comprueba cada posición hasta el tope. Un campo opcional nuevo solo se escribe si tiene algo (y al editar se borra con `deleteField()` si se vacía), para que la app nueva funcione aunque el propietario aún no haya publicado las reglas. Orden: publicar la app, que él publique las reglas (enlace de GitHub fijado al commit) y después tocar datos reales.
 - **Comprobar sintaxis.** `node --check app/main.js` falla por ser módulo ES; se copia a un `.mjs` y se comprueba ese. Un módulo suelto, como `app/text.js`, se prueba importándolo con una URL `data:` desde un script de Node.
-- **Prueba local.** Servidor «puntuam-local» de `.claude/launch.json` (`python -m http.server 8765`).
+- **Prueba local.** Servidor «puntuam-local» de `.claude/launch.json` (`python -m http.server 8765`). La clave del mapa está en `app/clau-local.js`, que no se sube (25 de noviembre de 2026): si falta, el mapa y el buscador no cargan.
   - `?muestra`: datos de muestra sin sesión. Guardar falla con «reading 'uid'», es lo esperado.
   - `&visitant`: como quien no ha entrado.
   - `&gplace=<placeId>`: las muestras sin foto usan ese sitio de Google.
@@ -69,6 +69,7 @@ Cómo trabaja el propietario (Isidre) y lo aprendido en las sesiones del 21 al 2
   - En «Edita», `find` con el nombre de un tipo devuelve dos botones: el del formulario es el de referencia más alta; el otro es del panel de filtros. La referencia de «Desa els canvis» cambia de una ficha a otra: buscarla cada vez.
 - **Despliegue.** Tras el push, esperar a que la web publicada sirva `main.js?v=<sha>` (uno o dos minutos) y mirar que la consola no tenga errores.
 - **Estilos del mapa.** Se editan como JSON (`docs/mapa/`) en el editor de cada estilo. El editor avisa si un elemento no existe o no tiene esa parte: la «plaza» (`townSquare`) no tiene superficie aunque la documentación de Google diga que sí. En oscuro, Google pinta las zonas urbanas de azul si no se les da color. Un estilo publicado tarda unos minutos en verse en la app.
+- **Sitios web de una clave de Google** (25 de noviembre de 2026): el Places UI Kit (tarjetas y buscador) solo envía el origen, `https://isidrecc.github.io/`, sin la ruta. Por eso la clave necesita `https://isidrecc.github.io/*` además de `https://isidrecc.github.io/restaurantes/*`; con solo la segunda, el mapa funciona pero las tarjetas dan «referer … did not match». En local no se nota, porque allí el origen coincide.
 - **Places UI Kit.** La tarjeta compacta normal lleva siempre el botón «Maps»; la avanzada deja quitarlo pero se cobra más cara. Detalles y precios comprobados en `docs/diseno.md`, secciones 4 y 4b. Un mismo elemento de Google no puede estar en dos sitios a la vez: se guarda uno por hueco.
 
 ## Equipo

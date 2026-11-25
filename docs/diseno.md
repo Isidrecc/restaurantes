@@ -330,7 +330,7 @@ Orden de construcción en `docs/especificacion.md`, sección 6. Antes de constru
 | 5a · Icono e instalación | Logotipo en todos los tamaños (sección 7, «Icono») y comprobar la instalación en el iPhone | Hecha el 25 de noviembre de 2026: icono de la opción A publicado y comprobado por el propietario en su iPhone al volver a añadir la app a la pantalla de inicio (nombre «Puntuam» y mesa con sillas) |
 | 5b · Consulta sin cobertura | Abrir la app y ver lo ya cargado sin conexión (detalle debajo) | Publicada el 25 de noviembre de 2026 y probada en local. Probada por el propietario en su iPhone con el modo avión ese mismo día |
 | 5c · Copia de seguridad | Pasar las puntuaciones a un .csv guardado en Dropbox (detalle debajo) | Hecha el 25 de noviembre de 2026, con la primera copia, y aprobada por el propietario ese mismo día |
-| 5d · Clave del mapa | Sacar la clave de Google Maps del repo y borrar la antigua | Pendiente |
+| 5d · Clave del mapa | Sacar la clave de Google Maps del repo y borrar la antigua (detalle debajo) | Hecha el 25 de noviembre de 2026 y comprobada en la web publicada. Falta el visto bueno del propietario |
 | 5e · Estadísticas de uso | Analizar las opciones antes de elegir | Pendiente |
 | 5f · Vista para ordenador | Aprovechar las pantallas anchas | Pendiente |
 
@@ -357,3 +357,15 @@ Decidido por el propietario el 25 de noviembre de 2026: «me bastaría con pasar
 - **No guarda:** fotos ni pies de foto, otros locales, coordenadas, sitio de Google ni la marca de recomendación. Restaurar no está automatizado: con el CSV se rehacen notas y textos, pero las fichas habría que situarlas de nuevo.
 - **Primera copia:** 25 de noviembre de 2026, 28 restaurantes, 3 con nota.
 - **Copias programadas de Firestore:** no se activan. Comprobado el 25 de noviembre de 2026 en https://firebase.google.com/docs/firestore/backups y https://firebase.google.com/docs/firestore/pricing: se configuran en la consola de Google Cloud (diaria o semanal, guardadas hasta 14 semanas), no tienen cuota gratuita, la restauración crea una base de datos nueva con un comando en Cloud Shell y no cubren las fotos de Storage. El precio por GiB en `europe-southwest1` no se pudo confirmar.
+
+#### 5d · Clave del mapa
+
+Enfoque aprobado por el propietario el 25 de noviembre de 2026 («Dale»).
+
+- **Qué se gana:** la clave de Google Maps ya no está en GitHub, donde hay programas que buscan claves. Se sigue viendo en la web publicada, porque el mapa la necesita; la protegen sus límites de sitios web y de API y los topes diarios.
+- **Cómo:** en `app/config.js` queda la marca `__MAPS_KEY__`. Al publicar, `tools/build-site.mjs` la cambia por el secreto `MAPS_KEY` de GitHub; sin el secreto, el montaje falla y sigue la versión anterior. En local, `app/maps.js` lee la clave de `app/clau-local.js`, que no se sube (`.gitignore`). Detalle en `docs/publicacion.md`.
+- **Hecho por el propietario**, guiado: clave nueva «Mapa web Puntuam 261125» con las mismas API y sitios que la anterior, más `http://localhost:8765/*` y `https://isidrecc.github.io/*`; secreto `MAPS_KEY` en GitHub; borrado de la clave antigua. Datos de la clave en `docs/especificacion.md`, sección 10.
+- **Tropiezo:** con solo `https://isidrecc.github.io/restaurantes/*`, el mapa funcionaba pero las tarjetas de Google de las fichas daban error («referer … did not match»), porque el Places UI Kit solo envía el origen. Se arregló añadiendo `https://isidrecc.github.io/*`.
+- **Comprobado el 25 de noviembre de 2026** en la web publicada, en tamaño móvil: mapa y pines, tarjeta de Google de una ficha, y en el alta el buscador, la dirección y el pin (descartando el alta). La clave antigua responde `API_KEY_INVALID`. Sin comprobar en el iPhone.
+- **Configuración de Firebase:** se queda en el código. La documentación de Firebase dice que su clave se puede incluir en el código y en archivos del repo (https://firebase.google.com/docs/projects/api-keys, consultado el 25 de noviembre de 2026); los datos los protegen las reglas.
+- No incluido: reescribir el historial de git (no hace falta, la clave antigua ya no vale) ni App Check.
