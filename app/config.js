@@ -49,5 +49,7 @@ export const CHEAP_PRICES = PRICES.slice(0, 2);
 // Colores de quien puntúa. El orden decide quién va primero en barras y leyendas.
 export const COLORS = ['azul', 'rosa'];
 
-// Centro y zoom por defecto: Palma (pedido por el propietario el 24 de noviembre de 2026; antes, toda Mallorca).
-export const HOME = { center: { lat: 39.5715, lng: 2.6505 }, zoom: 13 };
+// Centro y zoom por defecto: el centro de Palma, como en la captura que mandó el propietario el 25 de noviembre
+// de 2026 (de Bons Aires y L'Olivera al mar). Calculado con los pines que se veían en ella. El mapa vectorial
+// acepta zoom con decimales. Antes: Palma entera con zoom 13 (24 de noviembre) y, al principio, toda Mallorca.
+export const HOME = { center: { lat: 39.5725, lng: 2.6528 }, zoom: 14.3 };
