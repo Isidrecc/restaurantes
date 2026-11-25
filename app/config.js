@@ -45,9 +45,6 @@ export const COLOR_NAMES = { azul: 'tinta', rosa: 'turquesa' };
 export const PRICES = ['<20 €', '20-40 €', '40-60 €', '60-100 €', '>100 €'];
 // Tramos de la recomendación de la página de inicio («per menys de 40 €»): <20 y 20-40.
 export const CHEAP_PRICES = PRICES.slice(0, 2);
-// Ficha sin precio (25 de noviembre de 2026, pedido por el propietario para los hoteles): se guarda nulo y en la app
-// es ''. No sale en la lista ni en la ficha, el filtro de precio no la encuentra y no puede ser la recomendación.
-export const NO_PRICE = 'Sense preu';
 
 // Otros locales de una ficha, además del principal (docs/diseno.md, sección 2; 25 de noviembre de 2026).
 // El tope lo fijan también las reglas de Firestore.

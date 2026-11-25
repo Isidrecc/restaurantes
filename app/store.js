@@ -99,8 +99,7 @@ function fromDoc(id, d) {
     lat: d.location ? d.location.lat : null,
     lng: d.location ? d.location.lng : null,
     cuisines: Array.from(new Set((d.cuisines || []).map((c) => CUISINE_RENAMES[c] || c))),
-    // Sin precio (nulo): ''.
-    price: d.price == null ? '' : PRICES[d.price - 1] || PRICES[1],
+    price: PRICES[(d.price || 2) - 1] || PRICES[1],
     // Sin fecha: «Pendent de visitar».
     visitDate: d.visitDate || '',
     featured: d.featured === true,
@@ -124,7 +123,7 @@ function commonFields(r) {
     address: r.address || null,
     location: { lat: r.lat, lng: r.lng },
     cuisines: r.cuisines,
-    price: r.price ? PRICES.indexOf(r.price) + 1 : null,
+    price: PRICES.indexOf(r.price) + 1,
     visitDate: r.visitDate || null,
     featured: !!r.featured,
     blog: r.blog,

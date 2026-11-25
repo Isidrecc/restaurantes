@@ -74,7 +74,6 @@ service cloud.firestore {
     // visitDate null: «Pendent de visitar» (24 de noviembre de 2026).
     // featured: recomendación de la página de inicio, opcional (24 de noviembre de 2026).
     // branches: otros locales, opcional (25 de noviembre de 2026).
-    // price null: «Sense preu» (25 de noviembre de 2026).
     function validRestaurant(d) {
       return d.keys().hasOnly(['name', 'locality', 'address', 'location', 'cuisines', 'price', 'visitDate', 'blog',
                                'photos', 'placeId', 'source', 'featured', 'branches',
@@ -87,7 +86,7 @@ service cloud.firestore {
         && validLocation(d.location)
         && validBranches(d.get('branches', []))
         && d.cuisines is list && d.cuisines.size() <= 10
-        && (d.price == null || (d.price is int && d.price >= 1 && d.price <= 5))
+        && d.price is int && d.price >= 1 && d.price <= 5
         && (d.visitDate == null || (d.visitDate is string && d.visitDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')))
         && d.get('featured', false) is bool
         && d.blog is string && d.blog.size() <= 20000
