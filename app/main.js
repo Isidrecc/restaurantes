@@ -239,7 +239,8 @@ function renderMarkers(list) {
 function renderPreview() {
   const box = $('#preview');
   const r = selectedId && byId(selectedId);
-  if (!r || !passes(r)) { box.hidden = true; $('#legend').hidden = false; return; }
+  // En el ordenador no hay tarjeta resumen: la ficha ya está abierta a la izquierda.
+  if (!r || !passes(r) || isSplit()) { box.hidden = true; $('#legend').hidden = false; return; }
   box.innerHTML = rowHTML(r) +
     '<div class="preview-actions">' +
       '<button class="btn" type="button" data-act="close-preview">Tanca</button>' +
@@ -250,6 +251,7 @@ function renderPreview() {
 }
 // pin: el pin tocado, para centrar el mapa en ese local.
 function selectOnMap(id, pin) {
+  if (isSplit()) { openDetail(id, false, pin); return; }
   selectedId = id;
   render();
   const r = byId(id);
@@ -460,8 +462,23 @@ function showFilteredMap(group, value) {
 }
 
 // ---------- Vistas ----------
+// Vista de ordenador (parte 5f, 25 de noviembre de 2026; docs/diseno.md, sección 10): desde 1.024 px de ancho, en
+// «Llista» se ven a la vez la lista, a la izquierda, y el mapa, a la derecha («is-split»). La pestaña «Mapa» se
+// oculta y lleva a «Llista». La ficha se abre en la columna de la izquierda y el mapa se centra en ella.
+const wideMQ = window.matchMedia('(min-width: 1024px)');
+function isSplit() { return wideMQ.matches && (view === 'list' || view === 'map'); }
+// Centra el mapa en una ficha: en el pin tocado o, con varios locales, en todos.
+function focusOnMap(r, pin) {
+  if (!mainMap) return;
+  const pad = isSplit() ? 0 : $('#preview').offsetHeight + 12;
+  if (pin && pin.lat != null) { mainMap.focus(pin.lat, pin.lng, null, pad); return; }
+  const locs = locales(r);
+  if (locs.length > 1) mainMap.frame(locs, pad, 16); else mainMap.focus(r.lat, r.lng, 14, pad);
+}
 function setView(v) {
+  if (v === 'map' && wideMQ.matches) v = 'list';
   view = v;
+  $('#app').classList.toggle('is-split', isSplit());
   if (v !== 'form') lastBrowse = v;
   $$('.view').forEach((s) => s.classList.toggle('is-active', s.id === 'view-' + v));
   $$('.tabs button').forEach((b) => {
@@ -562,7 +579,8 @@ function markPhoto(img, ok) {
   const box = img.closest('.thumb, .lightbox');
   if (box) box.classList.add(ok ? 'is-loaded' : 'is-error');
 }
-function openDetail(id, keepScroll) {
+// pin: en el ordenador, el pin tocado en el mapa, para centrarlo a él y no a todos los locales.
+function openDetail(id, keepScroll, pin) {
   const r = byId(id);
   if (!r) { closeDetail(); return; }
   const prevScroll = keepScroll && $('#detail .panel-body') ? $('#detail .panel-body').scrollTop : 0;
@@ -651,6 +669,12 @@ function openDetail(id, keepScroll) {
   $('#detail .panel-body').scrollTop = prevScroll;
   hydratePhotos($('#detail'));
   $$('#detail .gmaps-loc[data-place]').forEach((loc) => showPlaceCard(r.id, loc));
+  // En el ordenador, con la lista y el mapa a la vista: se marcan sus pines y el mapa se centra en ella.
+  if (isSplit() && !keepScroll) {
+    selectedId = id;
+    render();
+    focusOnMap(r, pin);
+  }
 }
 function closeDetail() { $('#detail').hidden = true; detailId = null; flushHomePhotos(); }
 // Cabecera: bajo la dirección, cuántos locales más tiene la ficha.
@@ -1495,8 +1519,12 @@ function wire() {
       if (needNet()) return;
       startForm('add', null);
     }
+    // En el ordenador el menú está arriba y se ve con la ficha abierta: cambiar de pestaña la cierra.
+    if (detailId) { closeDetail(); if (isSplit()) { selectedId = null; render(); } }
     setView(b.dataset.view);
   }));
+  // Al pasar de ventana estrecha a ancha (o al revés), se rehace el reparto de la pantalla.
+  wideMQ.addEventListener('change', () => { setView(view); render(); });
   window.addEventListener('online', () => setOnline(true));
   window.addEventListener('offline', () => setOnline(false));
   $('#q').addEventListener('input', (e) => { filters.q = e.target.value; render(); });
@@ -1563,7 +1591,11 @@ function wire() {
     if (!b) return;
     const r = byId(detailId);
     const act = b.dataset.act;
-    if (act === 'back') { closeDetail(); return; }
+    if (act === 'back') {
+      closeDetail();
+      if (isSplit()) { selectedId = null; render(); }
+      return;
+    }
     if (!r) return;
     if (['edit', 'rate', 'visited', 'delete'].includes(act) && needNet()) return;
     if (act === 'share') shareRestaurant(r);
@@ -1593,15 +1625,11 @@ function wire() {
     if (act === 'show-on-map') {
       if (!passes(r)) { clearFilters(); toast('Filtres trets per mostrar-lo'); }
       selectedId = r.id;
-      closeDetail();
-      setView('map');
+      // En el ordenador el mapa ya está al lado: la ficha se queda abierta.
+      if (!isSplit()) { closeDetail(); setView('map'); }
       render();
       // Con varios locales, se encuadran todos.
-      if (mainMap) setTimeout(() => {
-        const locs = locales(r);
-        const pad = $('#preview').offsetHeight + 12;
-        if (locs.length > 1) mainMap.frame(locs, pad, 16); else mainMap.focus(r.lat, r.lng, 14, pad);
-      }, 30);
+      if (mainMap) setTimeout(() => focusOnMap(r), 30);
     }
   });
   $('#cf-ok').addEventListener('click', () => {

@@ -195,6 +195,7 @@ Tonos pastel poco saturados: terracota suave (el color de la icona) y amarillo m
 
 - Pieza clara y redondeada (22 px), con borde fino, separada de los bordes y flotando sobre el mapa. La sección activa en el acento intenso sobre fondo suave.
 - Botones «Inici · Mapa · + · Llista» desde el 24 de noviembre de 2026 (elegido por el propietario); antes, Mapa y Llista a los lados del «+». El «+» es más grande, cuadrado redondeado, en el acento con texto oscuro. Quien no puede añadir no ve el «+» y los otros tres se reparten el ancho.
+- En el ordenador (desde 1.024 px de ancho) el menú va en la barra de arriba, como «Inici · Llista · +», sin «Mapa» (25 de noviembre de 2026; sección 10, «5f · Vista para ordenador»).
 
 ### Icono
 
@@ -332,7 +333,7 @@ Orden de construcción en `docs/especificacion.md`, sección 6. Antes de constru
 | 5c · Copia de seguridad | Pasar las puntuaciones a un .csv guardado en Dropbox (detalle debajo) | Hecha el 25 de noviembre de 2026, con la primera copia, y aprobada por el propietario ese mismo día |
 | 5d · Clave del mapa | Sacar la clave de Google Maps del repo y borrar la antigua (detalle debajo) | Hecha el 25 de noviembre de 2026, comprobada en la web publicada y aprobada por el propietario ese mismo día |
 | 5e · Estadísticas de uso | Analizar las opciones antes de elegir (detalle debajo) | Análisis hecho el 25 de noviembre de 2026, con GoatCounter como recomendación. En espera por decisión del propietario («de momento dejamos eso en stand-by») |
-| 5f · Vista para ordenador | Aprovechar las pantallas anchas | Pendiente |
+| 5f · Vista para ordenador | Aprovechar las pantallas anchas (detalle debajo) | Publicada el 25 de noviembre de 2026 y probada en local y en la web publicada. Falta el visto bueno del propietario |
 
 #### 5b · Consulta sin cobertura
 
@@ -383,3 +384,17 @@ Análisis del 25 de noviembre de 2026, presentado al propietario, que lo dejó e
   - **Cloudflare Web Analytics:** gratis y sin cookies, pero no guarda la parte `?r=` ni tiene eventos, así que no cuenta fichas. Descartada.
   - **Google Analytics 4:** cookie `_ga` de 2 años; la política de Google exige consentimiento en el EEE «where legally required», y la AEPD no exime a las herramientas que reutilizan datos. Haría falta aviso de cookies. Descartada.
 - **Propuesta si se retoma:** el propietario crea la cuenta de GoatCounter con guía; el contador va solo en la web publicada; cuenta visitas, fichas abiertas (dirección propia por ficha, con su nombre) y llegadas desde `f/<id>/` (con una marca en la redirección); aviso en «El teu perfil» («Comptem les visites de manera anònima, sense galetes»), que se le enseña antes de publicar. Antes, comprobar los puntos sin confirmar de GoatCounter.
+
+#### 5f · Vista para ordenador
+
+Enfoque «lista y mapa juntos» aprobado por el propietario el 25 de noviembre de 2026 («Dale»), frente a la alternativa de una columna más ancha. Vio las capturas en local antes de publicar («Publícalo»).
+
+- **Cuándo:** desde 1.024 px de ancho (portátiles, ordenadores y el iPad en horizontal). Por debajo, todo igual que en el móvil.
+- **Barra de arriba**, a todo lo ancho: nombre; buscador, «Mitjana» y «Filtres» (no en Inici, como en el móvil); menú «Inici · Llista · +»; perfil. La pestaña «Mapa» no se ve y lleva a «Llista».
+- **Llista:** la lista a la izquierda (440 px) y el mapa a la derecha. Tocar una fila o un pin abre la ficha en la columna de la izquierda; sus pines quedan marcados y el mapa se centra en ella (en el pin tocado o, con varios locales, en todos). No hay tarjeta resumen. «Torna» vuelve a la lista y quita la marca. «Mostra al mapa» deja la ficha abierta. Cambiar de pestaña cierra la ficha.
+- **Ficha desde Inici** (o desde un enlace compartido): columna centrada de 680 px con el fondo oscurecido.
+- **Inici:** la portada en dos columnas (una sección en cada una), con la fecha a todo lo ancho; como mucho 1.160 px.
+- **Alta, edición y nota:** ventana centrada de 720 px. **Hojas** (filtros, nota, perfil, avisos, otro local): ventana centrada de 560 px en lugar de subir desde abajo.
+- **Cómo:** `app/styles.css`, bloque «Vista de ordenador» (`@media (min-width: 1024px)`, con la rejilla en `#app`), y en `app/main.js` la clase `is-split` en `#app`, `isSplit()` y `focusOnMap()`.
+- **Comprobado el 25 de noviembre de 2026:** en local con datos de muestra a 1366 × 800 y 1920 × 1080, en claro y oscuro, abriendo fichas desde la lista, desde un pin y desde Inici, filtros y alta; en tamaño móvil, menú abajo, pestaña «Mapa» y tarjeta resumen como antes. En la web publicada, con datos reales. Sin comprobar en un iPad.
+- **No incluido** (dicho al proponerlo): marcar el pin al pasar el ratón por una fila, atajos de teclado y versión para imprimir.
