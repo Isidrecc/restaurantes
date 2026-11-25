@@ -331,7 +331,7 @@ Orden de construcción en `docs/especificacion.md`, sección 6. Antes de constru
 | 5b · Consulta sin cobertura | Abrir la app y ver lo ya cargado sin conexión (detalle debajo) | Publicada el 25 de noviembre de 2026 y probada en local. Probada por el propietario en su iPhone con el modo avión ese mismo día |
 | 5c · Copia de seguridad | Pasar las puntuaciones a un .csv guardado en Dropbox (detalle debajo) | Hecha el 25 de noviembre de 2026, con la primera copia, y aprobada por el propietario ese mismo día |
 | 5d · Clave del mapa | Sacar la clave de Google Maps del repo y borrar la antigua (detalle debajo) | Hecha el 25 de noviembre de 2026, comprobada en la web publicada y aprobada por el propietario ese mismo día |
-| 5e · Estadísticas de uso | Analizar las opciones antes de elegir | Pendiente |
+| 5e · Estadísticas de uso | Analizar las opciones antes de elegir (detalle debajo) | Análisis hecho el 25 de noviembre de 2026, con GoatCounter como recomendación. En espera por decisión del propietario («de momento dejamos eso en stand-by») |
 | 5f · Vista para ordenador | Aprovechar las pantallas anchas | Pendiente |
 
 #### 5b · Consulta sin cobertura
@@ -369,3 +369,17 @@ Enfoque aprobado por el propietario el 25 de noviembre de 2026 («Dale»).
 - **Comprobado el 25 de noviembre de 2026** en la web publicada, en tamaño móvil: mapa y pines, tarjeta de Google de una ficha, y en el alta el buscador, la dirección y el pin (descartando el alta). La clave antigua responde `API_KEY_INVALID`. Sin comprobar en el iPhone.
 - **Configuración de Firebase:** se queda en el código. La documentación de Firebase dice que su clave se puede incluir en el código y en archivos del repo (https://firebase.google.com/docs/projects/api-keys, consultado el 25 de noviembre de 2026); los datos los protegen las reglas.
 - No incluido: reescribir el historial de git (no hace falta, la clave antigua ya no vale) ni App Check.
+
+#### 5e · Estadísticas de uso (en espera)
+
+Análisis del 25 de noviembre de 2026, presentado al propietario, que lo dejó en espera sin elegir. Objetivo (especificación, sección 6): visitas, fichas abiertas y enlaces compartidos que se abren.
+
+- **Lo que ya hay no sirve:** GitHub Pages no da estadísticas de la web (el «Traffic» del repo es de github.com). Google Cloud da cargas del mapa por día, de los últimos 30 días, sin páginas. Firestore da lecturas, que no equivalen a visitas.
+- **AEPD.** «Guía sobre el uso de las cookies» (mayo de 2024): las cookies de análisis no están exentas de consentimiento, y el artículo 22 de la LSSI se aplica también a tecnologías similares y a la huella digital del dispositivo. «Uso de cookies para herramientas de medición de audiencia» (v. enero de 2024, https://www.aepd.es/guias/guia-cookies-analiticas-externas.pdf): pueden ir sin consentimiento si solo miden la audiencia del sitio para el editor, con datos estadísticos anónimos, sin cruzar sitios ni ceder datos para otros fines. Lo admitido incluye la audiencia página por página, de dónde vienen, el dispositivo y los clics. Garantías: informar (por ejemplo, en la política de privacidad), conservar los datos 25 meses como mucho y, con proveedor, un contrato del artículo 28 del RGPD que le impida reutilizarlos.
+- **Opciones** (páginas oficiales consultadas ese día):
+  - **GoatCounter:** gratis «for reasonable public usage», sin cookies ni almacenamiento en el teléfono (la sesión es un resumen de IP y navegador que guarda 8 horas en memoria). Cuenta direcciones propias con `goatcounter.count({ path })` y eventos. Su página de RGPD dice que «probablemente» no hace falta aviso. **Recomendada.** Sin confirmar: dónde guarda los datos, cuánto tiempo y si ofrece contrato de encargado.
+  - **Umami Cloud:** gratis hasta 100.000 eventos al mes, un sitio y 6 meses de historial; sin cookies; eventos con `umami.track`. Servidores en EE. UU. y la UE.
+  - **Plausible:** desde 9 $ al mes, sin plan gratis; sin cookies; datos en la UE; dice que no hace falta aviso.
+  - **Cloudflare Web Analytics:** gratis y sin cookies, pero no guarda la parte `?r=` ni tiene eventos, así que no cuenta fichas. Descartada.
+  - **Google Analytics 4:** cookie `_ga` de 2 años; la política de Google exige consentimiento en el EEE «where legally required», y la AEPD no exime a las herramientas que reutilizan datos. Haría falta aviso de cookies. Descartada.
+- **Propuesta si se retoma:** el propietario crea la cuenta de GoatCounter con guía; el contador va solo en la web publicada; cuenta visitas, fichas abiertas (dirección propia por ficha, con su nombre) y llegadas desde `f/<id>/` (con una marca en la redirección); aviso en «El teu perfil» («Comptem les visites de manera anònima, sense galetes»), que se le enseña antes de publicar. Antes, comprobar los puntos sin confirmar de GoatCounter.
