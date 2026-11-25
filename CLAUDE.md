@@ -49,7 +49,7 @@ App web personal para puntuar y reseñar restaurantes: mapa, lista con filtros y
 ## Técnica (confirmada por el propietario)
 
 - HTML, CSS y JavaScript sin framework ni paso de compilación, con módulos ES. La demo ya está hecha así.
-- Publicación (desde el 24 de noviembre de 2026): GitHub Actions monta la web con `tools/build-site.mjs` (versión en los archivos y páginas de compartir `f/<id>/` con la portada) y la publica en GitHub Pages en cada push a `main` y cada 30 minutos. Ver `docs/publicacion.md`. Si se añade un archivo o carpeta que la app necesita, hay que añadirlo a la copia de ese script.
+- Publicación (desde el 24 de noviembre de 2026): GitHub Actions monta la web con `tools/build-site.mjs` (versión en los archivos y páginas de compartir `f/<id>/` con la portada) y la publica en GitHub Pages en cada push a `main` y cada 30 minutos. Ver `docs/publicacion.md`. Si se añade un archivo o carpeta que la app necesita, hay que añadirlo a la copia de ese script y, si no está en `app/` ni en `icons/`, a la lista del service worker (`sw.js`, consulta sin cobertura desde el 25 de noviembre de 2026).
 - Firebase (Auth con Google, Firestore y Storage) con el SDK modular.
 - Google Maps JavaScript API para el mapa. La demo usa Leaflet con una base esquemática solo porque se hizo dentro de un artefacto que bloquea mapas externos.
 - PWA instalable en iPhone.

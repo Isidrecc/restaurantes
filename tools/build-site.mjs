@@ -7,6 +7,7 @@
 //    cocinas, precio y la portada) y lleva al instante a la ficha (?r=id). WhatsApp y las demás apps leen
 //    esta página, no la app, que es la misma para todas las fichas.
 // 4. Crea 404.html: un enlace f/<id>/ de una ficha que aún no tiene página lleva igualmente a la ficha.
+// 5. Copia sw.js con la versión y la lista de archivos que el teléfono guarda para abrir la app sin conexión.
 //
 // Los datos se leen de Firestore sin clave ni sesión: la lectura es pública (docs/diseno.md, sección 1).
 import { cp, mkdir, readFile, writeFile, readdir, rm } from 'node:fs/promises';
@@ -145,6 +146,19 @@ async function main() {
   }
 
   await writeFile(join(OUT, '404.html'), NOT_FOUND);
+
+  // Service worker (docs/diseno.md, sección 10, parte 5b): la versión, para borrar la copia anterior, y los
+  // archivos que se guardan al instalarlo: la página, el manifiesto, la app con su versión, los iconos y Firebase.
+  const appFiles = (await readdir(join(OUT, 'app'))).filter((f) => /\.(js|css)$/.test(f)).map((f) => 'app/' + f + v);
+  const iconFiles = (await readdir(join(OUT, 'icons'))).map((f) => 'icons/' + f);
+  const storeSrc = await readFile(join(ROOT, 'app', 'store.js'), 'utf8');
+  const sdk = [...new Set(storeSrc.match(/https:\/\/www\.gstatic\.com\/firebasejs\/[\w.\/-]+\.js/g) || [])];
+  const precache = ['./', 'manifest.webmanifest', ...appFiles, ...iconFiles, ...sdk];
+  let sw = await readFile(join(ROOT, 'sw.js'), 'utf8');
+  sw = sw.split("const VERSION = 'dev';").join('const VERSION = ' + JSON.stringify(VERSION) + ';')
+    .split('const PRECACHE = [];').join('const PRECACHE = ' + JSON.stringify(precache) + ';');
+  if (!sw.includes(JSON.stringify(VERSION)) || sdk.length === 0) throw new Error('sw.js: no se han podido poner la versión o la lista');
+  await writeFile(join(OUT, 'sw.js'), sw);
 
   // Páginas de compartir. Si Firestore falla, el montaje falla y GitHub deja publicada la versión anterior.
   const [restaurants, users, ratings] = await Promise.all([list('restaurants'), list('users'), allRatings()]);

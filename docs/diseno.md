@@ -296,8 +296,21 @@ Orden de construcción en `docs/especificacion.md`, sección 6. Antes de constru
 | Parte | Contenido | Estado |
 |---|---|---|
 | 5a · Icono e instalación | Logotipo en todos los tamaños (sección 7, «Icono») y comprobar la instalación en el iPhone | Hecha el 25 de noviembre de 2026: icono de la opción A publicado y comprobado por el propietario en su iPhone al volver a añadir la app a la pantalla de inicio (nombre «Puntuam» y mesa con sillas) |
-| 5b · Consulta sin cobertura | Abrir la app y ver lo ya cargado sin conexión | Pendiente |
+| 5b · Consulta sin cobertura | Abrir la app y ver lo ya cargado sin conexión (detalle debajo) | Publicada el 25 de noviembre de 2026 y probada en local. Falta la prueba del propietario en su iPhone con el modo avión |
 | 5c · Copia de seguridad | Descargar los restaurantes, notas y comentarios | Pendiente |
 | 5d · Clave del mapa | Sacar la clave de Google Maps del repo y borrar la antigua | Pendiente |
 | 5e · Estadísticas de uso | Analizar las opciones antes de elegir | Pendiente |
 | 5f · Vista para ordenador | Aprovechar las pantallas anchas | Pendiente |
+
+#### 5b · Consulta sin cobertura
+
+Enfoque aprobado por el propietario el 25 de noviembre de 2026.
+
+- **Sin conexión se puede:** abrir la app desde el icono y ver Inici, la lista con sus filtros y las fichas, con notas y comentarios, tal como se cargaron la última vez con conexión.
+- **Aviso:** bajo la cabecera, una franja discreta «Sense connexió · es mostren les dades desades».
+- **No funciona sin conexión:** el mapa («Sense connexió. El mapa es carregarà quan tornis a tenir connexió.», y se carga solo al volver la red), la tarjeta y las fotos de Google, y las fotos propias (la app pide a Firebase la dirección de cada una).
+- **Altas, ediciones, notas y borrados** piden conexión: el «+», «Edita», «Puntua», «Ja hi hem anat» y «Esborra» avisan con «Cal connexió per afegir, editar o esborrar.», y guardar un formulario abierto, con «Sense connexió: no es pot desar. Torna-ho a provar quan en tinguis.», sin cerrarlo.
+- **Cómo:** los datos ya los guardaba Firestore en el teléfono (`persistentLocalCache`). Los archivos de la app los guarda un service worker (`sw.js`): la página siempre se pide primero a la red y solo sin red se usa la copia, así que las versiones nuevas llegan como antes; los archivos con versión (`?v=`) y Firebase se sirven de la copia. Al publicar, `tools/build-site.mjs` le pone la versión y la lista de archivos, y al cambiar de versión se borra la copia anterior. Sin red, la lectura del permiso y del nombre va directa a la copia de Firestore (`getDocFromCache`), para no esperar al servidor.
+- La primera vez después de publicarlo hay que abrir la app con conexión para que se guarde la copia.
+- **Sin comprobar:** cuánto tarda en salir lo guardado de Firestore con el teléfono sin red de verdad, y si el iPhone borra lo guardado cuando la app pasa semanas sin usarse.
+- No incluido (decidido al aprobar el enfoque): fotos propias ya vistas sin conexión, y puntuar sin conexión para guardarlo al volver la red, que sería una parte aparte si se quiere.

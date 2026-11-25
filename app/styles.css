@@ -120,6 +120,8 @@ h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; }
   padding: 10px 16px 8px;
   background: var(--surface);
 }
+/* Sin conexión (parte 5b): franja discreta bajo la cabecera. */
+.offline-bar { padding: 5px 16px; background: var(--surface-2); border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12px; font-weight: 600; text-align: center; }
 .brand { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
 .brand-name { font: var(--title-weight) 17px/1.2 var(--font-display); letter-spacing: -.01em; }
 .tag {

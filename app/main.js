@@ -97,6 +97,38 @@ function toast(msg) {
 }
 function errText(e) { return (e && (e.code || e.message)) || 'error desconegut'; }
 
+// ---------- Sin conexión (docs/diseno.md, sección 10, parte 5b) ----------
+// Sin red se consulta lo guardado en el teléfono. Dar de alta, editar, puntuar y borrar piden conexión, para
+// que no queden cambios a medias; el mapa de Google se carga al volver la red.
+let online = navigator.onLine;
+function needNet(msg) {
+  if (online) return false;
+  toast(msg || 'Cal connexió per afegir, editar o esborrar.');
+  return true;
+}
+function setOnline(on) {
+  online = on;
+  $('#offline').hidden = on;
+  if (on) ensureMainMap();
+}
+let mapTrying = false;
+function ensureMainMap() {
+  if (mainMap || mapTrying) return;
+  if (!online) {
+    $('#map').innerHTML = '<p class="map-error">Sense connexió. El mapa es carregarà quan tornis a tenir connexió.</p>';
+    return;
+  }
+  mapTrying = true;
+  $('#map').innerHTML = '';
+  createMainMap($('#map'), { onMapClick: () => { if (selectedId) { selectedId = null; render(); } } })
+    .then((m2) => { mainMap = m2; if (dataReady) render(); })
+    .catch((e) => {
+      $('#map').innerHTML = '<p class="map-error">' + (online ? 'No s’ha pogut carregar el mapa: ' + esc(errText(e))
+        : 'Sense connexió. El mapa es carregarà quan tornis a tenir connexió.') + '</p>';
+    })
+    .finally(() => { mapTrying = false; });
+}
+
 // ---------- Personas y medias ----------
 function person(uid) { return people.find((p) => p.uid === uid) || null; }
 function personName(uid) { const p = person(uid); return p ? p.name : 'Antic'; }
@@ -1175,6 +1207,7 @@ function renderDraftPhotos() {
 }
 async function saveForm() {
   if (saving || !draft) return;
+  if (needNet('Sense connexió: no es pot desar. Torna-ho a provar quan en tinguis.')) return;
   readForm();
   const blocks = formBlocks();
   for (let i = 0; i < blocks.length; i++) {
@@ -1315,9 +1348,14 @@ function wire() {
   document.addEventListener('load', (e) => { if (e.target instanceof HTMLImageElement) markPhoto(e.target, true); }, true);
   document.addEventListener('error', (e) => { if (e.target instanceof HTMLImageElement) markPhoto(e.target, false); }, true);
   $$('.tabs button').forEach((b) => b.addEventListener('click', () => {
-    if (b.dataset.view === 'form' && !(view === 'form' && formMode === 'add')) startForm('add', null);
+    if (b.dataset.view === 'form' && !(view === 'form' && formMode === 'add')) {
+      if (needNet()) return;
+      startForm('add', null);
+    }
     setView(b.dataset.view);
   }));
+  window.addEventListener('online', () => setOnline(true));
+  window.addEventListener('offline', () => setOnline(false));
   $('#q').addEventListener('input', (e) => { filters.q = e.target.value; render(); });
   $('#btn-filters').addEventListener('click', () => { buildFilterChips(); $('#sheet-filters').hidden = false; });
   $$('[data-close]').forEach((b) => b.addEventListener('click', () => { b.closest('.sheet').hidden = true; }));
@@ -1384,6 +1422,7 @@ function wire() {
     const act = b.dataset.act;
     if (act === 'back') { closeDetail(); return; }
     if (!r) return;
+    if (['edit', 'rate', 'visited', 'delete'].includes(act) && needNet()) return;
     if (act === 'share') shareRestaurant(r);
     if (act === 'edit') { closeDetail(); startForm('edit', r); setView('form'); }
     if (act === 'rate') { closeDetail(); startForm('rate', r); setView('form'); }
@@ -1668,11 +1707,7 @@ async function startSession(user) {
   // Los datos se vuelven a pedir con cada cambio de sesión: así nadie se queda sin ellos si una lectura
   // sin entrar se rechazara.
   stopWatch = store.watchAll(onData, (e) => { console.error(e); toast('Error en llegir les dades: ' + errText(e)); });
-  if (!mainMap) {
-    createMainMap($('#map'), { onMapClick: () => { if (selectedId) { selectedId = null; render(); } } })
-      .then((m2) => { mainMap = m2; if (dataReady) render(); })
-      .catch((e) => { $('#map').innerHTML = '<p class="map-error">No s’ha pogut carregar el mapa: ' + esc(errText(e)) + '</p>'; });
-  }
+  ensureMainMap();
 }
 
 // Modo de muestra para revisar la interfaz en local sin iniciar sesión: solo en localhost y con ?muestra.
@@ -1689,6 +1724,8 @@ function localPreview() {
     '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">' +
     '<rect width="1200" height="800" fill="#2f4a3a"/><rect x="140" y="420" width="920" height="40" rx="20" fill="#c9a77c"/>' +
     '<circle cx="420" cy="330" r="110" fill="#f2e6d0"/><circle cx="780" cy="330" r="110" fill="#f2e6d0"/><circle cx="420" cy="330" r="60" fill="#d27a3c"/><circle cx="780" cy="330" r="60" fill="#e0b84a"/></svg>');
+  // Con &senseconnexio se ve como sin red (parte 5b).
+  if (params.has('senseconnexio')) { online = false; $('#offline').hidden = false; }
   // Con ?muestra&visitant se ve como alguien que no ha entrado.
   me = params.has('visitant') ? null : { uid: 'u1', email: 'muestra@localhost', role: 'owner', color: 'azul', displayName: 'Isidre' };
   showScreen(null);
@@ -1709,13 +1746,12 @@ function localPreview() {
         blog: '', photos: [], placeId: gplace, ratings: {} }
     ]
   });
-  createMainMap($('#map'), { onMapClick: () => { if (selectedId) { selectedId = null; render(); } } })
-    .then((m2) => { mainMap = m2; render(); })
-    .catch((e) => { $('#map').innerHTML = '<p class="map-error">No s’ha pogut carregar el mapa: ' + esc(errText(e)) + '</p>'; });
+  ensureMainMap();
 }
 
 buildFormStatics();
 wire();
+$('#offline').hidden = online;
 setView(view);
 // Enlace compartido a una ficha: se abre al llegar los datos y se quita de la dirección.
 const params = new URLSearchParams(location.search);
@@ -1727,3 +1763,5 @@ if (params.get('r')) {
 }
 if (location.hostname === 'localhost' && params.has('muestra')) localPreview();
 else store.onSession(startSession);
+// Copia de los archivos de la app en el teléfono, para abrirla sin conexión (sw.js).
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch((e) => console.error(e));

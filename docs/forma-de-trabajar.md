@@ -54,6 +54,8 @@ Cómo trabaja el propietario (Isidre) y lo aprendido en las sesiones del 21 al 2
   - `&gplace=<placeId>`: las muestras sin foto usan ese sitio de Google.
   - `&sensefotos`: sin fotos, y así no se gastan consultas de Google.
   - Sin `?muestra`, localhost lee la Firestore real.
+  - `&senseconnexio`: como sin red (franja de aviso, mapa y ediciones bloqueadas).
+  - **Probar sin conexión** (25 de noviembre de 2026): `node tools/build-site.mjs`, abrir `http://localhost:8765/_site/?muestra&sensefotos` con «puntuam-local» para que el service worker guarde la copia, recargar una vez, parar el servidor y volver a abrir la dirección con `&senseconnexio`. En la carpeta raíz el service worker queda en «dev» y siempre pide primero a la red. El iPhone sin red de verdad solo lo puede probar el propietario.
 - **Navegador integrado.** Con el panel oculto, las capturas pueden quedarse congeladas; el mapa sí se pinta bien en la primera carga. Para comprobar textos y estado, mejor JavaScript que capturas. El modo oscuro se prueba con la emulación del esquema de color. Al acabar, volver al tamaño de escritorio.
 - **Despliegue.** Tras el push, esperar a que la web publicada sirva `main.js?v=<sha>` (uno o dos minutos) y mirar que la consola no tenga errores.
 - **Estilos del mapa.** Se editan como JSON (`docs/mapa/`) en el editor de cada estilo. El editor avisa si un elemento no existe o no tiene esa parte: la «plaza» (`townSquare`) no tiene superficie aunque la documentación de Google diga que sí. En oscuro, Google pinta las zonas urbanas de azul si no se les da color. Un estilo publicado tarda unos minutos en verse en la app.

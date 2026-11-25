@@ -6,10 +6,11 @@ Desde el 24 de noviembre de 2026, GitHub Pages publica lo que monta un flujo de 
 
 El flujo `.github/workflows/pages.yml` ejecuta `tools/build-site.mjs`, que:
 
-1. Copia la app: `index.html`, `manifest.webmanifest`, `app/`, `icons/` y `demo/`. Lo demás del repo (`docs/`, reglas, herramientas) ya no se publica.
+1. Copia la app: `index.html`, `manifest.webmanifest`, `app/`, `icons/` y `demo/` (y `sw.js` en el paso 5). Lo demás del repo (`docs/`, reglas, herramientas) ya no se publica.
 2. Pone la versión del commit (`?v=…`) a los archivos de la app y a sus importaciones, para que el navegador no siga con los de la publicación anterior.
 3. Lee de Firestore, sin clave ni sesión, los restaurantes, las notas y los nombres de quien puntúa, y crea `f/<id>/index.html` por restaurante con la vista previa (nombre; nota, localidad, cocinas y precio; la portada) y una redirección inmediata a la ficha (`?r=id`).
 4. Crea `404.html`: un enlace `f/<id>/` de una ficha que aún no tiene página lleva igualmente a la ficha.
+5. Copia `sw.js`, el service worker que deja abrir la app sin conexión, con la versión del commit y la lista de archivos que guarda el teléfono: la página, el manifiesto, todo `app/` con su versión, todo `icons/` y los módulos de Firebase que importa `app/store.js`. Un archivo nuevo en `app/` o `icons/` entra solo en la lista; uno en otro sitio hay que añadirlo a mano.
 
 «Comparteix» en la app publicada comparte `https://isidrecc.github.io/restaurantes/f/<id>/`.
 

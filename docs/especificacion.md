@@ -209,7 +209,7 @@ Probado el 23 de noviembre de 2026 con la página `prueba/` en un iPhone (iOS 18
 | Fotos | ✅ Una foto de 4,6 MB queda en 556 KB (1600 px) y una miniatura de 47 KB (400 px). ⚠️ Una foto ya pequeña (305 KB) creció a 367 KB al recomprimirla: si el original es JPEG y ya cabe en 1600 px, se sube tal cual. |
 | Mapa con clave restringida | ✅ Carga en GitHub Pages y en `localhost:8000`. |
 | Lentitud al abrir | ❌→✅ Con la conexión por defecto de Firestore, la primera lectura al abrir la app instalada se atascaba unos 30 segundos por consulta (27 a 80 s en total). Forzando **long polling** (`experimentalForceLongPolling: true`) y manteniendo la caché del dispositivo: 0,8 a 2,5 s en tres aperturas. Sin caché también es rápido, pero se pierde la consulta sin cobertura. |
-| Consulta sin cobertura | Sin probar. Queda para el paso 5. |
+| Consulta sin cobertura | Construida el 25 de noviembre de 2026 (paso 5, parte 5b; `docs/diseno.md`, sección 10). Probada en local con el servidor parado; falta la prueba en el iPhone con el modo avión. |
 
 Decisiones que salen de la prueba:
 

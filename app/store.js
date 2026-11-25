@@ -4,7 +4,7 @@ import {
   getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
 } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js';
 import {
-  initializeFirestore, persistentLocalCache, doc, collection, collectionGroup, getDoc,
+  initializeFirestore, persistentLocalCache, doc, collection, collectionGroup, getDoc, getDocFromCache,
   setDoc, updateDoc, writeBatch, serverTimestamp, onSnapshot
 } from 'https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js';
 import {
@@ -21,6 +21,13 @@ const storage = getStorage(app);
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt: 'select_account' });
 
+// Sin conexión, las lecturas sueltas van directas a la copia del teléfono: getDoc esperaría al servidor.
+// Si no está en la copia, se intenta igualmente con getDoc (parte 5b).
+function readDoc(r) {
+  if (navigator.onLine === false) return getDocFromCache(r).catch(() => getDoc(r));
+  return getDoc(r);
+}
+
 // ---------- Sesión y acceso ----------
 
 export function onSession(cb) { return onAuthStateChanged(auth, cb); }
@@ -30,14 +37,14 @@ export function currentUser() { return auth.currentUser; }
 
 // Papel y color de la persona: members/{correo en minúsculas}.
 export async function getMembership(user) {
-  const snap = await getDoc(doc(db, 'members', user.email.toLowerCase()));
+  const snap = await readDoc(doc(db, 'members', user.email.toLowerCase()));
   if (!snap.exists()) return null;
   const d = snap.data();
   return { role: d.role, color: COLORS.includes(d.color) ? d.color : null };
 }
 
 export async function getProfile(uid) {
-  const snap = await getDoc(doc(db, 'users', uid));
+  const snap = await readDoc(doc(db, 'users', uid));
   return snap.exists() ? snap.data() : null;
 }
 
