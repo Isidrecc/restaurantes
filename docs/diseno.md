@@ -333,7 +333,7 @@ Orden de construcción en `docs/especificacion.md`, sección 6. Antes de constru
 | 5c · Copia de seguridad | Pasar las puntuaciones a un .csv guardado en Dropbox (detalle debajo) | Hecha el 25 de noviembre de 2026, con la primera copia, y aprobada por el propietario ese mismo día |
 | 5d · Clave del mapa | Sacar la clave de Google Maps del repo y borrar la antigua (detalle debajo) | Hecha el 25 de noviembre de 2026, comprobada en la web publicada y aprobada por el propietario ese mismo día |
 | 5e · Estadísticas de uso | Analizar las opciones antes de elegir (detalle debajo) | Análisis hecho el 25 de noviembre de 2026, con GoatCounter como recomendación. En espera por decisión del propietario («de momento dejamos eso en stand-by») |
-| 5f · Vista para ordenador | Aprovechar las pantallas anchas (detalle debajo) | Publicada el 25 de noviembre de 2026 y probada en local y en la web publicada. Falta el visto bueno del propietario |
+| 5f · Vista para ordenador | Aprovechar las pantallas anchas (detalle debajo) | Publicada el 25 de noviembre de 2026, probada en local y en la web publicada y aprobada por el propietario ese mismo día |
 
 #### 5b · Consulta sin cobertura
 
