@@ -5,11 +5,11 @@
   "styles": [
     { "id": "natural.land", "geometry": { "fillColor": "#f8f3ee" } },
     { "id": "natural.land.landCover", "geometry": { "fillColor": "#efe7dc" } },
-    { "id": "pointOfInterest.recreation.park", "geometry": { "fillColor": "#e0e8cf" } },
-    { "id": "pointOfInterest.recreation.sportsField", "geometry": { "fillColor": "#e0e8cf" } },
-    { "id": "pointOfInterest.recreation.sportsComplex", "geometry": { "fillColor": "#e0e8cf" } },
-    { "id": "pointOfInterest.recreation.golfCourse", "geometry": { "fillColor": "#e0e8cf" } },
-    { "id": "infrastructure.roadNetwork.noTraffic.pedestrianMall", "geometry": { "fillColor": "#e0e8cf" } },
+    { "id": "pointOfInterest.recreation.park", "geometry": { "fillColor": "#cdebd5" } },
+    { "id": "pointOfInterest.recreation.sportsField", "geometry": { "fillColor": "#cdebd5" } },
+    { "id": "pointOfInterest.recreation.sportsComplex", "geometry": { "fillColor": "#cdebd5" } },
+    { "id": "pointOfInterest.recreation.golfCourse", "geometry": { "fillColor": "#cdebd5" } },
+    { "id": "infrastructure.roadNetwork.noTraffic.pedestrianMall", "geometry": { "fillColor": "#cdebd5" } },
     {
       "id": "natural.water",
       "geometry": { "fillColor": "#cfe3e1" },
