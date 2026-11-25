@@ -318,7 +318,7 @@ Criterios usados (para repetirlos en próximas altas):
 Preguntas al propietario y sus respuestas (25 de noviembre de 2026):
 
 - Su lista de bares de copas acababa con un punto vacío: no faltaba ninguno.
-- Tipos de cocina en los restaurantes nuevos (por ejemplo Xinès en Hemudu, Japonès en Arume Sushi Bar, Asiàtic en Kasui): sí. Pendiente: los pone Claude en la app publicada a las 15 fichas sin tipo, según lo que diga Google de cada sitio, con los tipos que ya hay y creando otro solo si hace falta, y le pasa la tabla.
+- Tipos de cocina en los restaurantes nuevos (por ejemplo Xinès en Hemudu, Japonès en Arume Sushi Bar, Asiàtic en Kasui): sí. Hecho el 25 de noviembre de 2026 por Claude en la app publicada con la sesión del propietario, con el tipo principal que da Google a cada sitio (Places, `primaryType`), los tipos que ya había y tres nuevos creados con «+ Afegeix»: Hamburgueses, Basc y Mediterrani. Resultado: Hemudu, Xinès; Kasui, Asiàtic; Santa Chiara, Italià (Google: restaurante, con pizzería e italiano entre sus tipos); Arume Sake Bar y Arume Sushi Bar & Dim Sum, Japonès; Restaurante Arume, Japonès y Asiàtic (Google: asiático, con japonés y sushi entre sus tipos); Maca de Castro, Menú degustació (Google: alta cocina); Klüg, Poyo Club y Cafetería El Perro Lechero, Hamburgueses (Google: hamburguesería en los tres); La Vasca, Basc; Andana, Mediterrani. Comprobado por la lectura pública ese día. Blat al Sac, Selvatge y Los Platos de Soto siguen sin tipo: Google solo dice «Restaurant», pendiente de que el propietario diga cuál.
 - Precios provisionales («20-40 €» en los tres hoteles y en Selvatge, porque Google no da precio, y en The Poppa Club, porque Google da 20-60 €): los tres hoteles, sin precio. Hoy el precio es obligatorio en la app y en las reglas, así que siguen en «20-40 €». Se le propuso una opción «Sense preu» (sin precio en la lista y en la ficha, fuera del filtro de precio y de la recomendación de Inici, con reglas nuevas que publica él), pendiente de respuesta. De Selvatge y The Poppa Club no dijo nada: siguen en «20-40 €» provisional.
 
 ### Paso 5, por partes
@@ -329,7 +329,7 @@ Orden de construcción en `docs/especificacion.md`, sección 6. Antes de constru
 |---|---|---|
 | 5a · Icono e instalación | Logotipo en todos los tamaños (sección 7, «Icono») y comprobar la instalación en el iPhone | Hecha el 25 de noviembre de 2026: icono de la opción A publicado y comprobado por el propietario en su iPhone al volver a añadir la app a la pantalla de inicio (nombre «Puntuam» y mesa con sillas) |
 | 5b · Consulta sin cobertura | Abrir la app y ver lo ya cargado sin conexión (detalle debajo) | Publicada el 25 de noviembre de 2026 y probada en local. Probada por el propietario en su iPhone con el modo avión ese mismo día |
-| 5c · Copia de seguridad | Pasar las puntuaciones a un .csv guardado en Dropbox (detalle debajo) | Hecha el 25 de noviembre de 2026, con la primera copia. Falta el visto bueno del propietario |
+| 5c · Copia de seguridad | Pasar las puntuaciones a un .csv guardado en Dropbox (detalle debajo) | Hecha el 25 de noviembre de 2026, con la primera copia, y aprobada por el propietario ese mismo día |
 | 5d · Clave del mapa | Sacar la clave de Google Maps del repo y borrar la antigua | Pendiente |
 | 5e · Estadísticas de uso | Analizar las opciones antes de elegir | Pendiente |
 | 5f · Vista para ordenador | Aprovechar las pantallas anchas | Pendiente |
