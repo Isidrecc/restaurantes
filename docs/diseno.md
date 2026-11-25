@@ -295,7 +295,7 @@ Orden de construcción en `docs/especificacion.md`, sección 6. Antes de constru
 
 | Parte | Contenido | Estado |
 |---|---|---|
-| 5a · Icono e instalación | Logotipo en todos los tamaños (sección 7, «Icono») y comprobar la instalación en el iPhone | Icono publicado el 25 de noviembre de 2026 (opción A). Falta comprobar la instalación en el iPhone |
+| 5a · Icono e instalación | Logotipo en todos los tamaños (sección 7, «Icono») y comprobar la instalación en el iPhone | Hecha el 25 de noviembre de 2026: icono de la opción A publicado y comprobado por el propietario en su iPhone al volver a añadir la app a la pantalla de inicio (nombre «Puntuam» y mesa con sillas) |
 | 5b · Consulta sin cobertura | Abrir la app y ver lo ya cargado sin conexión | Pendiente |
 | 5c · Copia de seguridad | Descargar los restaurantes, notas y comentarios | Pendiente |
 | 5d · Clave del mapa | Sacar la clave de Google Maps del repo y borrar la antigua | Pendiente |
