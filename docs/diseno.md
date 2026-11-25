@@ -302,7 +302,24 @@ Pedido por el propietario al dar de alta Santa Chiara y Klüg, que tienen dos lo
 |---|---|
 | App: datos, pines, apartado «Locals» y «Altres locals» en «Edita» | Publicada el 25 de noviembre de 2026 y probada en local con datos de muestra y el buscador real de Google, en claro y oscuro |
 | Reglas de Firestore que aceptan `branches` | Publicadas por el propietario el 25 de noviembre de 2026. Comprobado ese día al guardar las dos fichas de la fila siguiente |
-| Segundo local de Santa Chiara (carrer de Can Salat, 2; en Google, «Santa Chiara Raimundo Pizza Napoletana Contemporanea») y de Klüg (carrer del Comte de Barcelona, 22), quitando del comentario la línea que lo explicaba | Hecho el 25 de noviembre de 2026 por Claude en la app publicada con la sesión del propietario, eligiéndolos en el buscador de Google. Comprobado en la ficha (las dos tarjetas de Google) y en el mapa (los dos pines marcados con «Mostra al mapa»). Falta el visto bueno del propietario |
+| Segundo local de Santa Chiara (carrer de Can Salat, 2; en Google, «Santa Chiara Raimundo Pizza Napoletana Contemporanea») y de Klüg (carrer del Comte de Barcelona, 22), quitando del comentario la línea que lo explicaba | Hecho el 25 de noviembre de 2026 por Claude en la app publicada con la sesión del propietario, eligiéndolos en el buscador de Google. Comprobado en la ficha (las dos tarjetas de Google) y en el mapa (los dos pines marcados con «Mostra al mapa»). Enseñado al propietario con capturas; no comentó el resultado y pidió documentar para seguir en otra sesión. Falta que lo mire en su iPhone y lo dé por bueno |
+
+### Altas del 25 de noviembre de 2026
+
+Pausa en el paso 5 pedida por el propietario: dar de alta una lista de restaurantes y bares de copas como «Pendent de visitar». Los dio de alta Claude en la app publicada con la sesión del propietario, eligiéndolos en el buscador de Google. Con ellos hay 28 fichas.
+
+Criterios usados (para repetirlos en próximas altas):
+
+- **Nombre:** el de Google, acortado cuando Google lo alarga (por ejemplo «Santa Chiara»); si dos sitios comparten nombre, el que los distingue («Arume Sake Bar» y «Restaurante Arume», dos conceptos distintos según el propietario).
+- **Precio:** el tramo de la app que corresponde al precio de Google; si el de Google cruza dos tramos, el que cubre la mayor parte. Sin precio en Google, «20-40 €» provisional, avisando al propietario.
+- **Tipo:** los bares de copas y las terrazas de hoteles van con el tipo nuevo «Prendre una copa». A los restaurantes no se les puso tipo de cocina.
+- **Varios locales de una misma marca:** una sola ficha con los dos locales (sección 2, «Otros locales»).
+
+Preguntas al propietario sin respuesta (25 de noviembre de 2026):
+
+- Su lista de bares de copas acababa con un punto vacío: ¿faltaba alguno?
+- ¿Se ponen tipos de cocina a los restaurantes nuevos (por ejemplo Xinès en Hemudu, Japonès en Arume Sushi Bar, Asiàtic en Kasui)?
+- Precios provisionales: «20-40 €» en los tres hoteles y en Selvatge (Google no da precio) y en The Poppa Club (Google da 20-60 €).
 
 ### Paso 5, por partes
 

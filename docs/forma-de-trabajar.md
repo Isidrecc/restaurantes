@@ -40,13 +40,17 @@ Cómo trabaja el propietario (Isidre) y lo aprendido en las sesiones del 21 al 2
 
 ## Datos reales
 
-- No tocar fichas reales sin permiso. Para pruebas hay «Prova Claude (esborrar)».
-- Los datos se pueden comprobar con la lectura pública de Firestore por REST, sin clave.
+- No tocar fichas reales sin permiso. Ya no hay fichas de prueba en la base real (25 de noviembre de 2026): para probar se usa el modo de muestra en local.
+- Los datos se pueden comprobar con la lectura pública de Firestore por REST, sin clave: `https://firestore.googleapis.com/v1/projects/puntuam-a-taula/databases/(default)/documents/restaurants?pageSize=100`.
+- **Altas y cambios que pide él** («añade estos restaurantes»): se hacen en la app publicada, en el navegador integrado con su sesión y en tamaño móvil. Criterios de nombre, precio y tipo en `docs/diseno.md`, sección 10, «Altas del 25 de noviembre de 2026». Al acabar, se cuentan las fichas por REST y se le da una tabla con lo que dice Google y lo que se ha puesto, marcando lo provisional.
+- `?r=<id>` en la web publicada abre directamente esa ficha (el id sale de la lectura por REST).
 
 ## Aprendizajes técnicos
 
 - **Fin de línea.** La copia de trabajo usa CRLF (`core.autocrlf true`). En los scripts, pasar a `\n`, editar y devolver CRLF. Los avisos «LF will be replaced by CRLF» de git son normales.
 - **Editar archivos grandes.** Mejor un script de Node en el scratchpad que se ejecuta con `node archivo.js`; algunos `node -e` en línea los bloquea la comprobación de seguridad. Sustituir con `indexOf` y `slice`, no con `String.replace`, que interpreta `$$` y `$'` del texto nuevo. Nunca meter texto con comillas invertidas dentro de un `node -e "…"` en la consola: bash las ejecuta como comandos (pasó el 25 de noviembre de 2026; por suerte no cambió nada). El Edit no encuentra líneas con espacios duros (` `) literales, como las de `PRICES` en `app/config.js`.
+- **Scripts en el scratchpad con la herramienta de escribir archivos**, no con un heredoc en bash: un heredoc largo con apóstrofos catalanes (`’`) y comillas falló el 25 de noviembre de 2026 («unexpected EOF»). Patrón que funciona: un `edit_util.js` que sustituye texto exacto con `indexOf`, falla si no lo encuentra o si aparece dos veces, y respeta CRLF; y un script por cambio que lo usa.
+- **Campos nuevos en Firestore** (aprendido con los varios locales, 25 de noviembre de 2026): las reglas no recorren listas, así que se comprueba cada posición hasta el tope. Un campo opcional nuevo solo se escribe si tiene algo (y al editar se borra con `deleteField()` si se vacía), para que la app nueva funcione aunque el propietario aún no haya publicado las reglas. Orden: publicar la app, que él publique las reglas (enlace de GitHub fijado al commit) y después tocar datos reales.
 - **Comprobar sintaxis.** `node --check app/main.js` falla por ser módulo ES; se copia a un `.mjs` y se comprueba ese. Un módulo suelto, como `app/text.js`, se prueba importándolo con una URL `data:` desde un script de Node.
 - **Prueba local.** Servidor «puntuam-local» de `.claude/launch.json` (`python -m http.server 8765`).
   - `?muestra`: datos de muestra sin sesión. Guardar falla con «reading 'uid'», es lo esperado.
@@ -57,6 +61,9 @@ Cómo trabaja el propietario (Isidre) y lo aprendido en las sesiones del 21 al 2
   - `&senseconnexio`: como sin red (franja de aviso, mapa y ediciones bloqueadas).
   - **Probar sin conexión** (25 de noviembre de 2026): `node tools/build-site.mjs`, abrir `http://localhost:8765/_site/?muestra&sensefotos` con «puntuam-local» para que el service worker guarde la copia, recargar una vez, parar el servidor y volver a abrir la dirección con `&senseconnexio`. En la carpeta raíz el service worker queda en «dev» y siempre pide primero a la red. El iPhone sin red de verdad solo lo puede probar el propietario.
 - **Navegador integrado.** Con el panel oculto, las capturas pueden quedarse congeladas; el mapa sí se pinta bien en la primera carga. Para comprobar textos y estado, mejor JavaScript que capturas. El modo oscuro se prueba con la emulación del esquema de color. Al acabar, volver al tamaño de escritorio.
+  - Hacer siempre una captura antes de tocar por coordenadas y usar el marco que indica esa captura: a veces es el de la página (375 × 812) y a veces el del panel escalado. Para botones y pines es más fiable `find` (los pines salen como botones «Nom, nota 8,3»); las referencias caducan al cambiar de página.
+  - En tamaño móvil, la lista del buscador de Google ocupa toda la pantalla; la primera sugerencia queda arriba. Después hay que tocar el aro del mapa para poner el pin.
+  - Las tarjetas de Google en el ancho del móvil salen sin foto y con borde: es como las pinta Google, no un error.
 - **Despliegue.** Tras el push, esperar a que la web publicada sirva `main.js?v=<sha>` (uno o dos minutos) y mirar que la consola no tenga errores.
 - **Estilos del mapa.** Se editan como JSON (`docs/mapa/`) en el editor de cada estilo. El editor avisa si un elemento no existe o no tiene esa parte: la «plaza» (`townSquare`) no tiene superficie aunque la documentación de Google diga que sí. En oscuro, Google pinta las zonas urbanas de azul si no se les da color. Un estilo publicado tarda unos minutos en verse en la app.
 - **Places UI Kit.** La tarjeta compacta normal lleva siempre el botón «Maps»; la avanzada deja quitarlo pero se cobra más cara. Detalles y precios comprobados en `docs/diseno.md`, secciones 4 y 4b. Un mismo elemento de Google no puede estar en dos sitios a la vez: se guarda uno por hueco.
