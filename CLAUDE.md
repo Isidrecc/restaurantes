@@ -12,7 +12,8 @@ App web personal para puntuar y reseñar restaurantes: mapa, lista con filtros y
 - Paso 4 (pantalla de accesos) descartado el 24 de noviembre de 2026: los accesos se gestionan en la consola de Firebase con `docs/accesos.md`.
 - Peticiones del propietario del 24 de noviembre de 2026, en cinco partes (`docs/diseno.md`, sección 10, «Peticiones del 24 de noviembre de 2026»): terminadas y aprobadas el 25 de noviembre de 2026. En espera, sin fecha: fotos intercaladas con el texto del comentario.
 - Siguiente: paso 5, remate (icono e instalación, consulta sin cobertura, copia de seguridad, sacar la clave del mapa del repo y, desde el 25 de noviembre de 2026, estadísticas de uso y vista para ordenador). Orden de construcción en `docs/especificacion.md`, sección 6. Partes y estado en `docs/diseno.md`, sección 10, «Paso 5, por partes». Icono (opción A) hecho el 25 de noviembre de 2026; las demás opciones de logotipo, en `docs/logo/`.
-- Ficha de prueba en la base de datos real que el propietario conserva por ahora: «Prova Claude (esborrar)». «Celler de proves» ya no está (comprobado el 24 de noviembre de 2026).
+- Ya no quedan fichas de prueba en la base de datos real: ni «Celler de proves» ni «Prova Claude (esborrar)» (comprobado el 25 de noviembre de 2026).
+- Desde el 25 de noviembre de 2026 hay un tipo nuevo, «Prendre una copa», para bares y terrazas de copas, creado al dar de alta los primeros. Es un tipo más de la lista, sin pantalla propia.
 - Se trabaja directamente en `main`, sin ramas ni pull requests, por decisión del propietario (24 de noviembre de 2026). Se retomarán cuando los cambios sean más complicados.
 - Copia local del propietario: `Dropbox\08 CURSOS PERSONALES\11 Puntuam a taula`.
 - La seguridad está en la sección 9 de la especificación.
