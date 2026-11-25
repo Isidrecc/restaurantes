@@ -11,7 +11,7 @@ App web personal para puntuar y reseñar restaurantes: mapa, lista con filtros y
 - Paso 3 terminado el 24 de noviembre de 2026, con la prueba final y la aprobación del propietario en el iPhone. Partes y decisiones en `docs/diseno.md`, sección 10.
 - Paso 4 (pantalla de accesos) descartado el 24 de noviembre de 2026: los accesos se gestionan en la consola de Firebase con `docs/accesos.md`.
 - Peticiones del propietario del 24 de noviembre de 2026, en cinco partes (`docs/diseno.md`, sección 10, «Peticiones del 24 de noviembre de 2026»): terminadas y aprobadas el 25 de noviembre de 2026. En espera, sin fecha: fotos intercaladas con el texto del comentario.
-- Siguiente: paso 5, remate (icono e instalación, consulta sin cobertura, copia de seguridad y sacar la clave del mapa del repo). Orden de construcción en `docs/especificacion.md`, sección 6.
+- Siguiente: paso 5, remate (icono e instalación, consulta sin cobertura, copia de seguridad, sacar la clave del mapa del repo y, desde el 25 de noviembre de 2026, estadísticas de uso). Orden de construcción en `docs/especificacion.md`, sección 6. Aún sin empezar: primero se propone el enfoque de cada parte.
 - Ficha de prueba en la base de datos real que el propietario conserva por ahora: «Prova Claude (esborrar)». «Celler de proves» ya no está (comprobado el 24 de noviembre de 2026).
 - Se trabaja directamente en `main`, sin ramas ni pull requests, por decisión del propietario (24 de noviembre de 2026). Se retomarán cuando los cambios sean más complicados.
 - Copia local del propietario: `Dropbox\08 CURSOS PERSONALES\11 Puntuam a taula`.
@@ -22,6 +22,7 @@ App web personal para puntuar y reseñar restaurantes: mapa, lista con filtros y
 1. `docs/especificacion.md`: decisiones tomadas, pendientes de confirmar, pantallas, modelo de datos, orden de construcción y condiciones de Google.
 2. `docs/diseno.md`: diseño vigente, que manda sobre partes de la especificación y de la demo.
 3. `demo/index.html`: prototipo aprobado. Es la referencia de comportamiento, salvo lo que cambia `docs/diseno.md`. Ya no lo es de aspecto ni de textos. Se abre directamente en un navegador.
+4. `docs/forma-de-trabajar.md`: cómo trabaja el propietario, paso a paso, y aprendizajes técnicos de sesiones anteriores (prueba local, despliegue, estilos del mapa).
 
 ## Cómo trabajar con el propietario
 
@@ -31,7 +32,10 @@ App web personal para puntuar y reseñar restaurantes: mapa, lista con filtros y
 - Respuestas concisas y estructuradas, con lo crítico primero.
 - Redacción llana, sin frases hechas. No usar rayas ni guiones a modo de raya.
 - Si algo no se ha comprobado, decirlo. No dar por buenos precios ni condiciones de servicios externos sin verificarlos en la documentación oficial.
-- Los pasos que haga él en consolas externas (Google Cloud, Firebase, GitHub) se guían uno a uno.
+- Los pasos que haga él en consolas externas (Google Cloud, Firebase, GitHub) se guían uno a uno, con los nombres de menú en español y un enlace de GitHub fijado al commit para los archivos.
+- Suele seguir la sesión desde el móvil con Remote Control: el último mensaje debe entenderse solo y acabar con la pregunta y sus opciones.
+- «Dale» aprueba la propuesta tal como está, con sus recomendaciones. Si había que elegir y no elige, se toma la recomendada y se dice.
+- Al terminar cada parte: publicar, comprobar en la web publicada, enviarle capturas y preguntar si la da por buena. Detalle en `docs/forma-de-trabajar.md`.
 
 ## Reglas del proyecto
 
