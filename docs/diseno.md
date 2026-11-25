@@ -37,6 +37,7 @@ Desaparecen las reseñas de cada persona.
 - **Tipos de cocina** de partida: Autor, Japonès, Nikkei, Xinès, Menú degustació, Menú de migdia, Mallorquí, Asiàtic, Italià, Brasa y Arrossos (decidido el 24 de noviembre de 2026). Al final hay un botón «+ Afegeix» para crear otro. Los tipos añadidos no se guardan aparte: salen de los restaurantes que los usan, así que los ven todos y desaparecen si ningún restaurante los usa. Si se escribe uno que ya existe con otras mayúsculas o sin tildes, se marca el existente. Máximo 10 por restaurante. Los nombres antiguos en castellano se muestran en catalán (`CUISINE_RENAMES` en `app/config.js`) y se guardan así al editar.
 - **Localidad**: el pueblo o ciudad de la dirección de Google (sección 5), por ejemplo Caimari o Port de Pollença, no el municipio. No se pide en el alta: solo se escribe a mano si Google no la da. Se sigue viendo en la ficha como etiqueta tocable, sirve de filtro y el buscador de la app busca en ella (confirmado el 24 de noviembre de 2026).
 - **Dirección**: la de Google al elegir el restaurante en el buscador (sección 5). Se ve en la ficha y el buscador de la app busca también en ella.
+- **Otros locales** (pedido por el propietario el 25 de noviembre de 2026, para Santa Chiara y Klüg, que tienen dos locales en Palma): además del local principal (pin, dirección y sitio de Google de siempre), una ficha puede tener hasta tres locales más, cada uno con su pin, su dirección y su sitio de Google (`branches`). Notas, comentario, fotos, precio, tipos y localidad son de la ficha, comunes a todos. Se añaden desde «Edita» (sección 6). El buscador de la app busca también en sus direcciones. No incluido (decidido al aprobar el enfoque): localidad propia de cada local (si otro local está en otro pueblo, el filtro de ese pueblo no encuentra la ficha), cambiar cuál es el principal (se quita y se vuelve a añadir) y añadir locales en el alta.
 
 ## 3. Nota que se ve
 
@@ -50,7 +51,7 @@ De arriba abajo:
 
 1. **Cabecera sobre la portada** (boceto del propietario, 24 de noviembre de 2026): la foto marcada como portada o, si no hay ninguna, la primera, a todo el ancho y arriba del todo; mientras carga se ve una rueda y al tocarla se amplía. Encima, en blanco sobre un oscurecido arriba y abajo:
    - arriba, el **nombre** y, debajo, el **recuadro con la nota** (la del selector) con su texto (Excel·lent, Molt bo…) y quién ha puntuado al lado;
-   - abajo a la izquierda, la **dirección** y **«Visitat el…»**;
+   - abajo a la izquierda, la **dirección**, si tiene otros locales «i 1 local més» (o «i 2 locals més») debajo, y **«Visitat el…»**;
    - abajo a la derecha, las **etiquetas tocables** de localidad, tipos de cocina y precio, translúcidas: al tocar una, se abre el mapa con ese filtro puesto **sustituyendo** los filtros que hubiera.
    Sin fotos, la misma disposición sobre un fondo de color, con el texto oscuro. Si está pendiente de visitar, el recuadro dice «Pendent», al lado «Pendent de visitar» y no hay fecha.
 2. (Desde el 24 de noviembre de 2026, el nombre, la dirección, las etiquetas, la fecha y la nota van en la cabecera.)
@@ -61,6 +62,7 @@ De arriba abajo:
 7. **Texto largo** del restaurante, con su formato (sección 5, paso 4): negrita, cursiva, subrayado y enlaces a otras webs, en el color de acento y subrayados, que se abren aparte sin salir de la app.
 8. **Fotos al final**, cada una con su pie y también la portada. Al tocarla se amplía con el pie debajo. Mientras cargan se ve una rueda y aparecen con un fundido. En la foto ampliada se pasa a la anterior o la siguiente con flechas a los lados, deslizando el dedo o con las teclas de flecha, y debajo se ve «2 / 5» (24 de noviembre de 2026). Al llegar al final vuelve a la primera.
 9. **A Google Maps** (24 de noviembre de 2026, pedido por el propietario): si el sitio se eligió en el buscador de Google (tiene `placeId`), la tarjeta compacta de Google (Places UI Kit, Place Details compacto) con foto y galería, nombre, estrellas con número de reseñas, tipo, precio, si está abierto y su botón «Maps» al perfil. **Pequeña, para que no destaque** (pedido por el propietario el 24 de noviembre de 2026): en horizontal, con la foto pequeña a la izquierda, a todo el ancho de la ficha y sin tarjeta alrededor; con menos ancho, Google quita la foto. Sin `placeId`, o si la tarjeta no carga (por ejemplo, por el tope diario), sale «Obre a Google Maps» (Maps URLs: el sitio de Google o, si no lo hay, el punto del pin).
+   - **Con varios locales** (25 de noviembre de 2026), el apartado se llama «Locals»: cada local con su dirección encima y su tarjeta de Google (o «Obre a Google Maps» si no tiene sitio de Google o la tarjeta no carga), separados por un filete. Cada tarjeta es una consulta más. Si dos locales tuvieran el mismo sitio de Google, el segundo llevaría el enlace: un mismo elemento de Google no puede estar en dos sitios.
    - El UI Kit queda fuera de las restricciones del EEE y no hace falta mostrarlo con un mapa. Cada tarjeta creada cuenta una consulta «Places UI Kit Query» (categoría Essentials, 10.000 gratis al mes y después 1 dólar por 1.000; comprobado el 24 de noviembre de 2026). La app guarda cada tarjeta creada y redibujar la ficha no la vuelve a pedir. Por dentro, Google descarga además las fotos de su galería (10 en la prueba). No se ha comprobado qué cuota diaria de Google Cloud cuenta estas tarjetas: probablemente «Query Requests» de Places UI Kit, que tiene un tope de 300.
 10. Acciones: «Comparteix» (todos, también sin entrar); «Mostra al mapa»; «Puntua» o «Edita la meva nota» (quien puntúa), que abre solo su nota; en un pendiente, en su lugar, «Ja hi hem anat: posa la data i la nota» (editores), que abre la edición con la fecha de hoy y el bloque de la nota; «Edita» (editores), que abre la edición completa (sección 6); «Esborra» (propietario).
 
@@ -137,6 +139,7 @@ Fuentes: https://developers.google.com/maps/documentation/places/web-service/pol
 - **«Puntua» o «Edita la meva nota»** se mantiene en la ficha y abre solo el bloque de la nota (confirmado el 24 de noviembre de 2026).
 - Al guardar la edición, la nota de quien puntúa solo se guarda si la ha cambiado.
 - «Pendent de visitar» solo aparece si nadie ha puntuado el restaurante. Al quitarlo vuelven la fecha (hoy) y el bloque de la nota.
+- **«Altres locals»** (25 de noviembre de 2026), en el primer bloque, bajo «Localitat»: la lista de los otros locales, cada uno con su dirección (o «Local sense adreça») y una X para quitarlo, y el botón «+ Afegeix un altre local». El botón abre una hoja «Afegeix un local» con el buscador de Google y un mapa que empieza junto al local principal, como el paso 1 del alta: se elige el local, el mapa lo marca con el aro y se pone el pin tocándolo (se puede arrastrar); también se puede poner el pin sin buscar, y entonces no tiene dirección. «Afegeix el local» sin pin avisa «Toca el mapa per marcar on és.». Con tres locales más, el botón desaparece y se lee «Com a màxim, 3 locals més.». Los cambios se guardan con «Desa els canvis», como el resto.
 - **«Recomanació per menys de 40 €»** (bajo el precio, «Pàgina d'inici»): solo al editar y solo con precio «<20 €» o «20-40 €». Con otro precio no se ve y se guarda sin marcar.
 
 ### Común al alta y a la edición
@@ -204,6 +207,7 @@ Tonos pastel poco saturados: terracota suave (el color de la icona) y amarillo m
 - Estilo propio en la nube de Google: **«Terracota»** para el modo claro y **«Terracota nit»** para el oscuro, a juego con la paleta (24 de noviembre de 2026; antes, «Lavanda» y «Noche», en el historial de git). Son dos estilos de Google, uno de variante clara y otro oscura, asociados al mismo Map ID: cada Map ID admite uno de cada.
 - El mapa se crea con `colorScheme: FOLLOW_SYSTEM`. Solo se puede fijar al crearlo: si el sistema cambia de modo con la app abierta, el mapa no cambia hasta volver a abrirla. Aceptado.
 - **Encuadre al abrir** (25 de noviembre de 2026, con una captura del propietario): el centro de Palma, de Bons Aires y L'Olivera hasta el mar, con el centro en 39,5725 N, 2,6528 E y zoom 14,3 (el mapa vectorial acepta decimales). Se calculó con la posición de los ocho pines que se veían en la captura; en un móvil de 393 px de ancho sale igual. Antes, Palma entera con zoom 13. Lo usa también el mapa del alta. Está en `HOME`, en `app/config.js`.
+- **Un pin por local** (25 de noviembre de 2026): una ficha con varios locales tiene un pin en cada uno, con la misma nota y el mismo color. Al tocar cualquiera se abre la tarjeta resumen de la ficha, el mapa se centra en el pin tocado y se marcan todos los pines de la ficha. «Mostra al mapa», desde la ficha, encuadra todos sus locales (sin acercarse más del zoom 16).
 - En los dos modos se ocultan los puntos de interés de Google (comercios y restaurantes). Se dejan los nombres de pueblos y del mar.
 - Sin nombres de autopistas y vías rápidas ni de sus enlaces, sin placas de carreteras (Ma-20, Ma-1110…) y sin números de salida; las calles y avenidas conservan el nombre, también las que Google agrupa como «arterial» con las carreteras secundarias (parte 5 de las peticiones, 25 de noviembre de 2026).
 - Zonas verdes en **verde menta** (elegido por el propietario el 25 de noviembre de 2026, en lugar del verde salvia propuesto): parques y jardines (Google los trata igual), campos e instalaciones de deporte, golf y zonas peatonales. Antes, los parques iban en beis y el deporte en el verde intenso de Google.
@@ -238,7 +242,7 @@ Fuentes: https://developers.google.com/maps/documentation/javascript/cloud-custo
 |---|---|---|
 | `members/{correo}` | `role`: `owner` o `editor` (`viewer` ya no hace falta). `color`: `azul`, `rosa` o ninguno | Propietarios, en la consola |
 | `users/{uid}` | `displayName`, `color` (debe coincidir con el de `members`), `updatedAt` | Cada uno el suyo |
-| `restaurants/{id}` | `name`, `locality`, `address` (opcional), `location`, `cuisines`, `price` (1 a 5), `visitDate` (`AAAA-MM-DD`, o nulo si está pendiente de visitar), `featured` (opcional, recomendación de la página de inicio), `blog` (con las marcas de formato de la sección 5, paso 4), `photos` (lista de `{full, thumb, caption}`, y `cover: true` en la portada si se ha elegido), `placeId`, `source`, `createdBy`, `createdAt`, `updatedBy`, `updatedAt` | Editores |
+| `restaurants/{id}` | `name`, `locality`, `address` (opcional), `location`, `cuisines`, `price` (1 a 5), `visitDate` (`AAAA-MM-DD`, o nulo si está pendiente de visitar), `featured` (opcional, recomendación de la página de inicio), `blog` (con las marcas de formato de la sección 5, paso 4), `photos` (lista de `{full, thumb, caption}`, y `cover: true` en la portada si se ha elegido), `placeId`, `source`, `branches` (opcional, hasta tres otros locales, cada uno `{address, location, placeId}`; sin ninguno, el campo no existe), `createdBy`, `createdAt`, `updatedBy`, `updatedAt` | Editores |
 | `restaurants/{id}/ratings/{uid}` | `scores`, `global`, `dish`, `updatedAt` | Solo su autor, si tiene color |
 | ~~`accessRequests/{uid}`~~ | Retirada el 24 de noviembre de 2026 con la app pública. Las que queden se borran en la consola | Nadie desde la app |
 
@@ -289,6 +293,16 @@ Lista del propietario de ese día, ordenada en partes. Al final de cada una se l
 | 5 · Mapa | Parques, jardines y plazas en verde suave dentro de «Terracota»; sin nombres de autopistas y carreteras, solo los de las calles. El propietario actualiza los dos estilos en Google Cloud (sección 8) | Publicada el 25 de noviembre de 2026 y aprobada por el propietario. Zonas verdes en menta; las plazas no se pueden colorear |
 
 En espera, sin fecha: fotos intercaladas con el texto en el comentario.
+
+### Varios locales por ficha (25 de noviembre de 2026)
+
+Pedido por el propietario al dar de alta Santa Chiara y Klüg, que tienen dos locales cada uno en Palma: «Añade los dos… con la misma ficha». Propuesta aprobada ese día («Dale»), entre la parte 5b y la 5c. Detalle en las secciones 2, 4, 6, 8 y 9.
+
+| Qué | Estado |
+|---|---|
+| App: datos, pines, apartado «Locals» y «Altres locals» en «Edita» | Publicada el 25 de noviembre de 2026 y probada en local con datos de muestra y el buscador real de Google, en claro y oscuro |
+| Reglas de Firestore que aceptan `branches` | Pendiente de publicar por el propietario. Hasta entonces la app funciona como antes, pero guardar una ficha con otros locales da error de permisos |
+| Segundo local de Santa Chiara (carrer de Can Salat) y de Klüg (carrer del Comte de Barcelona), quitando del comentario la línea que lo explicaba | Pendiente, después de las reglas |
 
 ### Paso 5, por partes
 
