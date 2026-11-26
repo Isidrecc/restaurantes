@@ -78,6 +78,35 @@ function pinElement(text, klass) {
   return wrap;
 }
 
+// Grupo de pines (26 de noviembre de 2026, docs/diseno.md, sección 8): dos o tres pines pequeños con la punta en el
+// mismo sitio, cada uno del color de la nota de un restaurante del grupo, con el de mejor nota delante, y «+N» si hay
+// más de tres. Sin número dentro: la bola con el número se leía como un pin con esa nota.
+const STACK_H = 42;
+function stackElement(members, count) {
+  const rank = (x) => (x.score == null ? -1 : x.score);
+  const top = members.slice().sort((a, b) => rank(b) - rank(a)).slice(0, 3);
+  // [centro x, tamaño] de cada pin, de atrás adelante; con tres, el de mejor nota va en medio.
+  const slots = top.length === 2 ? [[22, 26], [40, 26]] : [[13, 24], [49, 24], [31, 29]];
+  const order = top.length === 2 ? [top[1], top[0]] : [top[1], top[2], top[0]];
+  const wrap = document.createElement('div');
+  wrap.className = 'gstack';
+  order.forEach((x, i) => {
+    const [cx, size] = slots[i];
+    const pin = document.createElement('i');
+    pin.className = x.klass || 's0';
+    // La punta del pin girado queda a 0,707 × tamaño por debajo de su centro: se pone en la base del grupo.
+    pin.style.cssText = 'left:' + (cx - size / 2) + 'px;top:' + (STACK_H - 1.207 * size).toFixed(1) + 'px;width:' + size + 'px;height:' + size + 'px';
+    wrap.appendChild(pin);
+  });
+  if (count > 3) {
+    const more = document.createElement('span');
+    more.className = 'more';
+    more.textContent = '+' + (count - 3);
+    wrap.appendChild(more);
+  }
+  return wrap;
+}
+
 // ---------- Mapa principal ----------
 
 export async function createMainMap(el, { onMapClick }) {
@@ -86,17 +115,17 @@ export async function createMainMap(el, { onMapClick }) {
   const map = new Map(el, { ...options, zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER } });
   map.addListener('click', () => onMapClick && onMapClick());
   const markers = new globalThis.Map();
+  const info = new WeakMap(); // pin → su elemento de items, para pintar los grupos
   const clusterer = new window.markerClusterer.MarkerClusterer({
     map,
     markers: [],
     renderer: {
-      render: (cluster) => {
-        const div = document.createElement('div');
-        div.className = 'cluster gcluster';
-        div.innerHTML = '<span></span>';
-        div.querySelector('span').textContent = String(cluster.count);
-        return new AdvancedMarkerElement({ position: cluster.position, content: div, zIndex: 2000 + cluster.count });
-      }
+      render: (cluster) => new AdvancedMarkerElement({
+        position: cluster.position,
+        content: stackElement(cluster.markers.map((m) => info.get(m) || {}), cluster.count),
+        title: cluster.count + ' restaurants',
+        zIndex: 2000 + cluster.count
+      })
     }
   });
 
@@ -116,6 +145,7 @@ export async function createMainMap(el, { onMapClick }) {
       });
       m.addEventListener('gmp-click', () => onSelect(x.id, x));
       markers.set(x.key || x.id, m);
+      info.set(m, x);
       return m;
     });
     clusterer.addMarkers(list);

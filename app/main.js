@@ -231,7 +231,7 @@ function renderMarkers(list) {
     const g = agg(r).g;
     const title = r.name + (g == null && isPending(r) ? ', pendent de visitar' : ', nota ' + fmt(g));
     locales(r).forEach((l, i) => items.push({
-      key: r.id + ':' + i, id: r.id, lat: l.lat, lng: l.lng, text: g == null ? '·' : fmt(g), klass: cls(g), title, selected: r.id === selectedId
+      key: r.id + ':' + i, id: r.id, lat: l.lat, lng: l.lng, text: g == null ? '·' : fmt(g), klass: cls(g), score: g, title, selected: r.id === selectedId
     }));
   });
   mainMap.setMarkers(items, selectOnMap);

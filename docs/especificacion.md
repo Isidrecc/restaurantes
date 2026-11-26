@@ -80,7 +80,7 @@ La app se abre en Inici, con paneles destacados (`docs/diseno.md`, sección 4b).
 ### Mapa
 
 - Un pin por restaurante, con la nota global dentro y coloreado según ella.
-- Los pines que se solapan se agrupan en un círculo con el número. Se separan al acercar.
+- Los pines que se solapan se agrupan en un círculo con el número (desde el 26 de noviembre de 2026, en un ramo de dos o tres pines sin número: `docs/diseno.md`, sección 8). Se separan al acercar.
 - Al tocar un pin aparece una tarjeta resumen con acceso a la ficha. El pin seleccionado queda visible por encima de la tarjeta.
 - Leyenda de colores.
 - Estilo propio «Terracota» en claro y «Terracota nit» en oscuro (antes, «Lavanda» y «Noche»), sin los puntos de interés de Google (`docs/diseno.md`, sección 8).
